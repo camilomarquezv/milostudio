@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MILO Studio — Fashion Production &amp; Retouching</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#161B22;
+    --slate:#3C4A57;
+    --steel:#6E7F8D;
+    --mist:#C7D0D6;
+    --paper:#F2F4F5;
+    --paper-dim:#E4E8EA;
+    --line: rgba(22,27,34,0.14);
+    --accent:#2E5C73;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
+  }
+
+  body{
+    background-color:var(--paper);
+    background-image:
+      linear-gradient(rgba(22,27,34,0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(22,27,34,0.055) 1px, transparent 1px);
+    background-size:56px 56px;
+    background-position:center top;
+    background-attachment:scroll;
+    color:var(--ink);
+    font-family:'Archivo', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  h1,h2,h3{font-family:'Archivo', sans-serif; letter-spacing:-0.01em; line-height:1.02;}
+
+  .eyebrow{
+    font-size:0.72rem;
+    font-weight:700;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--steel);
+    display:inline-flex; align-items:center; gap:0.5em;
+  }
+  .eyebrow::before{content:""; width:6px; height:6px; background:var(--accent); border-radius:50%; display:inline-block;}
+
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:1280px; margin:0 auto; padding:0 clamp(20px,4vw,56px);}
+
+  /* ===== NAV ===== */
+  header{position:fixed; top:0; left:0; right:0; z-index:200; background:rgba(242,244,245,0.85); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
+  .nav{display:flex; align-items:center; justify-content:space-between; padding:14px clamp(20px,4vw,56px);}
+  .logo-wrap{display:flex; align-items:center; gap:10px;}
+  .logo-wrap img{height:30px; width:auto; display:block; transform:translateY(-3px);}
+  .nav-links{display:flex; gap:2.2rem; align-items:center;}
+  .nav-links a{font-size:0.85rem; font-weight:600; position:relative; padding-bottom:3px;}
+  .nav-links a::after{content:""; position:absolute; left:0; bottom:0; width:0; height:2px; background:var(--ink); transition:width 0.25s ease;}
+  .nav-links a:hover::after{width:100%;}
+  .lang-toggle{font-size:0.72rem; font-weight:800; letter-spacing:0.06em; border:1.5px solid var(--ink); background:transparent; color:var(--ink); padding:6px 12px; border-radius:100px; cursor:pointer; transition:background 0.2s ease, color 0.2s ease;}
+  .lang-toggle:hover{background:var(--ink); color:var(--paper);}
+  .nav-cta{background:var(--ink); color:var(--paper); padding:9px 18px; font-size:0.8rem; font-weight:700; border-radius:2px;}
+  .nav-cta:hover{background:var(--accent);}
+  .burger{display:none; flex-direction:column; gap:5px; cursor:pointer; background:none; border:none;}
+  .burger span{width:22px; height:2px; background:var(--ink);}
+
+  /* ===== SCROLL-PINNED HERO ===== */
+  .hero-pin{position:relative; height:260vh;}
+  .hero-stage{position:sticky; top:0; height:100vh; overflow:hidden; display:flex; align-items:center; justify-content:center;}
+
+  .logo-layer{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    will-change:filter, opacity, transform;
+  }
+  .logo-layer img{
+    width:min(78vw, 980px);
+    height:auto;
+    will-change:filter, opacity, transform;
+  }
+
+  .glass-panel{
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    width:min(90vw, 900px);
+    padding:clamp(36px,6vw,64px);
+    border-radius:8px;
+    text-align:center;
+    background:rgba(242,244,245,0);
+    border:1px solid rgba(22,27,34,0);
+    opacity:0;
+    will-change:opacity, background, backdrop-filter;
+  }
+  .glass-panel .eyebrow{
+    font-size:0.72rem; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:var(--steel);
+    display:inline-flex; align-items:center; gap:0.5em;
+  }
+  .glass-panel .eyebrow::before{content:""; width:6px; height:6px; background:var(--accent); border-radius:50%; display:inline-block;}
+  .glass-panel h1{
+    font-size:clamp(2rem, 5vw, 3.6rem); font-weight:800; line-height:1.05; margin-top:0.8rem;
+  }
+  .glass-panel h1 em{font-style:italic; font-weight:500; color:var(--slate);}
+  .glass-panel p{font-size:1rem; line-height:1.55; color:var(--slate); max-width:44ch; margin:1.1rem auto 0;}
+  .hero-cta-row{display:flex; gap:0.8rem; margin-top:1.6rem; justify-content:center; flex-wrap:wrap;}
+  .btn{display:inline-flex; align-items:center; gap:0.5em; padding:13px 24px; font-size:0.85rem; font-weight:700; border-radius:2px; border:1.5px solid var(--ink); transition:all 0.2s ease;}
+  .btn-solid{background:var(--ink); color:var(--paper);}
+  .btn-solid:hover{background:var(--accent); border-color:var(--accent);}
+  .btn-outline{background:transparent; color:var(--ink);}
+  .btn-outline:hover{background:var(--ink); color:var(--paper);}
+
+  .scroll-cue{
+    position:absolute; bottom:32px; left:50%; transform:translateX(-50%);
+    font-size:0.7rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--steel);
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    opacity:1; transition:opacity 0.3s ease;
+  }
+  .scroll-cue .line{width:1px; height:28px; background:var(--steel); overflow:hidden; position:relative;}
+  .scroll-cue .line::after{content:""; position:absolute; top:-100%; left:0; width:100%; height:100%; background:var(--ink); animation:cue 1.6s ease-in-out infinite;}
+  @keyframes cue{ 0%{top:-100%;} 60%{top:100%;} 100%{top:100%;} }
+
+
+
+  .marquee-band{margin-top:clamp(32px,6vw,60px); background:var(--ink); color:var(--paper); overflow:hidden;}
+  .marquee-track{display:flex; width:max-content; animation:scroll 30s linear infinite; padding:14px 0;}
+  @keyframes scroll{from{transform:translateX(0);} to{transform:translateX(-50%);}}
+  .marquee-track span{font-size:0.8rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; padding:0 2rem; white-space:nowrap; opacity:0.8;}
+  .marquee-track span::after{content:"·"; margin-left:2rem; color:var(--steel);}
+  .hero-marquee{margin-top:clamp(22px,3vw,34px); width:calc(100% + clamp(72px,12vw,128px)); margin-left:calc(-1 * clamp(36px,6vw,64px));}
+  .hero-marquee .marquee-track{padding:12px 0;}
+  .hero-marquee .marquee-track span{font-size:0.7rem; padding:0 1.35rem;}
+
+
+  /* ===== SECTION SHELL ===== */
+  section{padding:clamp(56px,9vw,120px) 0;}
+  .section-head{display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; margin-bottom:clamp(32px,5vw,56px); flex-wrap:wrap;}
+  .section-head h2{font-size:clamp(1.9rem,4vw,3rem); font-weight:800;}
+  .section-head .desc{max-width:32ch; font-size:0.95rem; line-height:1.5; color:var(--slate);}
+
+  .reveal{opacity:0; transform:translateY(20px); transition:opacity 0.6s ease, transform 0.6s ease;}
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  /* ===== ABOUT ===== */
+  .about{background:var(--ink); color:var(--paper); border-radius:4px;}
+  .about-grid{display:grid; grid-template-columns:0.75fr 1.25fr; gap:3rem; align-items:center;}
+  .about img{width:100%; border-radius:4px; filter:grayscale(1) contrast(1.05);}
+  .about h2{font-size:clamp(1.6rem,2.8vw,2.3rem); font-weight:800; color:var(--paper); line-height:1.25;}
+  .about-copy p{font-size:1rem; line-height:1.6; opacity:0.82; margin-top:1.1rem; max-width:50ch;}
+  .stat-row{display:flex; gap:2.2rem; margin-top:1.8rem; flex-wrap:wrap;}
+  .stat-row div{border-top:1px solid rgba(242,244,245,0.24); padding-top:0.7rem; min-width:110px;}
+  .stat-num{font-size:1.9rem; font-weight:800; display:block;}
+  .stat-label{font-size:0.72rem; opacity:0.68; text-transform:uppercase; letter-spacing:0.05em;}
+
+  @media (max-width:860px){.about-grid{grid-template-columns:1fr;}}
+
+  /* ===== SERVICES ===== */
+  .services-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
+  .service-card{background:var(--paper); padding:2rem 1.6rem; min-height:300px; display:flex; flex-direction:column; justify-content:space-between; transition:background 0.25s ease;}
+  .service-card .num{font-size:0.75rem; font-weight:700; color:var(--steel);}
+  .service-card h3{font-size:1.3rem; font-weight:800; margin:1.4rem 0 0.7rem;}
+  .service-card p{font-size:0.88rem; line-height:1.5; color:var(--slate);}
+  .service-card.lead{background:var(--ink); color:var(--paper);}
+  .service-card.lead .num{color:var(--mist);}
+  .service-card.lead p{opacity:0.82;}
+  .service-card:hover{background:var(--paper-dim);}
+  .service-card.lead:hover{background:var(--slate);}
+  @media (max-width:980px){.services-grid{grid-template-columns:1fr 1fr;}}
+  @media (max-width:620px){.services-grid{grid-template-columns:1fr;}}
+
+  /* ===== TEAM BUILDER ===== */
+  .builder{background:var(--paper-dim); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .builder-inner{display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:start;}
+  .role-grid{display:flex; flex-wrap:wrap; gap:0.6rem;}
+  .role-chip{font-size:0.82rem; font-weight:600; padding:11px 16px; border:1.5px solid var(--ink); border-radius:2px; cursor:pointer; background:transparent; transition:all 0.2s ease;}
+  .role-chip:hover{background:rgba(22,27,34,0.06);}
+  .role-chip.active{background:var(--ink); color:var(--paper);}
+  .builder-output{border:1.5px dashed var(--steel); border-radius:4px; padding:1.8rem; min-height:200px; display:flex; flex-direction:column; justify-content:space-between; background:var(--paper);}
+  #team-list{font-size:clamp(1.2rem,2.4vw,1.7rem); font-weight:700; line-height:1.35; margin:0.9rem 0;}
+  #team-list .empty{opacity:0.45; font-style:italic; font-weight:400; font-size:1rem;}
+  .team-tag{display:inline-block; text-decoration:underline; text-decoration-color:var(--steel); text-underline-offset:4px; margin-right:0.15em;}
+  .builder-note{font-size:0.82rem; color:var(--slate); line-height:1.5;}
+  @media (max-width:860px){.builder-inner{grid-template-columns:1fr;}}
+
+  /* ===== PROCESS ===== */
+  .process-list{border-top:1px solid var(--line);}
+  .process-row{display:grid; grid-template-columns:70px 1fr 1.4fr; gap:2rem; padding:1.7rem 0; border-bottom:1px solid var(--line); align-items:baseline;}
+  .process-row .pnum{font-size:1.3rem; font-weight:800; color:var(--steel);}
+  .process-row h3{font-size:1.15rem; font-weight:700;}
+  .process-row p{font-size:0.88rem; line-height:1.5; color:var(--slate); max-width:52ch;}
+  @media (max-width:700px){.process-row{grid-template-columns:44px 1fr; row-gap:0.4rem;} .process-row p{grid-column:2/3;}}
+
+  /* ===== EDITORIAL / MAGAZINES (3D Coverflow) ===== */
+  .editorial-intro{display:grid;grid-template-columns:1.1fr 0.9fr;gap:3rem;align-items:end;}
+  .editorial-intro .lead{font-size:clamp(1rem,1.8vw,1.25rem);line-height:1.5;color:var(--slate);max-width:46ch;}
+  .editorial-index{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--steel);line-height:1.7;justify-self:end;text-align:right;}
+
+  .coverflow-stage{position:relative;height:clamp(420px,50vw,560px);display:flex;align-items:center;justify-content:center;perspective:2200px;margin-top:2.6rem;}
+  .coverflow-stage::before{content:"";position:absolute;left:50%;bottom:8%;width:min(72vw,760px);height:56px;transform:translateX(-50%);background:radial-gradient(ellipse, rgba(22,27,34,.24) 0%, rgba(22,27,34,.08) 45%, transparent 72%);filter:blur(10px);pointer-events:none;}
+  .coverflow-track{position:relative;width:100%;height:100%;transform-style:preserve-3d;}
+  .mag-cover{position:absolute;top:50%;left:50%;width:224px;height:316px;margin:-158px 0 0 -112px;background:none;border:none;padding:0;cursor:pointer;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.22,.9,.24,1), filter .5s ease;}
+  .mag-cover-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;border-radius:2px;box-shadow:0 26px 52px rgba(22,27,34,.34);}
+  .mag-cover img{width:100%;height:100%;object-fit:cover;display:block;border-radius:2px;backface-visibility:hidden;}
+  .mag-spine{position:absolute;top:0;bottom:0;left:0;width:16px;background:linear-gradient(to right, rgba(0,0,0,.55), rgba(0,0,0,.05));transform:rotateY(90deg) translateZ(-8px);transform-origin:left center;}
+  .mag-shine{position:absolute;inset:0;border-radius:2px;background:linear-gradient(115deg, rgba(255,255,255,.16) 0%, transparent 30%, transparent 70%, rgba(0,0,0,.18) 100%);pointer-events:none;}
+  .mag-cover.is-active .mag-cover-inner{box-shadow:0 34px 66px rgba(22,27,34,.4);}
+
+  .coverflow-nav{display:flex;justify-content:center;gap:.5rem;margin-top:2.2rem;}
+  .coverflow-dot{width:7px;height:7px;border-radius:50%;background:var(--mist);border:none;cursor:pointer;transition:background .25s ease, transform .25s ease;}
+  .coverflow-dot.is-active{background:var(--ink);transform:scale(1.3);}
+
+  .coverflow-caption{text-align:center;margin-top:1.4rem;}
+  .coverflow-caption .title{font-size:1.5rem;font-weight:800;}
+  .coverflow-caption .sub{font-size:.85rem;color:var(--slate);margin-top:.3rem;}
+  .coverflow-caption .hint{font-size:.72rem;color:var(--steel);margin-top:.6rem;letter-spacing:.06em;text-transform:uppercase;}
+
+  .arrow-btn{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:100px;border:1.5px solid var(--ink);background:var(--paper);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;font-size:1.1rem;transition:background .2s ease, color .2s ease;}
+  .arrow-btn:hover{background:var(--ink);color:var(--paper);}
+  .arrow-prev{left:0;}
+  .arrow-next{right:0;}
+
+  @media (max-width:900px){
+    .editorial-intro{grid-template-columns:1fr;}.editorial-index{justify-self:start;text-align:left;}
+    .mag-cover{width:150px;height:212px;margin:-106px 0 0 -75px;}
+    .arrow-btn{width:36px;height:36px;}
+  }
+
+  /* ===== CAMPAIGNS GRID ===== */
+  .campaigns-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .campaign-tile{position:relative;border-radius:3px;overflow:hidden;aspect-ratio:4/5;cursor:pointer;}
+  .campaign-tile img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1) contrast(1.02);transition:transform .5s ease;}
+  .campaign-tile:hover img{transform:scale(1.06);}
+  .campaign-tile .tag{position:absolute;left:12px;bottom:12px;background:rgba(22,27,34,.82);color:var(--paper);font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:6px 10px;border-radius:2px;}
+  @media (max-width:900px){.campaigns-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.campaigns-grid{grid-template-columns:1fr;}}
+
+  /* ===== PROJECT MODAL ===== */
+  .project-modal{position:fixed;inset:0;background:rgba(22,27,34,.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:28px;z-index:500;}
+  .project-modal.open{display:flex;}
+  .project-modal-card{width:min(760px,96vw);max-height:92vh;overflow:auto;background:var(--paper);color:var(--ink);border-radius:4px;box-shadow:0 30px 90px rgba(0,0,0,.35);}
+  .project-modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:2rem;padding:28px 30px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(242,244,245,.96);backdrop-filter:blur(8px);z-index:2;}
+  .project-modal-head .eyebrow{margin-bottom:.5rem;}
+  .project-modal-head h2{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;}
+  .project-modal-head p{color:var(--slate);font-size:.88rem;margin-top:.45rem;}
+  .modal-close{width:42px;height:42px;border:1px solid var(--line);background:transparent;font-size:1.25rem;cursor:pointer;border-radius:2px;flex:0 0 auto;}
+  .modal-close:hover{background:var(--ink);color:var(--paper);}
+  .project-gallery{padding:24px 30px 12px;}
+  .project-slider{position:relative;display:flex;align-items:center;justify-content:center;background:var(--paper-dim);border-radius:2px;overflow:hidden;}
+  .project-slider img{display:block;width:100%;max-height:60vh;object-fit:contain;border-radius:2px;}
+  .slider-arrow{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:100px;border:1px solid rgba(22,27,34,.15);background:rgba(242,244,245,.9);color:var(--ink);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s ease,color 0.2s ease;z-index:2;}
+  .slider-arrow:hover{background:var(--ink);color:var(--paper);}
+  .slider-arrow.prev{left:12px;}
+  .slider-arrow.next{right:12px;}
+  .slider-dots{display:flex;justify-content:center;gap:8px;padding-top:14px;}
+  .slider-dot{width:7px;height:7px;border-radius:100px;background:var(--mist);border:none;cursor:pointer;padding:0;transition:background 0.2s ease,transform 0.2s ease;}
+  .slider-dot.is-active{background:var(--ink);transform:scale(1.3);}
+  .slider-count{position:absolute;bottom:12px;right:14px;font-size:.7rem;font-weight:700;letter-spacing:.04em;color:var(--paper);background:rgba(22,27,34,.55);padding:3px 9px;border-radius:100px;z-index:2;}
+  .project-note{padding:0 30px 28px;color:var(--slate);font-size:.8rem;line-height:1.5;}
+  .project-note strong{color:var(--ink);}
+  .behance-link{display:block; margin-top:0.9rem; font-weight:700; color:var(--ink); border-bottom:1.5px solid var(--ink); width:fit-content; padding-bottom:2px;}
+  .behance-link:hover{color:var(--accent); border-color:var(--accent);}
+  @media (max-width:620px){
+    .project-modal{padding:12px;}.project-modal-card{width:100%;max-height:96vh;}
+    .project-modal-head{padding:20px;}.project-gallery{padding:16px 20px;}.project-note{padding:0 20px 22px;}
+  }
+
+
+  /* ===== CREDENTIALS ===== */
+  .cred-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:2.2rem;}
+  .cred-card{border-top:2px solid var(--ink); padding-top:1.2rem;}
+  .cred-card h3{font-size:1.05rem; font-weight:700; margin-bottom:0.5rem;}
+  .cred-card p{font-size:0.88rem; line-height:1.5; color:var(--slate);}
+  @media (max-width:800px){.cred-grid{grid-template-columns:1fr;}}
+
+  /* ===== CONTACT ===== */
+  .contact{background:var(--ink); color:var(--paper); border-radius:4px;}
+  .contact-grid{display:grid; grid-template-columns:1fr 1fr; gap:3rem;}
+  .contact h2{font-size:clamp(2rem,4.6vw,3.4rem); font-weight:800; color:var(--paper);}
+  .contact-copy p{font-size:1rem; line-height:1.5; margin-top:1rem; max-width:38ch; opacity:0.8;}
+  .contact-email{margin-top:1.8rem; display:inline-block; font-size:1.2rem; font-weight:700; border-bottom:2px solid var(--paper); padding-bottom:2px;}
+  form{display:flex; flex-direction:column; gap:1rem;}
+  .field{display:flex; flex-direction:column; gap:0.4rem;}
+  label{font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; opacity:0.75;}
+  input, select, textarea{background:transparent; border:none; border-bottom:1.5px solid rgba(242,244,245,0.4); padding:9px 2px; font-family:'Archivo', sans-serif; font-size:0.95rem; color:var(--paper);}
+  input::placeholder, textarea::placeholder{color:rgba(242,244,245,0.45);}
+  input:focus, select:focus, textarea:focus{outline:none; border-bottom-color:var(--paper);}
+  select option{color:#000;}
+  textarea{resize:vertical; min-height:64px;}
+  .submit-btn{margin-top:0.4rem; align-self:flex-start; background:var(--paper); color:var(--ink); padding:13px 26px; border-radius:2px; font-weight:700; font-size:0.85rem; border:none; cursor:pointer; transition:opacity 0.2s ease;}
+  .submit-btn:hover{opacity:0.85;}
+  .contact-direct{display:flex; flex-direction:column; justify-content:center; height:100%;}
+  .contact-phone{font-size:clamp(2rem,4.5vw,3rem); font-weight:800; color:var(--paper); margin-top:0.9rem; display:inline-block; border-bottom:2px solid var(--paper); padding-bottom:4px; width:fit-content; transition:opacity 0.2s ease;}
+  .contact-phone:hover{opacity:0.8;}
+  .contact-direct-note{font-size:0.85rem; color:var(--paper); opacity:0.7; margin-top:1.1rem; max-width:34ch; line-height:1.5;}
+  @media (max-width:800px){.contact-grid{grid-template-columns:1fr;}}
+
+  /* ===== FOOTER ===== */
+  footer{padding:2rem 0; border-top:1px solid var(--line);}
+  .footer-row{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;}
+  .footer-row img{height:20px; filter:grayscale(1);}
+  .footer-links{display:flex; gap:1.4rem; font-size:0.78rem; color:var(--slate);}
+
+  @media (max-width:860px){
+    .nav-links{position:fixed; top:60px; left:0; right:0; bottom:0; background:var(--paper); flex-direction:column; align-items:flex-start; padding:2rem clamp(20px,4vw,56px); gap:1.4rem; transform:translateX(100%); transition:transform 0.3s ease; z-index:99;}
+    .nav-links.open{transform:translateX(0);}
+    .nav-links a{font-size:1.2rem;}
+    .burger{display:flex;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="logo-wrap">
+      <img src="images/site/logo-mark.png" alt="MILO icon">
+      <span style="font-weight:800; font-size:1.05rem; letter-spacing:0.02em;">MILO STUDIO</span>
+    </div>
+    <nav class="nav-links" id="navLinks">
+      <a href="#services" data-i18n="nav.services">Services</a>
+      <a href="#team-builder" data-i18n="nav.buildTeam">Build a Team</a>
+      <a href="#work" data-i18n="nav.editorial">Editorial</a>
+      <a href="#about" data-i18n="nav.studio">Studio</a>
+      <a href="#contact" class="nav-cta" data-i18n="nav.cta">Start a Project</a>
+      <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch language">ES</button>
+    </nav>
+    <button class="burger" id="burgerBtn" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero-pin" id="heroPin">
+  <div class="hero-stage">
+    <div class="logo-layer" id="logoLayer">
+      <img src="images/site/hero-wordmark.png" alt="MILO">
+    </div>
+    <div class="glass-panel" id="glassPanel">
+      <span class="eyebrow" data-i18n="hero.eyebrow">Bogotá — Worldwide</span>
+      <h1 data-i18n-html="hero.h1">Full-service <em>fashion</em> production &amp; retouching.</h1>
+      <p data-i18n="hero.p">MILO Studio assembles the stylists, casting, and retouchers your campaign needs — one brief, one accountable team.</p>
+      <div class="hero-cta-row">
+        <a href="#work" class="btn btn-solid" data-i18n="hero.cta1">See the Work</a>
+        <a href="#contact" class="btn btn-outline" data-i18n="hero.cta2">Start a Project</a>
+      </div>
+      <div class="marquee-band hero-marquee">
+        <div class="marquee-track">
+          <span>Nike</span><span>Adidas</span><span>Zegna</span><span>Valentino</span><span>Ferragamo</span><span>Calvin Klein</span><span>Kenzo</span><span>Sisley</span><span>Ray-Ban</span><span>Dafiti</span><span>Hawkers</span><span>Iceberg</span>
+          <span>Nike</span><span>Adidas</span><span>Zegna</span><span>Valentino</span><span>Ferragamo</span><span>Calvin Klein</span><span>Kenzo</span><span>Sisley</span><span>Ray-Ban</span><span>Dafiti</span><span>Hawkers</span><span>Iceberg</span>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-cue" id="scrollCue"><span data-i18n="hero.scroll">Scroll</span><div class="line"></div></div>
+  </div>
+</section>
+
+
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="wrap">
+    <div class="about reveal" style="padding:clamp(32px,5vw,56px);">
+      <div class="about-grid">
+        <img src="images/site/about-bts.jpg" alt="MILO Studio behind the scenes">
+        <div>
+          <span class="eyebrow" style="color:var(--mist);" data-i18n="about.eyebrow">The Studio</span>
+          <h2 style="margin-top:0.8rem;" data-i18n="about.h2">One decade. One point of contact. A full crew behind it.</h2>
+          <div class="about-copy">
+            <p data-i18n="about.p1">MILO Studio is led by Camilo Márquez Villegas, an art director and fashion photographer with ten years producing campaigns for luxury and lifestyle brands across Latin America and Europe.</p>
+            <p data-i18n="about.p2">Clients brief MILO once. We assemble the stylists, makeup artists, models, and retouchers the project actually calls for, and manage them as one accountable studio — from concept to delivery.</p>
+          </div>
+          <div class="stat-row">
+            <div><span class="stat-num">10+</span><span class="stat-label" data-i18n="about.stat1">Years in Production</span></div>
+            <div><span class="stat-num">20+</span><span class="stat-label" data-i18n="about.stat2">Brands &amp; Designers</span></div>
+            <div><span class="stat-num">2</span><span class="stat-label" data-i18n="about.stat3">EU + LATAM Markets</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div><span class="eyebrow" data-i18n="services.eyebrow">What We Do</span><h2 style="margin-top:0.7rem;" data-i18n="services.h2">Two things we do really well.</h2></div>
+      <p class="desc" data-i18n="services.desc">And a few more that round out a full production — all under one brief, one team, one delivery.</p>
+    </div>
+    <div class="services-grid reveal">
+      <div class="service-card lead">
+        <span class="num">01</span>
+        <div><h3 data-i18n="service1.title">Retouching &amp; Post-Production</h3><p data-i18n="service1.desc">Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.</p></div>
+      </div>
+      <div class="service-card lead">
+        <span class="num">02</span>
+        <div><h3 data-i18n="service2.title">Photography &amp; Production</h3><p data-i18n="service2.desc">Full campaign shoots managed start to finish: casting, location, lighting, and on-set direction.</p></div>
+      </div>
+      <div class="service-card">
+        <span class="num">03</span>
+        <div><h3 data-i18n="service3.title">Creative Direction</h3><p data-i18n="service3.desc">Concept, mood, and visual strategy defined up front, so every asset serves one clear campaign vision.</p></div>
+      </div>
+      <div class="service-card">
+        <span class="num">04</span>
+        <div><h3 data-i18n="service4.title">E-Commerce &amp; Catalog</h3><p data-i18n="service4.desc">High-volume, consistent product and model imagery built for online retail, without losing quality control.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM BUILDER -->
+<section class="builder" id="team-builder">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div><span class="eyebrow" data-i18n="team.eyebrow">How Projects Are Staffed</span><h2 style="margin-top:0.7rem;" data-i18n="team.h2">Every brief gets its own crew.</h2></div>
+      <p class="desc" data-i18n="team.desc">No fixed package. Tap the roles your project needs and see the team MILO puts together for it.</p>
+    </div>
+    <div class="builder-inner reveal">
+      <div class="role-grid" id="roleGrid">
+        <button class="role-chip" data-role="Photographer" data-i18n="role.photographer">Photographer</button>
+        <button class="role-chip" data-role="Stylist" data-i18n="role.stylist">Stylist</button>
+        <button class="role-chip" data-role="Makeup Artist" data-i18n="role.makeup">Makeup Artist</button>
+        <button class="role-chip" data-role="Model Casting" data-i18n="role.casting">Model Casting</button>
+        <button class="role-chip" data-role="Producer" data-i18n="role.producer">Producer</button>
+        <button class="role-chip" data-role="Retoucher" data-i18n="role.retoucher">Retoucher</button>
+        <button class="role-chip" data-role="Motion / Video" data-i18n="role.motion">Motion / Video</button>
+        <button class="role-chip" data-role="Set Design" data-i18n="role.setdesign">Set Design</button>
+      </div>
+      <div class="builder-output">
+        <div><span class="eyebrow" data-i18n="team.yourTeam">Your Team</span><div id="team-list"><span class="empty" data-i18n="team.empty">Select roles to build your crew →</span></div></div>
+        <p class="builder-note" data-i18n="team.note">This is how every MILO project starts: a briefing, then a team sized to it — never more than the project needs, never less than it takes to do it right.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="wrap">
+    <div class="section-head reveal"><div><span class="eyebrow" data-i18n="process.eyebrow">The Process</span><h2 style="margin-top:0.7rem;" data-i18n="process.h2">From brief to delivery.</h2></div></div>
+    <div class="process-list reveal">
+      <div class="process-row"><span class="pnum">01</span><h3 data-i18n="process1.title">Briefing</h3><p data-i18n="process1.desc">Brand, market, timeline, and budget — one conversation to define the scope of the campaign.</p></div>
+      <div class="process-row"><span class="pnum">02</span><h3 data-i18n="process2.title">Team Assembly</h3><p data-i18n="process2.desc">MILO staffs the project: stylist, MUA, casting, production support — matched to what the brief actually requires.</p></div>
+      <div class="process-row"><span class="pnum">03</span><h3 data-i18n="process3.title">Production</h3><p data-i18n="process3.desc">On-set direction and shoot management, with Camilo leading creative and technical decisions throughout the day.</p></div>
+      <div class="process-row"><span class="pnum">04</span><h3 data-i18n="process4.title">Retouch &amp; Deliver</h3><p data-i18n="process4.desc">Post-production and final asset delivery in the formats the campaign needs — print, digital, or e-commerce ready.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- EDITORIAL PORTFOLIO -->
+<section id="work">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div><span class="eyebrow" data-i18n="editorial.eyebrow">Editorial</span><h2 style="margin-top:0.7rem;" data-i18n="editorial.h2">Stories made to be opened.</h2></div>
+      <p class="desc" data-i18n="editorial.desc">Editorial work lives here as physical objects — magazine covers you can browse and open for the full story.</p>
+    </div>
+
+    <div class="editorial-intro reveal">
+      <p class="lead" data-i18n="editorial.lead">Instead of a conventional grid, the editorial archive is presented as a shelf of publications fanned out for browsing. Click a cover to bring it forward.</p>
+      <div class="editorial-index">01 — Penida<br>02 — Elegant<br>03 — Imirage<br>04 — Shuba<br>05 — Scorpio Vin<br>06 — MOB<br>07 — Tag</div>
+    </div>
+
+    <div class="coverflow-stage reveal" aria-label="Editorial magazine covers">
+      <button class="arrow-btn arrow-prev" id="prevBtn" aria-label="Previous cover">‹</button>
+      <button class="arrow-btn arrow-next" id="nextBtn" aria-label="Next cover">›</button>
+      <div class="coverflow-track" id="coverTrack">
+        <button class="mag-cover" type="button" data-index="0" data-project="penida" aria-label="Open Penida">
+          <div class="mag-cover-inner">
+            <img src="images/editorial/penida/01.jpg" alt="Penida magazine cover">
+            <span class="mag-spine"></span>
+            <span class="mag-shine"></span>
+          </div>
+        </button>
+        <button class="mag-cover" type="button" data-index="1" data-project="elegant" aria-label="Open Elegant">
+          <div class="mag-cover-inner">
+            <img src="images/editorial/elegant/01.jpg" alt="Elegant magazine cover">
+            <span class="mag-spine"></span>
+            <span class="mag-shine"></span>
+          </div>
+        </button>
+        <button class="mag-cover" type="button" data-index="2" data-project="imirage" aria-label="Open Imirage">
+          <div class="mag-cover-inner">
+            <img src="images/editorial/imirage/01.jpg" alt="Imirage magazine cover">
+            <span class="mag-spine"></span>
+            <span class="mag-shine"></span>
+          </div>
+        </button>
+        <button class="mag-cover" type="button" data-index="3" data-project="shuba" aria-label="Open Shuba">
+          <div class="mag-cover-inner">
+            <img src="images/editorial/shuba/01.jpg" alt="Shuba magazine cover">
+            <span class="mag-spine"></span>
+            <span class="mag-shine"></span>
+          </div>
+        </button>
+        <button class="mag-cover" type="button" data-index="4" data-project="scorpiovin" aria-label="Open Scorpio Vin">
+          <div class="mag-cover-inner">
+            <img src="images/editorial/scorpiovin/01.jpg" alt="Scorpio Vin magazine cover">
+            <span class="mag-spine"></span>
+            <span class="mag-shine"></span>
+          </div>
+        </button>
+        <button class="mag-cover" type="button" data-index="5" data-project="mob" aria-label="Open MOB">
+          <div class="mag-cover-inner">
+            <img src="images/editorial/mob/01.jpg" alt="MOB magazine cover">
+            <span class="mag-spine"></span>
+            <span class="mag-shine"></span>
+          </div>
+        </button>
+        <button class="mag-cover" type="button" data-index="6" data-project="tag" aria-label="Open Tag">
+          <div class="mag-cover-inner">
+            <img src="images/editorial/tag/01.jpg" alt="Tag magazine cover">
+            <span class="mag-spine"></span>
+            <span class="mag-shine"></span>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <div class="coverflow-caption reveal">
+      <div class="title" id="captionTitle"></div>
+      <div class="sub" id="captionSub"></div>
+      <div class="hint" data-i18n="editorial.hint">Click the centered cover to open the project</div>
+    </div>
+
+    <div class="coverflow-nav" id="coverDots"></div>
+  </div>
+</section>
+
+<!-- CAMPAIGNS -->
+<section id="campaigns">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div><span class="eyebrow" data-i18n="campaigns.eyebrow">Campaigns</span><h2 style="margin-top:0.7rem;" data-i18n="campaigns.h2">Brand work, shot and produced.</h2></div>
+      <p class="desc" data-i18n="campaigns.desc">A selection of commercial campaigns across footwear, fashion, and lifestyle brands.</p>
+    </div>
+
+    <div class="campaigns-grid reveal">
+      <div class="campaign-tile" data-campaign="nike"><img src="images/campaigns/nike/01.jpg" alt="Nike campaign"><span class="tag">Nike</span></div>
+      <div class="campaign-tile" data-campaign="adidas"><img src="images/campaigns/adidas/01.jpg" alt="Adidas campaign"><span class="tag">Adidas</span></div>
+      <div class="campaign-tile" data-campaign="zegna"><img src="images/campaigns/zegna/01.jpg" alt="Zegna campaign"><span class="tag">Zegna</span></div>
+      <div class="campaign-tile" data-campaign="valentino"><img src="images/campaigns/valentino/01.jpg" alt="Valentino campaign"><span class="tag">Valentino</span></div>
+      <div class="campaign-tile" data-campaign="iceberg"><img src="images/campaigns/iceberg/01.jpg" alt="Iceberg campaign"><span class="tag">Iceberg</span></div>
+      <div class="campaign-tile" data-campaign="payless"><img src="images/campaigns/payless/01.jpg" alt="Payless campaign"><span class="tag">Payless</span></div>
+      <div class="campaign-tile" data-campaign="calvin_k"><img src="images/campaigns/calvin_k/01.jpg" alt="Calvin Klein campaign"><span class="tag">Calvin Klein</span></div>
+      <div class="campaign-tile" data-campaign="desigual"><img src="images/campaigns/desigual/01.jpg" alt="Desigual campaign"><span class="tag">Desigual</span></div>
+      <div class="campaign-tile" data-campaign="fila"><img src="images/campaigns/fila/01.jpg" alt="Fila campaign"><span class="tag">Fila</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECT MODAL -->
+<div class="project-modal" id="projectModal" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle">
+  <div class="project-modal-card">
+    <div class="project-modal-head">
+      <div><span class="eyebrow" id="projectModalEyebrow">Editorial</span><h2 id="projectModalTitle">Project</h2><p id="projectModalSub">Editorial archive</p></div>
+      <button class="modal-close" id="modalClose" type="button" aria-label="Close project">×</button>
+    </div>
+    <div class="project-gallery" id="projectGallery"></div>
+    <div class="project-note" id="projectNote"></div>
+  </div>
+</div>
+<!-- CONTACT -->
+<section id="contact">
+  <div class="wrap">
+    <div class="contact reveal" style="padding:clamp(32px,5vw,56px);">
+      <div class="contact-grid">
+        <div>
+          <span class="eyebrow" style="color:var(--mist);" data-i18n="contact.eyebrow">Start a Project</span>
+          <h2 style="margin-top:0.8rem;" data-i18n="contact.h2">Tell us what you're building.</h2>
+          <div class="contact-copy"><p data-i18n="contact.copy">Send over the brand, the brief, and the timeline. We'll come back with the team and the plan.</p></div>
+          <a href="mailto:camilomarquezv@outlook.com" class="contact-email">camilomarquezv@outlook.com</a>
+        </div>
+        <div class="contact-direct">
+          <span class="eyebrow" style="color:var(--mist);" data-i18n="contact.callEyebrow">Call or WhatsApp</span>
+          <a href="https://wa.me/573045448900" target="_blank" rel="noopener" class="contact-phone">+57 304 544 8900</a>
+          <p class="contact-direct-note" data-i18n="contact.note">Fastest way to reach the studio directly — tell us your brand and what you're producing.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-row">
+      <img src="images/site/footer-logo.jpg" alt="MILO icon">
+      <div class="footer-links"><a href="#services" data-i18n="nav.services">Services</a><a href="#work" data-i18n="nav.editorial">Editorial</a><a href="#campaigns" data-i18n="footer.campaigns">Campaigns</a><a href="#contact" data-i18n="footer.contact">Contact</a><a href="https://www.behance.net/marquezvillegas" target="_blank" rel="noopener">Behance ↗</a></div>
+      <div style="font-size:0.78rem; color:var(--steel);" data-i18n="footer.tagline">Bogotá, Colombia — Design Prototype</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const translations = {
+    'nav.services': {en:'Services', es:'Servicios'},
+    'nav.buildTeam': {en:'Build a Team', es:'Arma un Equipo'},
+    'nav.editorial': {en:'Editorial', es:'Editorial'},
+    'nav.studio': {en:'Studio', es:'Estudio'},
+    'nav.cta': {en:'Start a Project', es:'Inicia un Proyecto'},
+
+    'hero.eyebrow': {en:'Bogotá — Worldwide', es:'Bogotá — Internacional'},
+    'hero.p': {en:'MILO Studio assembles the stylists, casting, and retouchers your campaign needs — one brief, one accountable team.', es:'MILO Studio reúne a los estilistas, el casting y los retocadores que tu campaña necesita — un solo brief, un equipo responsable.'},
+    'hero.scroll': {en:'Scroll', es:'Desplázate'},
+    'hero.cta1': {en:'See the Work', es:'Ver el Trabajo'},
+    'hero.cta2': {en:'Start a Project', es:'Inicia un Proyecto'},
+
+    'about.eyebrow': {en:'The Studio', es:'El Estudio'},
+    'about.h2': {en:'One decade. One point of contact. A full crew behind it.', es:'Una década. Un solo punto de contacto. Todo un equipo detrás.'},
+    'about.p1': {en:"MILO Studio is led by Camilo Márquez Villegas, an art director and fashion photographer with ten years producing campaigns for luxury and lifestyle brands across Latin America and Europe.", es:'MILO Studio está dirigido por Camilo Márquez Villegas, director de arte y fotógrafo de moda con diez años produciendo campañas para marcas de lujo y lifestyle en Latinoamérica y Europa.'},
+    'about.p2': {en:'Clients brief MILO once. We assemble the stylists, makeup artists, models, and retouchers the project actually calls for, and manage them as one accountable studio — from concept to delivery.', es:'Los clientes hacen el brief una sola vez. Nosotros reunimos a los estilistas, maquilladores, modelos y retocadores que el proyecto realmente necesita, y los gestionamos como un solo estudio responsable — desde el concepto hasta la entrega.'},
+    'about.stat1': {en:'Years in Production', es:'Años en Producción'},
+    'about.stat2': {en:'Brands & Designers', es:'Marcas y Diseñadores'},
+    'about.stat3': {en:'EU + LATAM Markets', es:'Mercados UE + LATAM'},
+
+    'services.eyebrow': {en:'What We Do', es:'Qué Hacemos'},
+    'services.h2': {en:'Two things we do really well.', es:'Dos cosas que hacemos muy bien.'},
+    'services.desc': {en:'And a few more that round out a full production — all under one brief, one team, one delivery.', es:'Y algunas más que completan una producción integral — todo bajo un solo brief, un equipo, una entrega.'},
+    'service1.title': {en:'Retouching & Post-Production', es:'Retoque y Postproducción'},
+    'service1.desc': {en:'Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.', es:'Retoque de belleza, moda y producto con estándar editorial — corrección de color y acabado fiel a la identidad de marca.'},
+    'service2.title': {en:'Photography & Production', es:'Fotografía y Producción'},
+    'service2.desc': {en:'Full campaign shoots managed start to finish: casting, location, lighting, and on-set direction.', es:'Producción de campañas gestionada de principio a fin: casting, locación, iluminación y dirección en set.'},
+    'service3.title': {en:'Creative Direction', es:'Dirección Creativa'},
+    'service3.desc': {en:'Concept, mood, and visual strategy defined up front, so every asset serves one clear campaign vision.', es:'Concepto, mood y estrategia visual definidos desde el inicio, para que cada pieza responda a una visión clara de campaña.'},
+    'service4.title': {en:'E-Commerce & Catalog', es:'E-Commerce y Catálogo'},
+    'service4.desc': {en:'High-volume, consistent product and model imagery built for online retail, without losing quality control.', es:'Imágenes de producto y modelo de alto volumen y consistentes, pensadas para retail online, sin perder control de calidad.'},
+
+    'team.eyebrow': {en:'How Projects Are Staffed', es:'Cómo se Arman los Equipos'},
+    'team.h2': {en:'Every brief gets its own crew.', es:'Cada brief tiene su propio equipo.'},
+    'team.desc': {en:'No fixed package. Tap the roles your project needs and see the team MILO puts together for it.', es:'Sin paquetes fijos. Elige los roles que tu proyecto necesita y mira el equipo que MILO arma para él.'},
+    'team.yourTeam': {en:'Your Team', es:'Tu Equipo'},
+    'team.empty': {en:'Select roles to build your crew →', es:'Selecciona roles para armar tu equipo →'},
+    'team.note': {en:'This is how every MILO project starts: a briefing, then a team sized to it — never more than the project needs, never less than it takes to do it right.', es:'Así empieza cada proyecto MILO: un briefing y luego un equipo a su medida — nunca más de lo que el proyecto necesita, nunca menos de lo que se requiere para hacerlo bien.'},
+    'role.photographer': {en:'Photographer', es:'Fotógrafo(a)'},
+    'role.stylist': {en:'Stylist', es:'Estilista'},
+    'role.makeup': {en:'Makeup Artist', es:'Maquillador(a)'},
+    'role.casting': {en:'Model Casting', es:'Casting de Modelos'},
+    'role.producer': {en:'Producer', es:'Productor(a)'},
+    'role.retoucher': {en:'Retoucher', es:'Retocador(a)'},
+    'role.motion': {en:'Motion / Video', es:'Motion / Video'},
+    'role.setdesign': {en:'Set Design', es:'Diseño de Set'},
+
+    'process.eyebrow': {en:'The Process', es:'El Proceso'},
+    'process.h2': {en:'From brief to delivery.', es:'Del brief a la entrega.'},
+    'process1.title': {en:'Briefing', es:'Briefing'},
+    'process1.desc': {en:'Brand, market, timeline, and budget — one conversation to define the scope of the campaign.', es:'Marca, mercado, tiempos y presupuesto — una sola conversación para definir el alcance de la campaña.'},
+    'process2.title': {en:'Team Assembly', es:'Armado del Equipo'},
+    'process2.desc': {en:'MILO staffs the project: stylist, MUA, casting, production support — matched to what the brief actually requires.', es:'MILO arma el equipo del proyecto: estilista, maquillaje, casting, apoyo de producción — según lo que el brief realmente requiere.'},
+    'process3.title': {en:'Production', es:'Producción'},
+    'process3.desc': {en:'On-set direction and shoot management, with Camilo leading creative and technical decisions throughout the day.', es:'Dirección en set y gestión de la producción, con Camilo liderando las decisiones creativas y técnicas durante toda la jornada.'},
+    'process4.title': {en:'Retouch & Deliver', es:'Retoque y Entrega'},
+    'process4.desc': {en:'Post-production and final asset delivery in the formats the campaign needs — print, digital, or e-commerce ready.', es:'Postproducción y entrega final en los formatos que la campaña necesita — listo para impresión, digital o e-commerce.'},
+
+    'editorial.eyebrow': {en:'Editorial', es:'Editorial'},
+    'editorial.h2': {en:'Stories made to be opened.', es:'Historias hechas para abrirse.'},
+    'editorial.desc': {en:'Editorial work lives here as physical objects — magazine covers you can browse and open for the full story.', es:'El trabajo editorial vive aquí como objetos físicos — portadas de revista que puedes explorar y abrir para ver la historia completa.'},
+    'editorial.lead': {en:'Instead of a conventional grid, the editorial archive is presented as a shelf of publications fanned out for browsing. Click a cover to bring it forward.', es:'En lugar de una grilla convencional, el archivo editorial se presenta como un estante de publicaciones abiertas en abanico para explorar. Haz clic en una portada para traerla al frente.'},
+    'editorial.hint': {en:'Click the centered cover to open the project', es:'Haz clic en la portada centrada para abrir el proyecto'},
+
+    'campaigns.eyebrow': {en:'Campaigns', es:'Campañas'},
+    'campaigns.h2': {en:'Brand work, shot and produced.', es:'Trabajo de marca, fotografiado y producido.'},
+    'campaigns.desc': {en:'A selection of commercial campaigns across footwear, fashion, and lifestyle brands.', es:'Una selección de campañas comerciales de marcas de calzado, moda y lifestyle.'},
+
+    'contact.eyebrow': {en:'Start a Project', es:'Inicia un Proyecto'},
+    'contact.h2': {en:"Tell us what you're building.", es:'Cuéntanos qué estás construyendo.'},
+    'contact.copy': {en:"Send over the brand, the brief, and the timeline. We'll come back with the team and the plan.", es:'Envíanos la marca, el brief y los tiempos. Te responderemos con el equipo y el plan.'},
+    'contact.callEyebrow': {en:'Call or WhatsApp', es:'Llama o Escribe por WhatsApp'},
+    'contact.note': {en:"Fastest way to reach the studio directly — tell us your brand and what you're producing.", es:'La forma más rápida de contactar al estudio directamente — cuéntanos tu marca y qué estás produciendo.'},
+
+    'footer.campaigns': {en:'Campaigns', es:'Campañas'},
+    'footer.contact': {en:'Contact', es:'Contacto'},
+    'footer.tagline': {en:'Bogotá, Colombia — Design Prototype', es:'Bogotá, Colombia — Prototipo de Diseño'},
+
+    'behance.full': {en:'View full project on Behance ↗', es:'Ver proyecto completo en Behance ↗'},
+    'behance.more': {en:'See more work on Behance ↗', es:'Ver más trabajo en Behance ↗'},
+  };
+
+  const heroH1 = {
+    en: 'Full-service <em>fashion</em> production &amp; retouching.',
+    es: 'Producción y retoque de <em>moda</em> integral.'
+  };
+
+  let currentLang = 'en';
+
+  function t(key){
+    const entry = translations[key];
+    if(!entry) return '';
+    return entry[currentLang] || entry.en;
+  }
+
+  function applyLang(){
+    document.documentElement.lang = currentLang;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      el.textContent = t(el.getAttribute('data-i18n'));
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+      const key = el.getAttribute('data-i18n-html');
+      el.innerHTML = key === 'hero.h1' ? heroH1[currentLang] : '';
+    });
+    const toggle = document.getElementById('langToggle');
+    if(toggle) toggle.textContent = currentLang === 'en' ? 'ES' : 'EN';
+    document.dispatchEvent(new CustomEvent('milo:langchange'));
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggle = document.getElementById('langToggle');
+    if(toggle){
+      toggle.addEventListener('click', () => {
+        currentLang = currentLang === 'en' ? 'es' : 'en';
+        applyLang();
+      });
+    }
+    applyLang();
+  });
+</script>
+<script>
+  const heroPin = document.getElementById('heroPin');
+  const logoLayer = document.getElementById('logoLayer');
+  const glassPanel = document.getElementById('glassPanel');
+  const scrollCue = document.getElementById('scrollCue');
+
+  function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+  function easeInOutCubic(t){ return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
+
+  function update(){
+    const rect = heroPin.getBoundingClientRect();
+    const total = heroPin.offsetHeight - window.innerHeight;
+    const scrolled = clamp(-rect.top, 0, total);
+    const progress = total > 0 ? scrolled / total : 0;
+    const eased = easeInOutCubic(clamp(progress * 1.4, 0, 1)); // finish transition a bit before pin ends
+
+    // logo: blur up, fade down, slight scale up
+    const blur = eased * 16;
+    const logoOpacity = 1 - eased * 0.85;
+    const logoScale = 1 + eased * 0.06;
+    logoLayer.style.filter = `blur(${blur}px)`;
+    logoLayer.style.opacity = logoOpacity;
+    logoLayer.style.transform = `scale(${logoScale})`;
+
+    // glass panel: fog up as it appears
+    const panelOpacity = clamp((eased - 0.15) / 0.7, 0, 1);
+    const panelBlur = 18 * panelOpacity;
+    const panelBg = 0.55 * panelOpacity;
+    const panelBorder = 0.14 * panelOpacity;
+    glassPanel.style.opacity = panelOpacity;
+    glassPanel.style.backdropFilter = `blur(${panelBlur}px)`;
+    glassPanel.style.webkitBackdropFilter = `blur(${panelBlur}px)`;
+    glassPanel.style.background = `rgba(242,244,245,${panelBg})`;
+    glassPanel.style.borderColor = `rgba(22,27,34,${panelBorder})`;
+    glassPanel.style.transform = `translate(-50%,-50%) translateY(${(1-panelOpacity)*14}px)`;
+
+    scrollCue.style.opacity = progress > 0.05 ? 0 : 1;
+  }
+
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if(!ticking){
+      requestAnimationFrame(() => { update(); ticking = false; });
+      ticking = true;
+    }
+  });
+  window.addEventListener('resize', update);
+  update();
+
+</script>
+
+<script>
+  const burger = document.getElementById('burgerBtn');
+  const navLinks = document.getElementById('navLinks');
+  burger.addEventListener('click', () => navLinks.classList.toggle('open'));
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if(entry.isIntersecting){ entry.target.classList.add('in'); io.unobserve(entry.target); } });
+  }, {threshold:0.12});
+  revealEls.forEach(el => io.observe(el));
+
+  const chips = document.querySelectorAll('.role-chip');
+  const teamList = document.getElementById('team-list');
+  let selected = [];
+  function renderTeam(){
+    teamList.innerHTML = selected.length === 0
+      ? `<span class="empty">${t('team.empty')}</span>`
+      : selected.map(role => `<span class="team-tag">${t('role.' + roleKey(role))}</span>`).join(' + ');
+  }
+  function roleKey(role){
+    const map = {'Photographer':'photographer','Stylist':'stylist','Makeup Artist':'makeup','Model Casting':'casting','Producer':'producer','Retoucher':'retoucher','Motion / Video':'motion','Set Design':'setdesign'};
+    return map[role] || role;
+  }
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const role = chip.dataset.role;
+      chip.classList.toggle('active');
+      selected = selected.includes(role) ? selected.filter(r => r !== role) : [...selected, role];
+      renderTeam();
+    });
+  });
+</script>
+
+
+<script>
+  const projectModal = document.getElementById('projectModal');
+  const projectGallery = document.getElementById('projectGallery');
+  const projectTitle = document.getElementById('projectModalTitle');
+  const projectSub = document.getElementById('projectModalSub');
+  const projectNote = document.getElementById('projectNote');
+  const modalClose = document.getElementById('modalClose');
+
+  const projectData = {
+    penida: { images: ['images/editorial/penida/01.jpg'], folder: 'images/editorial/penida', title: 'PENIDA', sub: {en:'Penida Magazine — Editorial / Sep 2025', es:'Revista Penida — Editorial / Sep 2025'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/230267081/Venon-Bloom' },
+    elegant: { images: ['images/editorial/elegant/01.jpg'], folder: 'images/editorial/elegant', title: 'ELEGANT', sub: {en:'Elegant Magazine — Otto by Eriko', es:'Revista Elegant — Otto by Eriko'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'} },
+    imirage: { images: ['images/editorial/imirage/01.jpg'], folder: 'images/editorial/imirage', title: 'IMIRAGE', sub: {en:'Imirage Magazine — Beauty Editorial', es:'Revista Imirage — Editorial de Belleza'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/121980999/Red-Muse' },
+    shuba: { images: ['images/editorial/shuba/01.jpg'], folder: 'images/editorial/shuba', title: 'SHUBA', sub: {en:'Shuba Magazine — Diversity Makeup, Issue 11', es:'Revista Shuba — Maquillaje Diversidad, Edición 11'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'} },
+    scorpiovin: { images: ['images/editorial/scorpiovin/01.jpg'], folder: 'images/editorial/scorpiovin', title: 'SCORPIO VIN', sub: {en:'Scorpio Vin — Neoscivic Editorial', es:'Scorpio Vin — Editorial Neoscivic'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'} },
+    mob: { images: ['images/editorial/mob/01.jpg'], folder: 'images/editorial/mob', title: 'MOB', sub: {en:'MOB Magazine — Editorial', es:'Revista MOB — Editorial'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'} },
+    tag: { images: ['images/editorial/tag/01.jpg'], folder: 'images/editorial/tag', title: 'TAG', sub: {en:'Tag Magazine — Editorial', es:'Revista Tag — Editorial'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/249848237/Tag-FILM-Editorial' },
+    nike: { images: ['images/campaigns/nike/01.jpg'], folder: 'images/campaigns/nike', title: 'NIKE', sub: {en:'Dafiti LATAM Campaign', es:'Campaña Dafiti LATAM'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'} },
+    adidas: { images: ['images/campaigns/adidas/01.jpg'], folder: 'images/campaigns/adidas', title: 'ADIDAS', sub: {en:'Dafiti LATAM Campaign', es:'Campaña Dafiti LATAM'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'}, behance: 'https://www.behance.net/gallery/252052449/Adidas-Retouch-HH-Global' },
+    zegna: { images: ['images/campaigns/zegna/01.jpg'], folder: 'images/campaigns/zegna', title: 'ZEGNA', sub: {en:'Le Collezioni Campaign', es:'Campaña Le Collezioni'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'} },
+    valentino: { images: ['images/campaigns/valentino/01.jpg'], folder: 'images/campaigns/valentino', title: 'VALENTINO', sub: {en:'Le Collezioni Campaign', es:'Campaña Le Collezioni'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'} },
+    iceberg: { images: ['images/campaigns/iceberg/01.jpg'], folder: 'images/campaigns/iceberg', title: 'ICEBERG', sub: {en:'Le Collezioni Campaign', es:'Campaña Le Collezioni'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'} },
+    payless: { images: ['images/campaigns/payless/01.jpg'], folder: 'images/campaigns/payless', title: 'PAYLESS', sub: {en:'Back to School Campaign', es:'Campaña Regreso a Clases'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'} },
+    calvin_k: { images: ['images/campaigns/calvin_k/01.jpg'], folder: 'images/campaigns/calvin_k', title: 'CALVIN KLEIN', sub: {en:'Le Collezioni Campaign', es:'Campaña Le Collezioni'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'} },
+    desigual: { images: ['images/campaigns/desigual/01.jpg'], folder: 'images/campaigns/desigual', title: 'DESIGUAL', sub: {en:'Campaign', es:'Campaña'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'} },
+    fila: { images: ['images/campaigns/fila/01.jpg'], folder: 'images/campaigns/fila', title: 'FILA', sub: {en:'Campaign', es:'Campaña'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'} },
+  };
+
+  let currentProjectKey = null, currentProjectImg = null, currentSlide = 0;
+
+  function renderSlide(){
+    const project = projectData[currentProjectKey];
+    if(!project) return;
+    const images = project.images && project.images.length ? project.images : (currentProjectImg ? [currentProjectImg] : []);
+    currentSlide = ((currentSlide % images.length) + images.length) % images.length;
+    const img = projectGallery.querySelector('.project-slider img');
+    if(img) img.src = images[currentSlide];
+    const dots = projectGallery.querySelectorAll('.slider-dot');
+    dots.forEach((d, i) => d.classList.toggle('is-active', i === currentSlide));
+    const count = projectGallery.querySelector('.slider-count');
+    if(count) count.textContent = `${currentSlide + 1} / ${images.length}`;
+  }
+  function goToSlide(i){ currentSlide = i; renderSlide(); }
+  function nextSlide(){ currentSlide++; renderSlide(); }
+  function prevSlide(){ currentSlide--; renderSlide(); }
+
+  function openProjectModal(key, imgSrc){
+    const project = projectData[key];
+    if(!project) return;
+    currentProjectKey = key; currentProjectImg = imgSrc; currentSlide = 0;
+    projectTitle.textContent = project.title;
+    projectSub.textContent = project.sub[currentLang];
+    const behanceUrl = project.behance || 'https://www.behance.net/marquezvillegas';
+    const linkLabel = project.behance ? t('behance.full') : t('behance.more');
+    projectNote.innerHTML = `${project.note[currentLang]} <a href="${behanceUrl}" target="_blank" rel="noopener" class="behance-link">${linkLabel}</a>`;
+
+    const images = project.images && project.images.length ? project.images : (imgSrc ? [imgSrc] : []);
+    const hasMultiple = images.length > 1;
+    projectGallery.innerHTML = images.length ? `
+      <div class="project-slider">
+        ${hasMultiple ? `<button class="slider-arrow prev" type="button" aria-label="Previous photo">‹</button>` : ''}
+        <img src="${images[0]}" alt="${project.title}">
+        ${hasMultiple ? `<button class="slider-arrow next" type="button" aria-label="Next photo">›</button>` : ''}
+        ${hasMultiple ? `<span class="slider-count"></span>` : ''}
+      </div>
+      ${hasMultiple ? `<div class="slider-dots">${images.map((_, i) => `<button class="slider-dot" type="button" aria-label="Go to photo ${i+1}"></button>`).join('')}</div>` : ''}
+    ` : '';
+
+    if(hasMultiple){
+      projectGallery.querySelector('.slider-arrow.prev').addEventListener('click', prevSlide);
+      projectGallery.querySelector('.slider-arrow.next').addEventListener('click', nextSlide);
+      projectGallery.querySelectorAll('.slider-dot').forEach((d, i) => d.addEventListener('click', () => goToSlide(i)));
+      const slider = projectGallery.querySelector('.project-slider');
+      let touchStartX = null;
+      slider.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].clientX; }, {passive:true});
+      slider.addEventListener('touchend', e => {
+        if(touchStartX === null) return;
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        if(Math.abs(dx) > 40){ dx < 0 ? nextSlide() : prevSlide(); }
+        touchStartX = null;
+      }, {passive:true});
+    }
+    renderSlide();
+
+    projectModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeProject(){
+    projectModal.classList.remove('open');
+    document.body.style.overflow = '';
+    currentProjectKey = null;
+  }
+  modalClose.addEventListener('click', closeProject);
+  projectModal.addEventListener('click', e => { if(e.target === projectModal) closeProject(); });
+  document.addEventListener('keydown', e => {
+    if(!projectModal.classList.contains('open')) return;
+    if(e.key === 'Escape') closeProject();
+    else if(e.key === 'ArrowRight') nextSlide();
+    else if(e.key === 'ArrowLeft') prevSlide();
+  });
+
+  // Campaign grid clicks
+  document.querySelectorAll('.campaign-tile').forEach(tile => {
+    tile.addEventListener('click', () => {
+      const key = tile.dataset.campaign;
+      const img = tile.querySelector('img');
+      openProjectModal(key, img.src);
+    });
+  });
+
+  // ===== Coverflow =====
+  const coverOrder = ['penida', 'elegant', 'imirage', 'shuba', 'scorpiovin', 'mob', 'tag'];
+  const covers = Array.from(document.querySelectorAll('#coverTrack .mag-cover'));
+  const dotsWrap = document.getElementById('coverDots');
+  const captionTitle = document.getElementById('captionTitle');
+  const captionSub = document.getElementById('captionSub');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let active = Math.floor(covers.length/2);
+
+  covers.forEach((c, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'coverflow-dot';
+    dot.setAttribute('aria-label', 'Go to cover ' + (i+1));
+    dot.addEventListener('click', () => setActive(i));
+    dotsWrap.appendChild(dot);
+  });
+  const dots = Array.from(dotsWrap.children);
+
+  function layoutCovers(){
+    covers.forEach((c, i) => {
+      const offset = i - active;
+      const abs = Math.abs(offset);
+      const rotateY = Math.max(-52, Math.min(52, offset * -20));
+      const translateX = offset * 132;
+      const translateZ = -abs * 80;
+      const scale = 1 - Math.min(abs * 0.09, 0.4);
+      c.style.transform = `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`;
+      c.style.zIndex = 100 - abs;
+      c.style.filter = abs === 0 ? 'brightness(1)' : `brightness(${1 - abs*0.06})`;
+      c.classList.toggle('is-active', i === active);
+    });
+    dots.forEach((d, i) => d.classList.toggle('is-active', i === active));
+    const key = coverOrder[active];
+    const proj = projectData[key];
+    if(proj){ captionTitle.textContent = proj.title; captionSub.textContent = proj.sub[currentLang]; }
+  }
+
+  function setActiveCover(i){
+    active = ((i % covers.length) + covers.length) % covers.length;
+    layoutCovers();
+  }
+
+  covers.forEach((c, i) => {
+    c.addEventListener('click', () => {
+      if(i === active){
+        const key = coverOrder[i];
+        const img = c.querySelector('img');
+        openProjectModal(key, img.src);
+      } else {
+        setActiveCover(i);
+      }
+    });
+  });
+  prevBtn.addEventListener('click', () => setActiveCover(active - 1));
+  nextBtn.addEventListener('click', () => setActiveCover(active + 1));
+
+  layoutCovers();
+
+  // Re-render dynamic (JS-built) bilingual content when language changes
+  document.addEventListener('milo:langchange', () => {
+    layoutCovers();
+    renderTeam();
+    if(currentProjectKey && projectModal.classList.contains('open')){
+      const savedSlide = currentSlide;
+      openProjectModal(currentProjectKey, currentProjectImg);
+      goToSlide(savedSlide);
+    }
+  });
+</script>
+
+</body>
+</html>
