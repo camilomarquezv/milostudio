@@ -187,6 +187,8 @@
   .editorial-intro .lead{font-size:clamp(1rem,1.8vw,1.25rem);line-height:1.5;color:var(--slate);max-width:46ch;}
   .editorial-index{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--steel);line-height:1.7;justify-self:end;text-align:right;}
 
+  .coverflow-pin{position:relative;} /* height set in JS (sizeCoverflowPin) to match .coverflow-sticky's content height + a fixed scroll-scrub distance */
+  .coverflow-sticky{position:sticky; top:0; padding-top:clamp(64px,9vh,110px);}
   .coverflow-stage{position:relative;height:clamp(420px,50vw,560px);display:flex;align-items:center;justify-content:center;perspective:2200px;margin-top:2.6rem;}
   .coverflow-stage::before{content:"";position:absolute;left:50%;bottom:8%;width:min(72vw,760px);height:56px;transform:translateX(-50%);background:radial-gradient(ellipse, rgba(22,27,34,.24) 0%, rgba(22,27,34,.08) 45%, transparent 72%);filter:blur(10px);pointer-events:none;}
   .coverflow-track{position:relative;width:100%;height:100%;transform-style:preserve-3d;}
@@ -372,69 +374,76 @@
       <div class="editorial-index">01 — Penida<br>02 — Elegant<br>03 — Imirage<br>04 — Shuba<br>05 — Scorpio Vin<br>06 — MOB<br>07 — Tag</div>
     </div>
 
-    <div class="coverflow-stage reveal" aria-label="Editorial magazine covers">
-      <button class="arrow-btn arrow-prev" id="prevBtn" aria-label="Previous cover">‹</button>
-      <button class="arrow-btn arrow-next" id="nextBtn" aria-label="Next cover">›</button>
-      <div class="coverflow-track" id="coverTrack">
-        <button class="mag-cover" type="button" data-index="0" data-project="penida" aria-label="Open Penida">
-          <div class="mag-cover-inner">
-            <img src="images/editorial/penida/01.jpg" alt="Penida magazine cover">
-            <span class="mag-spine"></span>
-            <span class="mag-shine"></span>
+  </div>
+
+  <div class="coverflow-pin" id="coverflowPin">
+    <div class="coverflow-sticky">
+      <div class="wrap">
+        <div class="coverflow-stage reveal" aria-label="Editorial magazine covers">
+          <button class="arrow-btn arrow-prev" id="prevBtn" aria-label="Previous cover">‹</button>
+          <button class="arrow-btn arrow-next" id="nextBtn" aria-label="Next cover">›</button>
+          <div class="coverflow-track" id="coverTrack">
+            <button class="mag-cover" type="button" data-index="0" data-project="penida" aria-label="Open Penida">
+              <div class="mag-cover-inner">
+                <img src="images/editorial/penida/01.jpg" alt="Penida magazine cover">
+                <span class="mag-spine"></span>
+                <span class="mag-shine"></span>
+              </div>
+            </button>
+            <button class="mag-cover" type="button" data-index="1" data-project="elegant" aria-label="Open Elegant">
+              <div class="mag-cover-inner">
+                <img src="images/editorial/elegant/01.jpg" alt="Elegant magazine cover">
+                <span class="mag-spine"></span>
+                <span class="mag-shine"></span>
+              </div>
+            </button>
+            <button class="mag-cover" type="button" data-index="2" data-project="imirage" aria-label="Open Imirage">
+              <div class="mag-cover-inner">
+                <img src="images/editorial/imirage/01.jpg" alt="Imirage magazine cover">
+                <span class="mag-spine"></span>
+                <span class="mag-shine"></span>
+              </div>
+            </button>
+            <button class="mag-cover" type="button" data-index="3" data-project="shuba" aria-label="Open Shuba">
+              <div class="mag-cover-inner">
+                <img src="images/editorial/shuba/01.jpg" alt="Shuba magazine cover">
+                <span class="mag-spine"></span>
+                <span class="mag-shine"></span>
+              </div>
+            </button>
+            <button class="mag-cover" type="button" data-index="4" data-project="scorpiovin" aria-label="Open Scorpio Vin">
+              <div class="mag-cover-inner">
+                <img src="images/editorial/scorpiovin/01.jpg" alt="Scorpio Vin magazine cover">
+                <span class="mag-spine"></span>
+                <span class="mag-shine"></span>
+              </div>
+            </button>
+            <button class="mag-cover" type="button" data-index="5" data-project="mob" aria-label="Open MOB">
+              <div class="mag-cover-inner">
+                <img src="images/editorial/mob/01.jpg" alt="MOB magazine cover">
+                <span class="mag-spine"></span>
+                <span class="mag-shine"></span>
+              </div>
+            </button>
+            <button class="mag-cover" type="button" data-index="6" data-project="tag" aria-label="Open Tag">
+              <div class="mag-cover-inner">
+                <img src="images/editorial/tag/01.jpg" alt="Tag magazine cover">
+                <span class="mag-spine"></span>
+                <span class="mag-shine"></span>
+              </div>
+            </button>
           </div>
-        </button>
-        <button class="mag-cover" type="button" data-index="1" data-project="elegant" aria-label="Open Elegant">
-          <div class="mag-cover-inner">
-            <img src="images/editorial/elegant/01.jpg" alt="Elegant magazine cover">
-            <span class="mag-spine"></span>
-            <span class="mag-shine"></span>
-          </div>
-        </button>
-        <button class="mag-cover" type="button" data-index="2" data-project="imirage" aria-label="Open Imirage">
-          <div class="mag-cover-inner">
-            <img src="images/editorial/imirage/01.jpg" alt="Imirage magazine cover">
-            <span class="mag-spine"></span>
-            <span class="mag-shine"></span>
-          </div>
-        </button>
-        <button class="mag-cover" type="button" data-index="3" data-project="shuba" aria-label="Open Shuba">
-          <div class="mag-cover-inner">
-            <img src="images/editorial/shuba/01.jpg" alt="Shuba magazine cover">
-            <span class="mag-spine"></span>
-            <span class="mag-shine"></span>
-          </div>
-        </button>
-        <button class="mag-cover" type="button" data-index="4" data-project="scorpiovin" aria-label="Open Scorpio Vin">
-          <div class="mag-cover-inner">
-            <img src="images/editorial/scorpiovin/01.jpg" alt="Scorpio Vin magazine cover">
-            <span class="mag-spine"></span>
-            <span class="mag-shine"></span>
-          </div>
-        </button>
-        <button class="mag-cover" type="button" data-index="5" data-project="mob" aria-label="Open MOB">
-          <div class="mag-cover-inner">
-            <img src="images/editorial/mob/01.jpg" alt="MOB magazine cover">
-            <span class="mag-spine"></span>
-            <span class="mag-shine"></span>
-          </div>
-        </button>
-        <button class="mag-cover" type="button" data-index="6" data-project="tag" aria-label="Open Tag">
-          <div class="mag-cover-inner">
-            <img src="images/editorial/tag/01.jpg" alt="Tag magazine cover">
-            <span class="mag-spine"></span>
-            <span class="mag-shine"></span>
-          </div>
-        </button>
+        </div>
+
+        <div class="coverflow-caption reveal">
+          <div class="title" id="captionTitle"></div>
+          <div class="sub" id="captionSub"></div>
+          <div class="hint" data-i18n="editorial.hint">Click the centered cover to open the project</div>
+        </div>
+
+        <div class="coverflow-nav" id="coverDots"></div>
       </div>
     </div>
-
-    <div class="coverflow-caption reveal">
-      <div class="title" id="captionTitle"></div>
-      <div class="sub" id="captionSub"></div>
-      <div class="hint" data-i18n="editorial.hint">Click the centered cover to open the project</div>
-    </div>
-
-    <div class="coverflow-nav" id="coverDots"></div>
   </div>
 </section>
 
@@ -956,13 +965,13 @@
   const captionSub = document.getElementById('captionSub');
   const prevBtn = document.getElementById('prevBtn');
   const nextBtn = document.getElementById('nextBtn');
-  let active = Math.floor(covers.length/2);
+  let active = 0;
 
   covers.forEach((c, i) => {
     const dot = document.createElement('button');
     dot.className = 'coverflow-dot';
     dot.setAttribute('aria-label', 'Go to cover ' + (i+1));
-    dot.addEventListener('click', () => setActive(i));
+    dot.addEventListener('click', () => setActiveCover(i));
     dotsWrap.appendChild(dot);
   });
   const dots = Array.from(dotsWrap.children);
@@ -1006,6 +1015,40 @@
   nextBtn.addEventListener('click', () => setActiveCover(active + 1));
 
   layoutCovers();
+
+  // Scroll-scrub the coverflow itself, same pattern as the hero logo: pin the carousel while
+  // scrolling drives which cover is centered, from Penida (0) through Tag (last), then releases.
+  const coverflowPin = document.getElementById('coverflowPin');
+  const coverflowSticky = document.querySelector('.coverflow-sticky');
+  const COVERFLOW_SCROLL_ROOM = 520;
+
+  function sizeCoverflowPin(){
+    coverflowPin.style.height = (coverflowSticky.offsetHeight + COVERFLOW_SCROLL_ROOM) + 'px';
+  }
+
+  function updateCoverflowScroll(){
+    const rect = coverflowPin.getBoundingClientRect();
+    const total = coverflowPin.offsetHeight - coverflowSticky.offsetHeight;
+    const scrolled = clamp(-rect.top, 0, total);
+    const progress = total > 0 ? scrolled / total : 0;
+    const targetIndex = Math.round(progress * (covers.length - 1));
+    if(targetIndex !== active){
+      active = targetIndex;
+      layoutCovers();
+    }
+  }
+
+  sizeCoverflowPin();
+  window.addEventListener('resize', sizeCoverflowPin);
+
+  let coverflowTicking = false;
+  window.addEventListener('scroll', () => {
+    if(!coverflowTicking){
+      requestAnimationFrame(() => { updateCoverflowScroll(); coverflowTicking = false; });
+      coverflowTicking = true;
+    }
+  });
+  updateCoverflowScroll();
 
   // Re-render dynamic (JS-built) bilingual content when language changes
   document.addEventListener('milo:langchange', () => {

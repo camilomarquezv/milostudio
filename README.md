@@ -57,7 +57,16 @@ and Services came first.
      (down to `clamp(20px,3vh,36px)`) so it sits close under the logo instead of double-padded.
 3. **Editorial** (`#work`) — 3D "coverflow" carousel (CSS `rotateY`/`translateZ`, no library) of
    7 magazine covers (Penida, Elegant, Imirage, Shuba, Scorpio Vin, MOB, Tag). Click a side cover
-   to center it; click the centered one to open the project modal.
+   to center it; click the centered one to open the project modal. **Scroll-scrubbed** (added
+   2026-08-25, same pattern as the hero logo): the carousel itself sits in `.coverflow-sticky`
+   inside a `#coverflowPin` wrapper, and while that's pinned, scrolling advances the centered
+   cover from Penida straight through to Tag (`updateCoverflowScroll()`, in the coverflow
+   `<script>` block — maps scroll progress within the pin directly to a cover index, 0 to 6).
+   Same JS-computed-height approach as the hero (`sizeCoverflowPin()`): the pin's height is the
+   sticky content's own height plus a fixed `COVERFLOW_SCROLL_ROOM` (520px), not a flat vh, so
+   there's no dead scroll space if the carousel is short relative to the viewport. Clicking a
+   cover or a dot still works at any time and simply overrides `active` until the next scroll
+   event recomputes it from scroll position.
 4. **Campaigns** (`#campaigns`) — grid of 9 brand campaign tiles (Nike, Adidas, Zegna, Valentino,
    Iceberg, Payless, Calvin Klein, Desigual, Fila), same modal on click
 5. **Services** (`#services`) — 4 service cards (Retouching, Photography, Creative Direction,
