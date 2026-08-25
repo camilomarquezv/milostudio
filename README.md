@@ -93,35 +93,50 @@ and Services came first.
    there's no dead scroll space if the carousel is short relative to the viewport. Clicking a
    cover or a dot still works at any time and simply overrides `active` until the next scroll
    event recomputes it from scroll position.
-4. **Campaigns** (`#campaigns`) — grid of 9 brand campaign tiles (Nike, Adidas, Zegna, Valentino,
-   Iceberg, Payless, Calvin Klein, Desigual, Fila), same modal on click. **Redesigned 2026-08-25**
-   as a two-column grid of tall cards (`.campaigns-grid{display:grid; grid-template-columns:repeat(2,1fr)}`),
-   referencing orionix.framer.website's work grid — photo on top in a `.campaign-media` box
-   (`aspect-ratio:3/4`, `border-radius:6px` — user first got 18px radius + a tighter/vh-based
-   height and asked for a straighter 3:4 portrait crop with less-rounded corners and more room
-   between cards, hence `aspect-ratio` over a `clamp()` height and `gap:64px 48px` on the grid),
-   brand name + campaign note below in a plain `.campaign-info` row (the note text comes straight
-   from each `projectData` entry's `sub` field via `renderCampaignInfo()`, re-run on
-   `milo:langchange` same as the other JS-built bilingual bits — not a `data-i18n` attribute,
-   since it's per-brand copy, not a site-wide key). This replaced the earlier flex-grow
-   hover-expand layout (tiles growing into their row on hover) — doesn't make sense with
-   fixed-size grid cards, so the whole tile now just lifts slightly (`translateY(-4px)` + bigger
-   shadow) on hover instead. Single column on mobile (`max-width:700px` breakpoint, `gap:44px`).
-   **Hover video preview on 3 tiles** (Nike, Adidas, Zegna — added 2026-08-25, kept as-is through
-   the redesign above): each of those three has a second `<img class="tile-hover-gif"
-   loading="lazy">` inside `.campaign-media`, `position:absolute; inset:0; opacity:0`,
-   cross-fading to `opacity:1` on `.campaign-tile:hover` (plain single-level hover, no specificity
-   trap). Now shows much bigger than before since the card itself is taller. Source was 3 BTS
-   `.mov` clips the user supplied (`nike.mov`, `adidas.mov`, `zegna.mov` — all B&W, portrait,
-   30–60fps originals); converted to GIF with Pillow/OpenCV since there's no ffmpeg on this
-   machine. First pass (full frame count, 480px wide, dithered) came out to 10–14MB *each* — GIF
-   compresses photographic/video content far worse than flat-color content. Re-encoded at 260px
-   wide, ~10fps (every 3rd–5th source frame depending on original fps), capped to 3.5s, a single
-   64-color palette sampled from a mid-clip frame, and **no dithering** (`dither=Image.NONE` —
-   dithering adds per-pixel noise that LZW/GIF compresses badly; a flat-ish quantized image
-   compresses much better and these are B&W BTS clips so banding isn't very visible at this size
-   anyway). Landed at 0.6–1.5MB each. The files live at `images/campaigns/<key>/hover.gif`
-   alongside each tile's existing `01.jpg`.
+4. **Campaigns** (`#campaigns`) — 9 brand campaigns (Nike, Adidas, Zegna, Valentino, Iceberg,
+   Payless, Calvin Klein, Desigual, Fila). Went through two redesigns the same day (2026-08-25):
+   first a static two-column grid of tall cards, then — per user feedback wanting "each project as
+   its own scroll, showing on its own" like the Services slider — **rebuilt as a scroll-scrubbed
+   single-project slider**, the same pin pattern as the hero logo / coverflow / services
+   (`#campaignsPin` → `.campaigns-sticky`, height computed in JS via `sizeCampaignsPin()` as the
+   sticky content's height + a fixed 1200px `CAMPAIGNS_SCROLL_ROOM`). Scrolling advances through
+   all 9 in order, one at a time (`updateCampaignsScroll()`, campaigns `<script>` block near the
+   bottom, right after the services slider block). Layout is a 3-column
+   `.campaigns-slide{grid-template-columns:140px auto 1fr}` — big number + vertical dot nav (same
+   `.service-bignum`/`.services-dots` pattern, renamed `.campaign-bignum`/`.campaigns-dots`), a
+   `.campaign-stage` photo (`aspect-ratio:3/4`, `border-radius:6px` — carried over from the grid
+   version's corner/ratio fix), then title + counter + campaign note (`projectData[key].sub`,
+   bilingual). Clicking the stage photo opens the usual project modal. All 9 slides reuse the
+   *same* DOM elements (one `<img id="campaignImg">`, not 9 separate tiles) — `renderCampaignSlide()`
+   swaps `src`/text on every index change, same technique as the services slider's single
+   text-swap and the coverflow's caption swap.
+   **Non-obvious fix needed for this layout specifically:** `.campaigns-sticky` is `display:flex`
+   (so it can vertically center the slide, same as `.services-sticky`/`.coverflow-sticky`) — but
+   its `.wrap` child has no explicit width, so as a flex item it sizes to shrink-to-fit instead of
+   filling the sticky stage. For `.services-slide` (`140px 1fr`, description text capped at
+   `max-width:52ch`) that shrink-to-fit result happens to look fine; for `.campaigns-slide`'s 3
+   columns, the extra `auto` track (the aspect-ratio'd photo) skewed the shrink-to-fit math hard
+   enough that the `1fr` text column collapsed to ~167px — title and note wrapped into a narrow
+   ragged column. Fixed with a scoped `.campaigns-sticky > .wrap{width:100%}` (not touched
+   site-wide, to avoid disturbing services/coverflow which already look correct as-is). **How to
+   apply:** if another pinned/flex-centered slide layout ends up with 3+ grid columns where one
+   has an intrinsic (non-1fr) size, check the text column's actual rendered width — don't assume a
+   working 2-column sticky pattern generalizes cleanly to 3 columns.
+   **Hover video preview on Nike/Adidas/Zegna** (added 2026-08-25, carried through both redesigns):
+   `#campaignHoverGif`, `position:absolute; inset:0; opacity:0` inside `.campaign-stage`,
+   cross-fading to `opacity:1` on `.campaign-stage:hover`. `renderCampaignSlide()` only points its
+   `src` at `images/campaigns/<key>/hover.gif` (and un-hides it) for those 3 keys — `display:none`
+   and `removeAttribute('src')` for the other 6, since setting `src=""` on an `<img>` makes it
+   re-request the current page URL, a real gotcha. Source was 3 BTS `.mov` clips the user supplied
+   (`nike.mov`, `adidas.mov`, `zegna.mov` — all B&W, portrait, 30–60fps originals); converted to
+   GIF with Pillow/OpenCV since there's no ffmpeg on this machine. First pass (full frame count,
+   480px wide, dithered) came out to 10–14MB *each* — GIF compresses photographic/video content far
+   worse than flat-color content. Re-encoded at 260px wide, ~10fps (every 3rd–5th source frame
+   depending on original fps), capped to 3.5s, a single 64-color palette sampled from a mid-clip
+   frame, and **no dithering** (`dither=Image.NONE` — dithering adds per-pixel noise that LZW/GIF
+   compresses badly; a flat-ish quantized image compresses much better and these are B&W BTS clips
+   so banding isn't very visible at this size anyway). Landed at 0.6–1.5MB each. The files live at
+   `images/campaigns/<key>/hover.gif` alongside each project's `01.jpg`.
 5. **Services** (`#services`) — redesigned 2026-08-25 from a static 4-card grid into a
    scroll-scrubbed slider (same pin pattern as the hero logo and editorial coverflow —
    `#servicesPin` → `.services-sticky`, height computed in JS via `sizeServicesPin()` as the

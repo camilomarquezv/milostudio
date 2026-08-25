@@ -246,25 +246,38 @@
     .arrow-btn{width:36px;height:36px;}
   }
 
-  /* ===== CAMPAIGNS GRID ===== */
-  /* Two-column grid of tall cards (ref: orionix.framer.website's work grid) — photo on top,
-     brand + note below. Taller frame than the old flex-grow row layout so the hover video on
-     Nike/Adidas/Zegna plays much bigger. */
-  .campaigns-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:64px 48px;}
-  .campaign-tile{cursor:pointer;}
-  .campaign-media{position:relative; border-radius:6px; overflow:hidden; aspect-ratio:3/4; box-shadow:0 1px 3px rgba(22,27,34,.08); transition:box-shadow .4s ease, transform .4s ease;}
-  .campaign-tile:hover .campaign-media{transform:translateY(-4px); box-shadow:0 26px 54px rgba(22,27,34,.18);}
-  .campaign-media img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1) contrast(1.02);}
-  /* A few tiles (Nike, Adidas, Zegna) have a BTS video clip that plays on hover, overlaid on top
-     of the static photo and cross-faded in — the photo stays underneath so there's no flash of
-     empty space while the GIF loads. */
-  .campaign-tile .tile-hover-gif{position:absolute; inset:0; opacity:0; transition:opacity .35s ease;}
-  .campaign-tile:hover .tile-hover-gif{opacity:1;}
-  .campaign-info{padding-top:18px; display:flex; justify-content:space-between; align-items:baseline; gap:1rem;}
-  .campaign-info h3{font-size:clamp(1.15rem,1.6vw,1.5rem); font-weight:800;}
-  .campaign-info p{color:var(--slate); font-size:.9rem; text-align:right;}
-  @media (max-width:700px){
-    .campaigns-grid{grid-template-columns:1fr; gap:44px;}
+  /* ===== CAMPAIGNS SLIDER ===== */
+  /* Same scroll-scrub pin pattern as the hero logo / coverflow / services: .campaigns-pin gives
+     scroll room, .campaigns-sticky pins in place while scroll progress drives which of the 9
+     campaigns is showing — one project at a time, matching the Services slider's mechanic. */
+  .campaigns-pin{position:relative;}
+  .campaigns-sticky{position:sticky; top:0; min-height:100vh; display:flex; align-items:center;}
+  /* Without this, the flex child shrinks to a content-based width instead of filling the sticky
+     stage — with the aspect-ratio'd image as a 3rd grid track alongside 1fr, that shrink-to-fit
+     math collapses the text column down to almost nothing. Force it to actually use the space. */
+  .campaigns-sticky > .wrap{width:100%;}
+  .campaigns-slide{display:grid; grid-template-columns:140px auto 1fr; gap:clamp(24px,4vw,56px); align-items:center; padding:clamp(32px,5vw,56px) 0;}
+  .campaign-num-col{display:flex; flex-direction:column; gap:1.6rem;}
+  .campaign-bignum{font-size:clamp(3rem,7vw,5.5rem); font-weight:800; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums;}
+  .campaigns-dots{display:flex; flex-direction:column; gap:10px;}
+  .campaigns-dots .cdot{width:8px; height:8px; border-radius:50%; background:var(--mist); border:none; cursor:pointer; padding:0; transition:background .25s ease, transform .25s ease;}
+  .campaigns-dots .cdot.is-active{background:var(--ink); transform:scale(1.3);}
+  .campaign-stage{position:relative; height:min(58vh,560px); aspect-ratio:3/4; border-radius:6px; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(22,27,34,.08); flex-shrink:0;}
+  .campaign-stage img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1) contrast(1.02);}
+  /* Nike/Adidas/Zegna have a BTS video clip that plays on hover, overlaid on top of the static
+     photo and cross-faded in — the photo stays underneath so there's no flash of empty space
+     while the GIF loads. Hidden entirely (not just transparent) for the other 6 campaigns. */
+  .campaign-stage .tile-hover-gif{position:absolute; inset:0; opacity:0; transition:opacity .35s ease;}
+  .campaign-stage:hover .tile-hover-gif{opacity:1;}
+  .campaign-info{max-width:46ch;}
+  .campaign-counter{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; color:var(--steel); margin-bottom:0.8rem;}
+  .campaign-info h3{font-size:clamp(1.8rem,3.4vw,2.8rem); font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
+  .campaign-info p{font-size:1rem; line-height:1.65; color:var(--slate);}
+  @media (max-width:860px){
+    .campaigns-slide{grid-template-columns:1fr; text-align:left;}
+    .campaign-num-col{flex-direction:row; align-items:center; justify-content:space-between;}
+    .campaigns-dots{flex-direction:row;}
+    .campaign-stage{height:auto; width:min(72vw,320px); aspect-ratio:3/4;}
   }
 
   /* ===== PROJECT MODAL ===== */
@@ -493,16 +506,27 @@
       <p class="desc" data-i18n="campaigns.desc">A selection of commercial campaigns across footwear, fashion, and lifestyle brands.</p>
     </div>
 
-    <div class="campaigns-grid reveal">
-      <div class="campaign-tile" data-campaign="nike"><div class="campaign-media"><img src="images/campaigns/nike/01.jpg" alt="Nike campaign"><img src="images/campaigns/nike/hover.gif" alt="" class="tile-hover-gif" loading="lazy"></div><div class="campaign-info"><h3>Nike</h3><p></p></div></div>
-      <div class="campaign-tile" data-campaign="adidas"><div class="campaign-media"><img src="images/campaigns/adidas/01.jpg" alt="Adidas campaign"><img src="images/campaigns/adidas/hover.gif" alt="" class="tile-hover-gif" loading="lazy"></div><div class="campaign-info"><h3>Adidas</h3><p></p></div></div>
-      <div class="campaign-tile" data-campaign="zegna"><div class="campaign-media"><img src="images/campaigns/zegna/01.jpg" alt="Zegna campaign"><img src="images/campaigns/zegna/hover.gif" alt="" class="tile-hover-gif" loading="lazy"></div><div class="campaign-info"><h3>Zegna</h3><p></p></div></div>
-      <div class="campaign-tile" data-campaign="valentino"><div class="campaign-media"><img src="images/campaigns/valentino/01.jpg" alt="Valentino campaign"></div><div class="campaign-info"><h3>Valentino</h3><p></p></div></div>
-      <div class="campaign-tile" data-campaign="iceberg"><div class="campaign-media"><img src="images/campaigns/iceberg/01.jpg" alt="Iceberg campaign"></div><div class="campaign-info"><h3>Iceberg</h3><p></p></div></div>
-      <div class="campaign-tile" data-campaign="payless"><div class="campaign-media"><img src="images/campaigns/payless/01.jpg" alt="Payless campaign"></div><div class="campaign-info"><h3>Payless</h3><p></p></div></div>
-      <div class="campaign-tile" data-campaign="calvin_k"><div class="campaign-media"><img src="images/campaigns/calvin_k/01.jpg" alt="Calvin Klein campaign"></div><div class="campaign-info"><h3>Calvin Klein</h3><p></p></div></div>
-      <div class="campaign-tile" data-campaign="desigual"><div class="campaign-media"><img src="images/campaigns/desigual/01.jpg" alt="Desigual campaign"></div><div class="campaign-info"><h3>Desigual</h3><p></p></div></div>
-      <div class="campaign-tile" data-campaign="fila"><div class="campaign-media"><img src="images/campaigns/fila/01.jpg" alt="Fila campaign"></div><div class="campaign-info"><h3>Fila</h3><p></p></div></div>
+  </div>
+
+  <div class="campaigns-pin" id="campaignsPin">
+    <div class="campaigns-sticky">
+      <div class="wrap">
+        <div class="campaigns-slide">
+          <div class="campaign-num-col">
+            <span class="campaign-bignum" id="campaignBigNum">01</span>
+            <div class="campaigns-dots" id="campaignsDots"></div>
+          </div>
+          <div class="campaign-stage" id="campaignStage">
+            <img id="campaignImg" src="images/campaigns/nike/01.jpg" alt="Nike campaign">
+            <img id="campaignHoverGif" src="images/campaigns/nike/hover.gif" alt="" class="tile-hover-gif" loading="lazy">
+          </div>
+          <div class="campaign-info">
+            <span class="campaign-counter" id="campaignCounter">01 / 09</span>
+            <h3 id="campaignTitle">Nike</h3>
+            <p id="campaignSub"></p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -1034,23 +1058,6 @@
     else if(e.key === 'ArrowLeft') prevSlide();
   });
 
-  // Campaign grid clicks + bilingual subtitle (pulled from projectData, not a data-i18n
-  // attribute, since these strings are per-brand rather than site-wide translation keys)
-  const campaignTiles = document.querySelectorAll('.campaign-tile');
-  function renderCampaignInfo(){
-    campaignTiles.forEach(tile => {
-      const proj = projectData[tile.dataset.campaign];
-      if(proj) tile.querySelector('.campaign-info p').textContent = proj.sub[currentLang];
-    });
-  }
-  campaignTiles.forEach(tile => {
-    tile.addEventListener('click', () => {
-      const key = tile.dataset.campaign;
-      const img = tile.querySelector('img');
-      openProjectModal(key, img.src);
-    });
-  });
-  renderCampaignInfo();
 
   // ===== Coverflow =====
   const coverOrder = ['penida', 'elegant', 'imirage', 'shuba', 'scorpiovin', 'mob', 'tag'];
@@ -1149,13 +1156,13 @@
   document.addEventListener('milo:langchange', () => {
     layoutCovers();
     renderTeam();
-    renderCampaignInfo();
     if(currentProjectKey && projectModal.classList.contains('open')){
       const savedSlide = currentSlide;
       openProjectModal(currentProjectKey, currentProjectImg);
       goToSlide(savedSlide);
     }
     if(typeof renderServiceSlide === 'function') renderServiceSlide();
+    if(typeof renderCampaignSlide === 'function') renderCampaignSlide();
   });
 </script>
 
@@ -1228,6 +1235,97 @@
   });
   renderServiceSlide();
   updateServicesScroll();
+</script>
+
+<script>
+  // ===== Campaigns slider ===== (same scroll-scrub pin pattern as the hero logo / coverflow /
+  // services — one campaign shows at a time, driven by scroll progress through #campaignsPin)
+  const campaignsData = [
+    {key: 'nike', label: 'Nike'},
+    {key: 'adidas', label: 'Adidas'},
+    {key: 'zegna', label: 'Zegna'},
+    {key: 'valentino', label: 'Valentino'},
+    {key: 'iceberg', label: 'Iceberg'},
+    {key: 'payless', label: 'Payless'},
+    {key: 'calvin_k', label: 'Calvin Klein'},
+    {key: 'desigual', label: 'Desigual'},
+    {key: 'fila', label: 'Fila'},
+  ];
+  const campaignHoverKeys = new Set(['nike', 'adidas', 'zegna']);
+  const campaignsPin = document.getElementById('campaignsPin');
+  const campaignsSticky = document.querySelector('.campaigns-sticky');
+  const campaignBigNum = document.getElementById('campaignBigNum');
+  const campaignCounter = document.getElementById('campaignCounter');
+  const campaignStage = document.getElementById('campaignStage');
+  const campaignImg = document.getElementById('campaignImg');
+  const campaignHoverGif = document.getElementById('campaignHoverGif');
+  const campaignTitleEl = document.getElementById('campaignTitle');
+  const campaignSubEl = document.getElementById('campaignSub');
+  const campaignsDotsWrap = document.getElementById('campaignsDots');
+  const CAMPAIGNS_SCROLL_ROOM = 1200;
+  let activeCampaign = 0;
+
+  campaignsData.forEach((c, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'cdot';
+    dot.type = 'button';
+    dot.setAttribute('aria-label', 'Go to campaign ' + (i + 1));
+    dot.addEventListener('click', () => { activeCampaign = i; renderCampaignSlide(); });
+    campaignsDotsWrap.appendChild(dot);
+  });
+  const campaignDots = Array.from(campaignsDotsWrap.children);
+
+  function renderCampaignSlide(){
+    const c = campaignsData[activeCampaign];
+    const proj = projectData[c.key];
+    const n = campaignsData.length;
+    campaignBigNum.textContent = String(activeCampaign + 1).padStart(2, '0');
+    campaignCounter.textContent = `${String(activeCampaign + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
+    campaignImg.src = proj.images[0];
+    campaignImg.alt = c.label + ' campaign';
+    campaignTitleEl.textContent = c.label;
+    campaignSubEl.textContent = proj.sub[currentLang];
+    if(campaignHoverKeys.has(c.key)){
+      campaignHoverGif.src = `images/campaigns/${c.key}/hover.gif`;
+      campaignHoverGif.style.display = '';
+    } else {
+      campaignHoverGif.removeAttribute('src');
+      campaignHoverGif.style.display = 'none';
+    }
+    campaignDots.forEach((d, i) => d.classList.toggle('is-active', i === activeCampaign));
+  }
+
+  campaignStage.addEventListener('click', () => {
+    openProjectModal(campaignsData[activeCampaign].key, campaignImg.src);
+  });
+
+  function sizeCampaignsPin(){
+    campaignsPin.style.height = (campaignsSticky.offsetHeight + CAMPAIGNS_SCROLL_ROOM) + 'px';
+  }
+
+  function updateCampaignsScroll(){
+    const rect = campaignsPin.getBoundingClientRect();
+    const total = campaignsPin.offsetHeight - campaignsSticky.offsetHeight;
+    const scrolled = clamp(-rect.top, 0, total);
+    const progress = total > 0 ? scrolled / total : 0;
+    const idx = Math.min(campaignsData.length - 1, Math.round(progress * (campaignsData.length - 1)));
+    if(idx !== activeCampaign){
+      activeCampaign = idx;
+      renderCampaignSlide();
+    }
+  }
+
+  sizeCampaignsPin();
+  window.addEventListener('resize', sizeCampaignsPin);
+  let campaignsTicking = false;
+  window.addEventListener('scroll', () => {
+    if(!campaignsTicking){
+      requestAnimationFrame(() => { updateCampaignsScroll(); campaignsTicking = false; });
+      campaignsTicking = true;
+    }
+  });
+  renderCampaignSlide();
+  updateCampaignsScroll();
 </script>
 
 <script>
