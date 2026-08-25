@@ -21,8 +21,18 @@ and Services came first.
 1. **Header/Nav** — logo, links (Services, Build a Team, Editorial, Studio, Start a Project),
    language toggle button (`#langToggle`). Nav link order was NOT changed in the reorder — it's
    still Services → Build a Team → Editorial → Studio, which no longer matches page order below.
-2. **Hero** (`#heroPin`) — scroll-pinned section: giant MILO wordmark blurs/frosts on scroll,
-   headline fades in over a glass panel (see hero-pin JS block)
+2. **Hero** (`#heroPin`) — scroll-pinned section, two phases driven by one `update()` function in
+   the hero-pin `<script>` block:
+   - **Assembly (0–35% of the pin's scroll range):** scrubs through `images/site/hero-sequence/`
+     (20 JPEG frames, `frame-01.jpg`…`frame-20.jpg`, extracted 2026-08-24 from a `milo.mov` clip
+     of the letters flying together) by swapping `#logoFrameImg`'s `src` — frame 1 is scattered
+     pieces, frame 20 is the fully-formed wordmark. All 20 are preloaded as `Image()` objects on
+     load so swapping is instant. Frames are native 1080×622 (the source video's resolution) —
+     the logo is capped at `width:min(78vw,980px)` in CSS specifically so it's never upscaled
+     past that and doesn't soften/pixelate; on very high-DPI (2x+) displays it won't be quite as
+     crisp as a native-2x asset would be, since 1080px is the ceiling.
+   - **Blur/fade (35–100%):** once assembled, the same blur-up/fade-down/scale-up treatment as
+     before takes over, and the headline fades in over the glass panel.
 3. **Editorial** (`#work`) — 3D "coverflow" carousel (CSS `rotateY`/`translateZ`, no library) of
    7 magazine covers (Penida, Elegant, Imirage, Shuba, Scorpio Vin, MOB, Tag). Click a side cover
    to center it; click the centered one to open the project modal.

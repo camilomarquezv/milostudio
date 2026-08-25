@@ -342,7 +342,7 @@
 <section class="hero-pin" id="heroPin">
   <div class="hero-stage">
     <div class="logo-layer" id="logoLayer">
-      <img src="images/site/hero-wordmark.png" alt="MILO">
+      <img src="images/site/hero-sequence/frame-01.jpg" alt="MILO" id="logoFrameImg">
     </div>
     <div class="glass-panel" id="glassPanel">
       <span class="eyebrow" data-i18n="hero.eyebrow">Bogotá — Worldwide</span>
@@ -758,20 +758,40 @@
 <script>
   const heroPin = document.getElementById('heroPin');
   const logoLayer = document.getElementById('logoLayer');
+  const logoFrameImg = document.getElementById('logoFrameImg');
   const glassPanel = document.getElementById('glassPanel');
   const scrollCue = document.getElementById('scrollCue');
 
   function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
   function easeInOutCubic(t){ return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
 
+  // Scroll-scrubbed logo assembly: frames 1-20 come from milo.mov (scattered pieces -> full
+  // wordmark). Preloaded once so swapping .src during scroll is instant, no flicker.
+  const HERO_FRAME_COUNT = 20;
+  const HERO_ASSEMBLY_END = 0.35; // fraction of pin scroll spent assembling before blur/fade starts
+  const heroFrames = [];
+  for(let i = 1; i <= HERO_FRAME_COUNT; i++){
+    const img = new Image();
+    img.src = `images/site/hero-sequence/frame-${String(i).padStart(2,'0')}.jpg`;
+    heroFrames.push(img);
+  }
+
   function update(){
     const rect = heroPin.getBoundingClientRect();
     const total = heroPin.offsetHeight - window.innerHeight;
     const scrolled = clamp(-rect.top, 0, total);
     const progress = total > 0 ? scrolled / total : 0;
-    const eased = easeInOutCubic(clamp(progress * 1.4, 0, 1)); // finish transition a bit before pin ends
 
-    // logo: blur up, fade down, slight scale up
+    // phase 1: scrub through the frame sequence as the logo assembles
+    const assemblyT = clamp(progress / HERO_ASSEMBLY_END, 0, 1);
+    const frameIdx = Math.min(HERO_FRAME_COUNT - 1, Math.round(assemblyT * (HERO_FRAME_COUNT - 1)));
+    const frameSrc = heroFrames[frameIdx].src;
+    if(logoFrameImg.src !== frameSrc) logoFrameImg.src = frameSrc;
+
+    // phase 2: once assembled, blur up / fade down / scale up into the headline, as before
+    const blurProgress = clamp((progress - HERO_ASSEMBLY_END) / (1 - HERO_ASSEMBLY_END), 0, 1);
+    const eased = easeInOutCubic(clamp(blurProgress * 1.4, 0, 1)); // finish transition a bit before pin ends
+
     const blur = eased * 16;
     const logoOpacity = 1 - eased * 0.85;
     const logoScale = 1 + eased * 0.06;
