@@ -262,7 +262,11 @@
   .campaigns-dots{display:flex; flex-direction:column; gap:10px;}
   .campaigns-dots .cdot{width:8px; height:8px; border-radius:50%; background:var(--mist); border:none; cursor:pointer; padding:0; transition:background .25s ease, transform .25s ease;}
   .campaigns-dots .cdot.is-active{background:var(--ink); transform:scale(1.3);}
-  .campaign-stage{position:relative; height:min(58vh,560px); aspect-ratio:3/4; border-radius:6px; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(22,27,34,.08); flex-shrink:0;}
+  /* Separate wrapper from .campaign-stage itself: the stage clips (overflow:hidden) for the
+     rounded-corner photo crop, so the prev/next arrows live on this outer element instead, or
+     they'd be clipped along with everything else. */
+  .campaign-stage-wrap{position:relative; flex-shrink:0;}
+  .campaign-stage{position:relative; height:min(58vh,560px); aspect-ratio:3/4; border-radius:6px; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(22,27,34,.08);}
   .campaign-stage img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1) contrast(1.02);}
   /* Nike/Adidas/Zegna have a BTS video clip that plays on hover, overlaid on top of the static
      photo and cross-faded in — the photo stays underneath so there's no flash of empty space
@@ -277,7 +281,8 @@
     .campaigns-slide{grid-template-columns:1fr; text-align:left;}
     .campaign-num-col{flex-direction:row; align-items:center; justify-content:space-between;}
     .campaigns-dots{flex-direction:row;}
-    .campaign-stage{height:auto; width:min(72vw,320px); aspect-ratio:3/4;}
+    .campaign-stage-wrap{width:min(72vw,320px); margin:0 auto;}
+    .campaign-stage{height:auto; width:100%; aspect-ratio:3/4;}
   }
 
   /* ===== PROJECT MODAL ===== */
@@ -347,7 +352,7 @@
   @media (max-width:560px){.form-row{grid-template-columns:1fr;}}
 
   /* ===== FOOTER ===== */
-  footer{padding:2rem 0; border-top:1px solid var(--line);}
+  footer{padding:2rem 0; border-top:1px solid var(--line); background:var(--paper-dim);}
   .footer-row{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;}
   .footer-row img{height:34px; filter:grayscale(1);}
   .footer-links{display:flex; gap:1.4rem; font-size:0.78rem; color:var(--slate);}
@@ -413,6 +418,54 @@
 
 
 
+<!-- CAMPAIGNS -->
+<section id="campaigns">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div><span class="eyebrow" data-i18n="campaigns.eyebrow">Campaigns</span><h2 style="margin-top:0.7rem;" data-i18n="campaigns.h2">Brand work, shot and produced.</h2></div>
+      <p class="desc" data-i18n="campaigns.desc">A selection of commercial campaigns across footwear, fashion, and lifestyle brands.</p>
+    </div>
+
+  </div>
+
+  <div class="campaigns-pin" id="campaignsPin">
+    <div class="campaigns-sticky">
+      <div class="wrap">
+        <div class="campaigns-slide">
+          <div class="campaign-num-col">
+            <span class="campaign-bignum" id="campaignBigNum">01</span>
+            <div class="campaigns-dots" id="campaignsDots"></div>
+          </div>
+          <div class="campaign-stage-wrap">
+            <button class="arrow-btn arrow-prev" id="campaignPrevBtn" aria-label="Previous campaign">‹</button>
+            <button class="arrow-btn arrow-next" id="campaignNextBtn" aria-label="Next campaign">›</button>
+            <div class="campaign-stage" id="campaignStage">
+              <img id="campaignImg" src="images/campaigns/nike/01.jpg" alt="Nike campaign">
+              <img id="campaignHoverGif" src="images/campaigns/nike/hover.gif" alt="" class="tile-hover-gif" loading="lazy">
+            </div>
+          </div>
+          <div class="campaign-info">
+            <span class="campaign-counter" id="campaignCounter">01 / 09</span>
+            <h3 id="campaignTitle">Nike</h3>
+            <p id="campaignSub"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECT MODAL -->
+<div class="project-modal" id="projectModal" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle">
+  <div class="project-modal-card">
+    <div class="project-modal-head">
+      <div><span class="eyebrow" id="projectModalEyebrow">Editorial</span><h2 id="projectModalTitle">Project</h2><p id="projectModalSub">Editorial archive</p></div>
+      <button class="modal-close" id="modalClose" type="button" aria-label="Close project">×</button>
+    </div>
+    <div class="project-gallery" id="projectGallery"></div>
+    <div class="project-note" id="projectNote"></div>
+  </div>
+</div>
 <!-- EDITORIAL PORTFOLIO -->
 <section id="work">
   <div class="wrap">
@@ -498,74 +551,15 @@
   </div>
 </section>
 
-<!-- CAMPAIGNS -->
-<section id="campaigns">
+<!-- PROCESS -->
+<section id="process">
   <div class="wrap">
-    <div class="section-head reveal">
-      <div><span class="eyebrow" data-i18n="campaigns.eyebrow">Campaigns</span><h2 style="margin-top:0.7rem;" data-i18n="campaigns.h2">Brand work, shot and produced.</h2></div>
-      <p class="desc" data-i18n="campaigns.desc">A selection of commercial campaigns across footwear, fashion, and lifestyle brands.</p>
-    </div>
-
-  </div>
-
-  <div class="campaigns-pin" id="campaignsPin">
-    <div class="campaigns-sticky">
-      <div class="wrap">
-        <div class="campaigns-slide">
-          <div class="campaign-num-col">
-            <span class="campaign-bignum" id="campaignBigNum">01</span>
-            <div class="campaigns-dots" id="campaignsDots"></div>
-          </div>
-          <div class="campaign-stage" id="campaignStage">
-            <img id="campaignImg" src="images/campaigns/nike/01.jpg" alt="Nike campaign">
-            <img id="campaignHoverGif" src="images/campaigns/nike/hover.gif" alt="" class="tile-hover-gif" loading="lazy">
-          </div>
-          <div class="campaign-info">
-            <span class="campaign-counter" id="campaignCounter">01 / 09</span>
-            <h3 id="campaignTitle">Nike</h3>
-            <p id="campaignSub"></p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PROJECT MODAL -->
-<div class="project-modal" id="projectModal" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle">
-  <div class="project-modal-card">
-    <div class="project-modal-head">
-      <div><span class="eyebrow" id="projectModalEyebrow">Editorial</span><h2 id="projectModalTitle">Project</h2><p id="projectModalSub">Editorial archive</p></div>
-      <button class="modal-close" id="modalClose" type="button" aria-label="Close project">×</button>
-    </div>
-    <div class="project-gallery" id="projectGallery"></div>
-    <div class="project-note" id="projectNote"></div>
-  </div>
-</div>
-<!-- SERVICES -->
-<section id="services">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div><span class="eyebrow" data-i18n="services.eyebrow">What We Do</span><h2 style="margin-top:0.7rem;" data-i18n="services.h2">Four things we do really well.</h2></div>
-      <p class="desc" data-i18n="services.desc">And a few more that round out a full production — all under one brief, one team, one delivery.</p>
-    </div>
-  </div>
-
-  <div class="services-pin" id="servicesPin">
-    <div class="services-sticky">
-      <div class="wrap">
-        <div class="services-slide">
-          <div class="service-num-col">
-            <span class="service-bignum" id="serviceBigNum">01</span>
-            <div class="services-dots" id="servicesDots"></div>
-          </div>
-          <div class="service-info">
-            <span class="service-counter" id="serviceCounter">01 / 04</span>
-            <h3 id="serviceTitle">Retouching &amp; Post-Production</h3>
-            <p id="serviceDesc">Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.</p>
-          </div>
-        </div>
-      </div>
+    <div class="section-head reveal"><div><span class="eyebrow" data-i18n="process.eyebrow">The Process</span><h2 style="margin-top:0.7rem;" data-i18n="process.h2">From brief to delivery.</h2></div></div>
+    <div class="process-list reveal">
+      <div class="process-row"><span class="pnum">01</span><h3 data-i18n="process1.title">Briefing</h3><p data-i18n="process1.desc">Brand, market, timeline, and budget — one conversation to define the scope of the campaign.</p></div>
+      <div class="process-row"><span class="pnum">02</span><h3 data-i18n="process2.title">Team Assembly</h3><p data-i18n="process2.desc">MILO staffs the project: stylist, MUA, casting, production support — matched to what the brief actually requires.</p></div>
+      <div class="process-row"><span class="pnum">03</span><h3 data-i18n="process3.title">Production</h3><p data-i18n="process3.desc">On-set direction and shoot management, with Camilo leading creative and technical decisions throughout the day.</p></div>
+      <div class="process-row"><span class="pnum">04</span><h3 data-i18n="process4.title">Retouch &amp; Deliver</h3><p data-i18n="process4.desc">Post-production and final asset delivery in the formats the campaign needs — print, digital, or e-commerce ready.</p></div>
     </div>
   </div>
 </section>
@@ -587,6 +581,34 @@
             <div><span class="stat-num">10+</span><span class="stat-label" data-i18n="about.stat1">Years in Production</span></div>
             <div><span class="stat-num">20+</span><span class="stat-label" data-i18n="about.stat2">Brands &amp; Designers</span></div>
             <div><span class="stat-num">2</span><span class="stat-label" data-i18n="about.stat3">EU + LATAM Markets</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div><span class="eyebrow" data-i18n="services.eyebrow">What We Do</span><h2 style="margin-top:0.7rem;" data-i18n="services.h2">Four things we do really well.</h2></div>
+      <p class="desc" data-i18n="services.desc">And a few more that round out a full production — all under one brief, one team, one delivery.</p>
+    </div>
+  </div>
+
+  <div class="services-pin" id="servicesPin">
+    <div class="services-sticky">
+      <div class="wrap">
+        <div class="services-slide">
+          <div class="service-num-col">
+            <span class="service-bignum" id="serviceBigNum">01</span>
+            <div class="services-dots" id="servicesDots"></div>
+          </div>
+          <div class="service-info">
+            <span class="service-counter" id="serviceCounter">01 / 04</span>
+            <h3 id="serviceTitle">Retouching &amp; Post-Production</h3>
+            <p id="serviceDesc">Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.</p>
           </div>
         </div>
       </div>
@@ -617,19 +639,6 @@
         <p class="builder-note" data-i18n="team.note">This is how every MILO project starts: a briefing, then a team sized to it — never more than the project needs, never less than it takes to do it right.</p>
         <a href="#contact" class="btn btn-solid builder-cta" id="quoteBtn" data-i18n="team.quoteCta">Get a Quote</a>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- PROCESS -->
-<section id="process">
-  <div class="wrap">
-    <div class="section-head reveal"><div><span class="eyebrow" data-i18n="process.eyebrow">The Process</span><h2 style="margin-top:0.7rem;" data-i18n="process.h2">From brief to delivery.</h2></div></div>
-    <div class="process-list reveal">
-      <div class="process-row"><span class="pnum">01</span><h3 data-i18n="process1.title">Briefing</h3><p data-i18n="process1.desc">Brand, market, timeline, and budget — one conversation to define the scope of the campaign.</p></div>
-      <div class="process-row"><span class="pnum">02</span><h3 data-i18n="process2.title">Team Assembly</h3><p data-i18n="process2.desc">MILO staffs the project: stylist, MUA, casting, production support — matched to what the brief actually requires.</p></div>
-      <div class="process-row"><span class="pnum">03</span><h3 data-i18n="process3.title">Production</h3><p data-i18n="process3.desc">On-set direction and shoot management, with Camilo leading creative and technical decisions throughout the day.</p></div>
-      <div class="process-row"><span class="pnum">04</span><h3 data-i18n="process4.title">Retouch &amp; Deliver</h3><p data-i18n="process4.desc">Post-production and final asset delivery in the formats the campaign needs — print, digital, or e-commerce ready.</p></div>
     </div>
   </div>
 </section>
@@ -1298,6 +1307,16 @@
   campaignStage.addEventListener('click', () => {
     openProjectModal(campaignsData[activeCampaign].key, campaignImg.src);
   });
+
+  // Prev/next arrows — a manual override for anyone who scrolls past a campaign too fast to
+  // register it, same "click overrides until the next scroll event" behavior as the coverflow's
+  // own arrows/dots.
+  function goToCampaign(i){
+    activeCampaign = ((i % campaignsData.length) + campaignsData.length) % campaignsData.length;
+    renderCampaignSlide();
+  }
+  document.getElementById('campaignPrevBtn').addEventListener('click', () => goToCampaign(activeCampaign - 1));
+  document.getElementById('campaignNextBtn').addEventListener('click', () => goToCampaign(activeCampaign + 1));
 
   function sizeCampaignsPin(){
     campaignsPin.style.height = (campaignsSticky.offsetHeight + CAMPAIGNS_SCROLL_ROOM) + 'px';

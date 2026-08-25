@@ -16,8 +16,14 @@ Netlify/Vercel) rather than dragging a single file into Netlify Drop — see "De
 - Language: site is bilingual EN/ES (see i18n section below), all copy in English by default
 
 ## Page structure (in `<body>` order)
-Reordered 2026-08-24 so Editorial and Campaigns show right after the hero — before that, About
-and Services came first.
+Reordered twice. First on 2026-08-24, so Editorial and Campaigns show right after the hero
+(before that, About and Services came first). Reordered again on 2026-08-25 to the current order
+below — Campaigns now leads (before Editorial), followed by Process, About, Services, then Team
+Builder and Contact. Nav link order was left as-is through both reorders (see item 1) and no
+longer matches page order. The physical `<section>` blocks were reshuffled directly in
+`index.html`; none of the `<script>` blocks needed to move since all of them already live after
+every section, at the bottom of `<body>` (they look up elements by ID, so section order in the
+markup doesn't matter to them).
 1. **Header/Nav** — logo, links (Services, Build a Team, Editorial, Studio, Start a Project),
    language toggle button (`#langToggle`). Nav link order was NOT changed in the reorder — it's
    still Services → Build a Team → Editorial → Studio, which no longer matches page order below.
@@ -78,22 +84,7 @@ and Services came first.
      pixelated at real size once live, so it's back to the original text ticker. The GIF file is
      still in `images/site/` (unused) in case a higher-res version shows up later; nothing
      references it now.
-3. **Editorial** (`#work`) — 3D "coverflow" carousel (CSS `rotateY`/`translateZ`, no library) of
-   7 magazine covers (Penida, Elegant, Imirage, Shuba, Scorpio Vin, MOB, Tag). Click a side cover
-   to center it; click the centered one to open the project modal. The section head only has the
-   eyebrow+`h2` now (the `.desc` paragraph that used to sit next to it — `editorial.desc` — was
-   removed 2026-08-25, user found it redundant next to the `.lead` paragraph in
-   `.editorial-intro` right below; the translation key is gone too, not just unused). **Scroll-scrubbed** (added
-   2026-08-25, same pattern as the hero logo): the carousel itself sits in `.coverflow-sticky`
-   inside a `#coverflowPin` wrapper, and while that's pinned, scrolling advances the centered
-   cover from Penida straight through to Tag (`updateCoverflowScroll()`, in the coverflow
-   `<script>` block — maps scroll progress within the pin directly to a cover index, 0 to 6).
-   Same JS-computed-height approach as the hero (`sizeCoverflowPin()`): the pin's height is the
-   sticky content's own height plus a fixed `COVERFLOW_SCROLL_ROOM` (520px), not a flat vh, so
-   there's no dead scroll space if the carousel is short relative to the viewport. Clicking a
-   cover or a dot still works at any time and simply overrides `active` until the next scroll
-   event recomputes it from scroll position.
-4. **Campaigns** (`#campaigns`) — 9 brand campaigns (Nike, Adidas, Zegna, Valentino, Iceberg,
+3. **Campaigns** (`#campaigns`) — 9 brand campaigns (Nike, Adidas, Zegna, Valentino, Iceberg,
    Payless, Calvin Klein, Desigual, Fila). Went through two redesigns the same day (2026-08-25):
    first a static two-column grid of tall cards, then — per user feedback wanting "each project as
    its own scroll, showing on its own" like the Services slider — **rebuilt as a scroll-scrubbed
@@ -109,7 +100,14 @@ and Services came first.
    bilingual). Clicking the stage photo opens the usual project modal. All 9 slides reuse the
    *same* DOM elements (one `<img id="campaignImg">`, not 9 separate tiles) — `renderCampaignSlide()`
    swaps `src`/text on every index change, same technique as the services slider's single
-   text-swap and the coverflow's caption swap.
+   text-swap and the coverflow's caption swap. **Prev/next arrows** (added 2026-08-25, same day
+   — user wanted a manual way to catch a campaign missed by scrolling too fast): reuses the
+   existing `.arrow-btn`/`.arrow-prev`/`.arrow-next` styling from the coverflow. They live on a
+   `.campaign-stage-wrap` element wrapping `.campaign-stage`, not inside the stage itself, since
+   the stage has `overflow:hidden` for its rounded photo crop and would clip them. `goToCampaign()`
+   wraps around at both ends (index 8 → next → 0). Same "override until the next scroll event"
+   behavior as the coverflow's own arrows/dots — clicking doesn't move the scroll position, so
+   continued scrolling picks up from wherever raw scroll progress maps to, same as before.
    **Non-obvious fix needed for this layout specifically:** `.campaigns-sticky` is `display:flex`
    (so it can vertically center the slide, same as `.services-sticky`/`.coverflow-sticky`) — but
    its `.wrap` child has no explicit width, so as a flex item it sizes to shrink-to-fit instead of
@@ -137,7 +135,30 @@ and Services came first.
    compresses badly; a flat-ish quantized image compresses much better and these are B&W BTS clips
    so banding isn't very visible at this size anyway). Landed at 0.6–1.5MB each. The files live at
    `images/campaigns/<key>/hover.gif` alongside each project's `01.jpg`.
-5. **Services** (`#services`) — redesigned 2026-08-25 from a static 4-card grid into a
+4. **Editorial** (`#work`) — 3D "coverflow" carousel (CSS `rotateY`/`translateZ`, no library) of
+   7 magazine covers (Penida, Elegant, Imirage, Shuba, Scorpio Vin, MOB, Tag). Click a side cover
+   to center it; click the centered one to open the project modal. The section head only has the
+   eyebrow+`h2` now (the `.desc` paragraph that used to sit next to it — `editorial.desc` — was
+   removed 2026-08-25, user found it redundant next to the `.lead` paragraph in
+   `.editorial-intro` right below; the translation key is gone too, not just unused). **Scroll-scrubbed** (added
+   2026-08-25, same pattern as the hero logo): the carousel itself sits in `.coverflow-sticky`
+   inside a `#coverflowPin` wrapper, and while that's pinned, scrolling advances the centered
+   cover from Penida straight through to Tag (`updateCoverflowScroll()`, in the coverflow
+   `<script>` block — maps scroll progress within the pin directly to a cover index, 0 to 6).
+   Same JS-computed-height approach as the hero (`sizeCoverflowPin()`): the pin's height is the
+   sticky content's own height plus a fixed `COVERFLOW_SCROLL_ROOM` (520px), not a flat vh, so
+   there's no dead scroll space if the carousel is short relative to the viewport. Clicking a
+   cover or a dot still works at any time and simply overrides `active` until the next scroll
+   event recomputes it from scroll position.
+5. **Process** (`#process`) — 4-step process (Briefing → Team Assembly → Production → Retouch &
+   Deliver). Each `.process-row` inverts on hover (added 2026-08-25) — dark `var(--ink)`
+   background, title goes `var(--paper)`, the number goes `var(--accent)`, description goes
+   `var(--mist)`. The row uses a negative-margin/matching-padding trick
+   (`margin:0 clamp(-20px,-3vw,-32px)` cancelling `padding:1.7rem clamp(20px,3vw,32px)`) so the
+   hover background bleeds full-width to `.process-list`'s own edge instead of stopping at the
+   row's normal content width.
+6. **About** (`#about`) — dark section, studio bio + 3 stats, B&W behind-the-scenes photo
+7. **Services** (`#services`) — redesigned 2026-08-25 from a static 4-card grid into a
    scroll-scrubbed slider (same pin pattern as the hero logo and editorial coverflow —
    `#servicesPin` → `.services-sticky`, height computed in JS via `sizeServicesPin()` as the
    sticky content's height + a fixed 700px `SERVICES_SCROLL_ROOM`). Scrolling advances through the
@@ -155,27 +176,22 @@ and Services came first.
    cards. Also: `#heroContent`'s padding is now `clamp(20px,3vh,36px)` on *both* top and bottom
    (was top-only) — the bottom half used to stack with `#work`'s own top padding and leave a large
    empty gap below the brand marquee.
-6. **About** (`#about`) — dark section, studio bio + 3 stats, B&W behind-the-scenes photo
-7. **Team Builder** (`#team-builder`) — interactive: click role chips (Photographer, Stylist,
+8. **Team Builder** (`#team-builder`) — interactive: click role chips (Photographer, Stylist,
    MUA, Casting, Producer, Retoucher, Motion/Video, Set Design) to build a live "team" string.
    A **"Get a Quote"/"Cotizar" button** (`#quoteBtn`, added 2026-08-25) appears in the output box
    once at least one role is selected — clicking it fills the contact form's message textarea
    (`#cfMessage`) with the selected roles (translated, via `team.quoteMessage`), smooth-scrolls to
    `#contact`, and focuses the name field. Hidden again (`.builder-cta` without `.show`) when
    nothing's selected, so it never shows an empty quote request.
-8. **Process** (`#process`) — 4-step process (Briefing → Team Assembly → Production → Retouch &
-   Deliver). Each `.process-row` inverts on hover (added 2026-08-25) — dark `var(--ink)`
-   background, title goes `var(--paper)`, the number goes `var(--accent)`, description goes
-   `var(--mist)`. The row uses a negative-margin/matching-padding trick
-   (`margin:0 clamp(-20px,-3vw,-32px)` cancelling `padding:1.7rem clamp(20px,3vw,32px)`) so the
-   hover background bleeds full-width to `.process-list`'s own edge instead of stopping at the
-   row's normal content width.
 9. **Project Modal** (`#projectModal`) — shared lightbox for both editorial covers and campaign
    tiles; pulls from the `projectData` JS object; includes a Behance deep-link when we have the
    real project URL, otherwise links to the profile
 10. **Contact** (`#contact`) — dark panel, email + WhatsApp, no form (previously had a form but
     it wasn't wired to anything, so it was replaced with direct contact info)
-11. **Footer** — nav links + Behance + tagline
+11. **Footer** — nav links + Behance + tagline. `background:var(--paper-dim)` (added 2026-08-25,
+    user wanted it "a bit darker, no grid") — an explicit opaque background paints over the
+    body's dot-grid pattern that otherwise shows through every section without its own
+    background-color. Reuses the same token `#team-builder` already uses, rather than a new color.
 
 ## Design system
 - Palette (CSS vars near top of `<style>`): `--ink:#161B22 --slate:#3C4A57 --steel:#6E7F8D
