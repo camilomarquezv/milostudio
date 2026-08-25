@@ -118,10 +118,14 @@
 
 
 
-  /* Animated brand-logo strip (GIF supplied by the user, already self-scrolling frame-by-frame —
-     no CSS animation needed here, just sizing). Native 1133x145; scales down on narrow viewports. */
-  .hero-marquee{margin-top:clamp(40px,6vw,68px); overflow:hidden;}
-  .hero-marquee img{display:block; width:100%; height:auto;}
+  .marquee-band{margin-top:clamp(32px,6vw,60px); background:var(--ink); color:var(--paper); overflow:hidden;}
+  .marquee-track{display:flex; width:max-content; animation:scroll 30s linear infinite; padding:14px 0;}
+  @keyframes scroll{from{transform:translateX(0);} to{transform:translateX(-50%);}}
+  .marquee-track span{font-size:0.8rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; padding:0 2rem; white-space:nowrap; opacity:0.8;}
+  .marquee-track span::after{content:"·"; margin-left:2rem; color:var(--steel);}
+  .hero-marquee{margin-top:clamp(40px,6vw,68px);}
+  .hero-marquee .marquee-track{padding:12px 0;}
+  .hero-marquee .marquee-track span{font-size:0.7rem; padding:0 1.35rem;}
 
 
   /* ===== CURSOR TRAIL ===== */
@@ -243,27 +247,26 @@
   }
 
   /* ===== CAMPAIGNS GRID ===== */
-  /* Flexbox, not CSS Grid: hovering a tile grows its flex-grow (revealing more of the photo
-     instead of the fixed-crop aspect-ratio box) while its row siblings shrink to make room —
-     flex-basis/flex-grow tween smoothly, so the row visibly "parts" around the hovered tile
-     without any image ever overlapping another. */
-  .campaigns-grid{display:flex; flex-wrap:wrap; gap:14px;}
-  .campaign-tile{
-    position:relative;border-radius:3px;overflow:hidden;cursor:pointer;
-    flex:1 1 26%; height:clamp(240px,24vw,400px);
-    transition:flex-grow .5s cubic-bezier(.22,.9,.24,1);
-  }
-  .campaigns-grid:hover .campaign-tile{flex-grow:0.7;}
-  .campaigns-grid:hover .campaign-tile:hover{flex-grow:2.6;}
-  .campaign-tile img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1) contrast(1.02);}
+  /* Two-column grid of tall cards (ref: orionix.framer.website's work grid) — photo on top,
+     brand + note below. Taller frame than the old flex-grow row layout so the hover video on
+     Nike/Adidas/Zegna plays much bigger. */
+  .campaigns-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:48px 28px;}
+  .campaign-tile{cursor:pointer;}
+  .campaign-media{position:relative; border-radius:18px; overflow:hidden; height:clamp(320px,34vw,540px); box-shadow:0 1px 3px rgba(22,27,34,.08); transition:box-shadow .4s ease, transform .4s ease;}
+  .campaign-tile:hover .campaign-media{transform:translateY(-4px); box-shadow:0 26px 54px rgba(22,27,34,.18);}
+  .campaign-media img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1) contrast(1.02);}
   /* A few tiles (Nike, Adidas, Zegna) have a BTS video clip that plays on hover, overlaid on top
      of the static photo and cross-faded in — the photo stays underneath so there's no flash of
      empty space while the GIF loads. */
   .campaign-tile .tile-hover-gif{position:absolute; inset:0; opacity:0; transition:opacity .35s ease;}
   .campaign-tile:hover .tile-hover-gif{opacity:1;}
-  .campaign-tile .tag{position:absolute;left:12px;bottom:12px;background:rgba(22,27,34,.82);color:var(--paper);font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:6px 10px;border-radius:2px;}
-  @media (max-width:900px){.campaign-tile{flex-basis:40%;}}
-  @media (max-width:560px){.campaign-tile{flex-basis:100%; flex-grow:1 !important; height:clamp(220px,68vw,320px);}}
+  .campaign-info{padding-top:18px; display:flex; justify-content:space-between; align-items:baseline; gap:1rem;}
+  .campaign-info h3{font-size:clamp(1.15rem,1.6vw,1.5rem); font-weight:800;}
+  .campaign-info p{color:var(--slate); font-size:.9rem; text-align:right;}
+  @media (max-width:700px){
+    .campaigns-grid{grid-template-columns:1fr; gap:32px;}
+    .campaign-media{height:clamp(300px,110vw,440px);}
+  }
 
   /* ===== PROJECT MODAL ===== */
   .project-modal{position:fixed;inset:0;background:rgba(22,27,34,.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:28px;z-index:500;}
@@ -388,8 +391,11 @@
       </div>
     </div>
   </div>
-  <div class="hero-marquee">
-    <img src="images/site/brand-marquee.gif" alt="Brand logos: Zegna, Adidas, Ferragamo, Nike, Iceberg, Ray-Ban, Harmont &amp; Blaine, Hackett, Hawkers, Sisley, Valentino, Calvin Klein, Kenzo, and more">
+  <div class="marquee-band hero-marquee">
+    <div class="marquee-track">
+      <span>Nike</span><span>Adidas</span><span>Zegna</span><span>Valentino</span><span>Ferragamo</span><span>Calvin Klein</span><span>Kenzo</span><span>Sisley</span><span>Ray-Ban</span><span>Dafiti</span><span>Hawkers</span><span>Iceberg</span>
+      <span>Nike</span><span>Adidas</span><span>Zegna</span><span>Valentino</span><span>Ferragamo</span><span>Calvin Klein</span><span>Kenzo</span><span>Sisley</span><span>Ray-Ban</span><span>Dafiti</span><span>Hawkers</span><span>Iceberg</span>
+    </div>
   </div>
 </section>
 
@@ -489,15 +495,15 @@
     </div>
 
     <div class="campaigns-grid reveal">
-      <div class="campaign-tile" data-campaign="nike"><img src="images/campaigns/nike/01.jpg" alt="Nike campaign"><img src="images/campaigns/nike/hover.gif" alt="" class="tile-hover-gif" loading="lazy"><span class="tag">Nike</span></div>
-      <div class="campaign-tile" data-campaign="adidas"><img src="images/campaigns/adidas/01.jpg" alt="Adidas campaign"><img src="images/campaigns/adidas/hover.gif" alt="" class="tile-hover-gif" loading="lazy"><span class="tag">Adidas</span></div>
-      <div class="campaign-tile" data-campaign="zegna"><img src="images/campaigns/zegna/01.jpg" alt="Zegna campaign"><img src="images/campaigns/zegna/hover.gif" alt="" class="tile-hover-gif" loading="lazy"><span class="tag">Zegna</span></div>
-      <div class="campaign-tile" data-campaign="valentino"><img src="images/campaigns/valentino/01.jpg" alt="Valentino campaign"><span class="tag">Valentino</span></div>
-      <div class="campaign-tile" data-campaign="iceberg"><img src="images/campaigns/iceberg/01.jpg" alt="Iceberg campaign"><span class="tag">Iceberg</span></div>
-      <div class="campaign-tile" data-campaign="payless"><img src="images/campaigns/payless/01.jpg" alt="Payless campaign"><span class="tag">Payless</span></div>
-      <div class="campaign-tile" data-campaign="calvin_k"><img src="images/campaigns/calvin_k/01.jpg" alt="Calvin Klein campaign"><span class="tag">Calvin Klein</span></div>
-      <div class="campaign-tile" data-campaign="desigual"><img src="images/campaigns/desigual/01.jpg" alt="Desigual campaign"><span class="tag">Desigual</span></div>
-      <div class="campaign-tile" data-campaign="fila"><img src="images/campaigns/fila/01.jpg" alt="Fila campaign"><span class="tag">Fila</span></div>
+      <div class="campaign-tile" data-campaign="nike"><div class="campaign-media"><img src="images/campaigns/nike/01.jpg" alt="Nike campaign"><img src="images/campaigns/nike/hover.gif" alt="" class="tile-hover-gif" loading="lazy"></div><div class="campaign-info"><h3>Nike</h3><p></p></div></div>
+      <div class="campaign-tile" data-campaign="adidas"><div class="campaign-media"><img src="images/campaigns/adidas/01.jpg" alt="Adidas campaign"><img src="images/campaigns/adidas/hover.gif" alt="" class="tile-hover-gif" loading="lazy"></div><div class="campaign-info"><h3>Adidas</h3><p></p></div></div>
+      <div class="campaign-tile" data-campaign="zegna"><div class="campaign-media"><img src="images/campaigns/zegna/01.jpg" alt="Zegna campaign"><img src="images/campaigns/zegna/hover.gif" alt="" class="tile-hover-gif" loading="lazy"></div><div class="campaign-info"><h3>Zegna</h3><p></p></div></div>
+      <div class="campaign-tile" data-campaign="valentino"><div class="campaign-media"><img src="images/campaigns/valentino/01.jpg" alt="Valentino campaign"></div><div class="campaign-info"><h3>Valentino</h3><p></p></div></div>
+      <div class="campaign-tile" data-campaign="iceberg"><div class="campaign-media"><img src="images/campaigns/iceberg/01.jpg" alt="Iceberg campaign"></div><div class="campaign-info"><h3>Iceberg</h3><p></p></div></div>
+      <div class="campaign-tile" data-campaign="payless"><div class="campaign-media"><img src="images/campaigns/payless/01.jpg" alt="Payless campaign"></div><div class="campaign-info"><h3>Payless</h3><p></p></div></div>
+      <div class="campaign-tile" data-campaign="calvin_k"><div class="campaign-media"><img src="images/campaigns/calvin_k/01.jpg" alt="Calvin Klein campaign"></div><div class="campaign-info"><h3>Calvin Klein</h3><p></p></div></div>
+      <div class="campaign-tile" data-campaign="desigual"><div class="campaign-media"><img src="images/campaigns/desigual/01.jpg" alt="Desigual campaign"></div><div class="campaign-info"><h3>Desigual</h3><p></p></div></div>
+      <div class="campaign-tile" data-campaign="fila"><div class="campaign-media"><img src="images/campaigns/fila/01.jpg" alt="Fila campaign"></div><div class="campaign-info"><h3>Fila</h3><p></p></div></div>
     </div>
   </div>
 </section>
@@ -1029,14 +1035,23 @@
     else if(e.key === 'ArrowLeft') prevSlide();
   });
 
-  // Campaign grid clicks
-  document.querySelectorAll('.campaign-tile').forEach(tile => {
+  // Campaign grid clicks + bilingual subtitle (pulled from projectData, not a data-i18n
+  // attribute, since these strings are per-brand rather than site-wide translation keys)
+  const campaignTiles = document.querySelectorAll('.campaign-tile');
+  function renderCampaignInfo(){
+    campaignTiles.forEach(tile => {
+      const proj = projectData[tile.dataset.campaign];
+      if(proj) tile.querySelector('.campaign-info p').textContent = proj.sub[currentLang];
+    });
+  }
+  campaignTiles.forEach(tile => {
     tile.addEventListener('click', () => {
       const key = tile.dataset.campaign;
       const img = tile.querySelector('img');
       openProjectModal(key, img.src);
     });
   });
+  renderCampaignInfo();
 
   // ===== Coverflow =====
   const coverOrder = ['penida', 'elegant', 'imirage', 'shuba', 'scorpiovin', 'mob', 'tag'];
@@ -1135,6 +1150,7 @@
   document.addEventListener('milo:langchange', () => {
     layoutCovers();
     renderTeam();
+    renderCampaignInfo();
     if(currentProjectKey && projectModal.classList.contains('open')){
       const savedSlide = currentSlide;
       openProjectModal(currentProjectKey, currentProjectImg);

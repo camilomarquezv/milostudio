@@ -72,17 +72,12 @@ and Services came first.
      Also has `background:var(--paper)` (added 2026-08-25) so the body's dot grid is hidden behind
      the headline *and* the marquee (`.hero-marquee` is a child of `#heroContent`, not `.wrap`) —
      the grid resumes right after, at Campaigns, which has no such override.
-     **The brand marquee is a single animated GIF** (`images/site/brand-marquee.gif`, added
-     2026-08-25), not the CSS-driven scrolling `<span>` ticker it used to be — the user supplied a
-     pre-made looping logo strip (Zegna, Adidas, Ferragamo, Nike, Iceberg, Ray-Ban, Harmont &
-     Blaine, Hackett, Hawkers, Sisley, Valentino, Calvin Klein, Kenzo, +more), so the scroll motion
-     is baked into the GIF's own frames — no `@keyframes`/`animation` needed, `.hero-marquee img`
-     is just `width:100%; height:auto`. The original file was 4.95MB (308 frames); re-encoded with
-     Pillow to every 3rd frame (103 frames, 90ms each — same ~9.3s loop) + a 32-color palette,
-     dropping it to 1.77MB with no visible quality loss (it's just black logos on white). If this
-     GIF ever needs replacing, keep in mind the original had an unused transparency flag in its
-     GIF info but was fully opaque white in practice — check actual pixel alpha, not just
-     `im.info`, before assuming a new source file is or isn't transparent.
+     **The brand marquee is back to the CSS-driven scrolling `<span>` ticker** (`.marquee-band` /
+     `.marquee-track`, `@keyframes scroll`). It was briefly a single animated GIF the user supplied
+     (`images/site/brand-marquee.gif`, added then reverted same day, 2026-08-25) — looked too
+     pixelated at real size once live, so it's back to the original text ticker. The GIF file is
+     still in `images/site/` (unused) in case a higher-res version shows up later; nothing
+     references it now.
 3. **Editorial** (`#work`) — 3D "coverflow" carousel (CSS `rotateY`/`translateZ`, no library) of
    7 magazine covers (Penida, Elegant, Imirage, Shuba, Scorpio Vin, MOB, Tag). Click a side cover
    to center it; click the centered one to open the project modal. The section head only has the
@@ -99,35 +94,32 @@ and Services came first.
    cover or a dot still works at any time and simply overrides `active` until the next scroll
    event recomputes it from scroll position.
 4. **Campaigns** (`#campaigns`) — grid of 9 brand campaign tiles (Nike, Adidas, Zegna, Valentino,
-   Iceberg, Payless, Calvin Klein, Desigual, Fila), same modal on click. **Hover-expand grid**
-   (added 2026-08-25): `.campaigns-grid` is `display:flex; flex-wrap:wrap` (not CSS Grid) so that
-   `flex-grow`/`flex-basis` tween smoothly — hovering a tile grows it (`.campaigns-grid:hover
-   .campaign-tile:hover{flex-grow:2.6}`) while its row siblings shrink (`.campaigns-grid:hover
-   .campaign-tile{flex-grow:0.7}`) to make room, so a cropped tile (many of these photos are
-   landscape, e.g. Nike/Adidas are 900×600, but sit in a portrait-ish box) reveals more of its
-   true frame on hover instead of just zooming into the existing crop. **Important:** the base
-   `flex-basis` (`26%` desktop, `40%` at the 900px breakpoint) is deliberately *less* than an
-   exact three-per-row (or two-per-row) fit — if `flex-basis` exactly fills the row (e.g. the
-   original `calc(33.333% - gap-share)`), there's zero leftover space for `flex-grow` to
-   redistribute and hovering does nothing; don't "simplify" this back to an exact-fit calc.
-   Also note the `.campaign-tile:hover` specificity: the sibling-shrink rule
-   (`.campaigns-grid:hover .campaign-tile`) is two classes + one pseudo-class, so the hovered
-   tile's own grow rule must be at least as specific (`.campaigns-grid:hover
-   .campaign-tile:hover`) or the shrink rule wins for it too and hovering has no visible effect.
-   **Hover video preview on 3 tiles** (Nike, Adidas, Zegna — added 2026-08-25): each of those three
-   has a second `<img class="tile-hover-gif" loading="lazy">` right after the static photo,
-   `position:absolute; inset:0; opacity:0`, cross-fading to `opacity:1` on `.campaign-tile:hover`
-   (plain single-level hover this time, no specificity trap — the flex-grow rule above is the only
-   one that needed the double-`:hover` trick). Source was 3 BTS `.mov` clips the user supplied
-   (`nike.mov`, `adidas.mov`, `zegna.mov` — all B&W, portrait, 30–60fps originals); converted to
-   GIF with Pillow/OpenCV since there's no ffmpeg on this machine. First pass (full frame count,
-   480px wide, dithered) came out to 10–14MB *each* — GIF compresses photographic/video content far
-   worse than the flat-color brand-marquee GIF did. Re-encoded at 260px wide, ~10fps (every 3rd–5th
-   source frame depending on original fps), capped to 3.5s, a single 64-color palette sampled from
-   a mid-clip frame, and **no dithering** (`dither=Image.NONE` — dithering adds per-pixel noise
-   that LZW/GIF compresses badly; a flat-ish quantized image compresses much better and these are
-   B&W BTS clips so banding isn't very visible at this size anyway). Landed at 0.6–1.5MB each. The
-   files live at `images/campaigns/<key>/hover.gif` alongside each tile's existing `01.jpg`.
+   Iceberg, Payless, Calvin Klein, Desigual, Fila), same modal on click. **Redesigned 2026-08-25**
+   as a two-column grid of tall cards (`.campaigns-grid{display:grid; grid-template-columns:repeat(2,1fr)}`),
+   referencing orionix.framer.website's work grid — photo on top in a rounded `.campaign-media`
+   box (`height:clamp(320px,34vw,540px)`, `border-radius:18px`), brand name + campaign note below
+   in a plain `.campaign-info` row (the note text comes straight from each `projectData` entry's
+   `sub` field via `renderCampaignInfo()`, re-run on `milo:langchange` same as the other JS-built
+   bilingual bits — not a `data-i18n` attribute, since it's per-brand copy, not a site-wide key).
+   This replaced the earlier flex-grow hover-expand layout (tiles growing into their row on hover)
+   — doesn't make sense with fixed-size grid cards, so the whole tile now just lifts slightly
+   (`translateY(-4px)` + bigger shadow) on hover instead. Single column on mobile
+   (`max-width:700px` breakpoint).
+   **Hover video preview on 3 tiles** (Nike, Adidas, Zegna — added 2026-08-25, kept as-is through
+   the redesign above): each of those three has a second `<img class="tile-hover-gif"
+   loading="lazy">` inside `.campaign-media`, `position:absolute; inset:0; opacity:0`,
+   cross-fading to `opacity:1` on `.campaign-tile:hover` (plain single-level hover, no specificity
+   trap). Now shows much bigger than before since the card itself is taller. Source was 3 BTS
+   `.mov` clips the user supplied (`nike.mov`, `adidas.mov`, `zegna.mov` — all B&W, portrait,
+   30–60fps originals); converted to GIF with Pillow/OpenCV since there's no ffmpeg on this
+   machine. First pass (full frame count, 480px wide, dithered) came out to 10–14MB *each* — GIF
+   compresses photographic/video content far worse than flat-color content. Re-encoded at 260px
+   wide, ~10fps (every 3rd–5th source frame depending on original fps), capped to 3.5s, a single
+   64-color palette sampled from a mid-clip frame, and **no dithering** (`dither=Image.NONE` —
+   dithering adds per-pixel noise that LZW/GIF compresses badly; a flat-ish quantized image
+   compresses much better and these are B&W BTS clips so banding isn't very visible at this size
+   anyway). Landed at 0.6–1.5MB each. The files live at `images/campaigns/<key>/hover.gif`
+   alongside each tile's existing `01.jpg`.
 5. **Services** (`#services`) — redesigned 2026-08-25 from a static 4-card grid into a
    scroll-scrubbed slider (same pin pattern as the hero logo and editorial coverflow —
    `#servicesPin` → `.services-sticky`, height computed in JS via `sizeServicesPin()` as the
