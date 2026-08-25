@@ -256,6 +256,11 @@
   .campaigns-grid:hover .campaign-tile{flex-grow:0.7;}
   .campaigns-grid:hover .campaign-tile:hover{flex-grow:2.6;}
   .campaign-tile img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1) contrast(1.02);}
+  /* A few tiles (Nike, Adidas, Zegna) have a BTS video clip that plays on hover, overlaid on top
+     of the static photo and cross-faded in — the photo stays underneath so there's no flash of
+     empty space while the GIF loads. */
+  .campaign-tile .tile-hover-gif{position:absolute; inset:0; opacity:0; transition:opacity .35s ease;}
+  .campaign-tile:hover .tile-hover-gif{opacity:1;}
   .campaign-tile .tag{position:absolute;left:12px;bottom:12px;background:rgba(22,27,34,.82);color:var(--paper);font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:6px 10px;border-radius:2px;}
   @media (max-width:900px){.campaign-tile{flex-basis:40%;}}
   @media (max-width:560px){.campaign-tile{flex-basis:100%; flex-grow:1 !important; height:clamp(220px,68vw,320px);}}
@@ -484,9 +489,9 @@
     </div>
 
     <div class="campaigns-grid reveal">
-      <div class="campaign-tile" data-campaign="nike"><img src="images/campaigns/nike/01.jpg" alt="Nike campaign"><span class="tag">Nike</span></div>
-      <div class="campaign-tile" data-campaign="adidas"><img src="images/campaigns/adidas/01.jpg" alt="Adidas campaign"><span class="tag">Adidas</span></div>
-      <div class="campaign-tile" data-campaign="zegna"><img src="images/campaigns/zegna/01.jpg" alt="Zegna campaign"><span class="tag">Zegna</span></div>
+      <div class="campaign-tile" data-campaign="nike"><img src="images/campaigns/nike/01.jpg" alt="Nike campaign"><img src="images/campaigns/nike/hover.gif" alt="" class="tile-hover-gif" loading="lazy"><span class="tag">Nike</span></div>
+      <div class="campaign-tile" data-campaign="adidas"><img src="images/campaigns/adidas/01.jpg" alt="Adidas campaign"><img src="images/campaigns/adidas/hover.gif" alt="" class="tile-hover-gif" loading="lazy"><span class="tag">Adidas</span></div>
+      <div class="campaign-tile" data-campaign="zegna"><img src="images/campaigns/zegna/01.jpg" alt="Zegna campaign"><img src="images/campaigns/zegna/hover.gif" alt="" class="tile-hover-gif" loading="lazy"><span class="tag">Zegna</span></div>
       <div class="campaign-tile" data-campaign="valentino"><img src="images/campaigns/valentino/01.jpg" alt="Valentino campaign"><span class="tag">Valentino</span></div>
       <div class="campaign-tile" data-campaign="iceberg"><img src="images/campaigns/iceberg/01.jpg" alt="Iceberg campaign"><span class="tag">Iceberg</span></div>
       <div class="campaign-tile" data-campaign="payless"><img src="images/campaigns/payless/01.jpg" alt="Payless campaign"><span class="tag">Payless</span></div>

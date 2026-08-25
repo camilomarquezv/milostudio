@@ -114,6 +114,20 @@ and Services came first.
    (`.campaigns-grid:hover .campaign-tile`) is two classes + one pseudo-class, so the hovered
    tile's own grow rule must be at least as specific (`.campaigns-grid:hover
    .campaign-tile:hover`) or the shrink rule wins for it too and hovering has no visible effect.
+   **Hover video preview on 3 tiles** (Nike, Adidas, Zegna — added 2026-08-25): each of those three
+   has a second `<img class="tile-hover-gif" loading="lazy">` right after the static photo,
+   `position:absolute; inset:0; opacity:0`, cross-fading to `opacity:1` on `.campaign-tile:hover`
+   (plain single-level hover this time, no specificity trap — the flex-grow rule above is the only
+   one that needed the double-`:hover` trick). Source was 3 BTS `.mov` clips the user supplied
+   (`nike.mov`, `adidas.mov`, `zegna.mov` — all B&W, portrait, 30–60fps originals); converted to
+   GIF with Pillow/OpenCV since there's no ffmpeg on this machine. First pass (full frame count,
+   480px wide, dithered) came out to 10–14MB *each* — GIF compresses photographic/video content far
+   worse than the flat-color brand-marquee GIF did. Re-encoded at 260px wide, ~10fps (every 3rd–5th
+   source frame depending on original fps), capped to 3.5s, a single 64-color palette sampled from
+   a mid-clip frame, and **no dithering** (`dither=Image.NONE` — dithering adds per-pixel noise
+   that LZW/GIF compresses badly; a flat-ish quantized image compresses much better and these are
+   B&W BTS clips so banding isn't very visible at this size anyway). Landed at 0.6–1.5MB each. The
+   files live at `images/campaigns/<key>/hover.gif` alongside each tile's existing `01.jpg`.
 5. **Services** (`#services`) — redesigned 2026-08-25 from a static 4-card grid into a
    scroll-scrubbed slider (same pin pattern as the hero logo and editorial coverflow —
    `#servicesPin` → `.services-sticky`, height computed in JS via `sizeServicesPin()` as the
