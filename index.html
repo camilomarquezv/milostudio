@@ -124,6 +124,12 @@
   .hero-marquee .marquee-track span{font-size:0.7rem; padding:0 1.35rem;}
 
 
+  /* ===== CURSOR TRAIL ===== */
+  /* mix-blend-mode:difference inverts against whatever's underneath, so a single white stroke
+     reads dark on light sections and light on dark sections (About, Contact) without needing
+     per-section color logic. */
+  #cursorTrail{position:fixed; inset:0; width:100vw; height:100vh; pointer-events:none; z-index:9999; mix-blend-mode:difference;}
+
   /* ===== SECTION SHELL ===== */
   section{padding:clamp(56px,9vw,120px) 0;}
   .section-head{display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; margin-bottom:clamp(32px,5vw,56px); flex-wrap:wrap;}
@@ -1129,6 +1135,64 @@
       submitBtn.textContent = originalLabel;
     }
   });
+</script>
+
+<!-- CURSOR TRAIL -->
+<canvas id="cursorTrail" aria-hidden="true"></canvas>
+<script>
+  (function(){
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const noHover = window.matchMedia('(hover: none)').matches;
+    if(reduceMotion || noHover) return; // skip on touch devices and when motion is reduced
+
+    const canvas = document.getElementById('cursorTrail');
+    const ctx = canvas.getContext('2d');
+    const TRAIL_MS = 220; // how long a point stays in the trail — longer window = a faster
+                           // mouse naturally draws a longer line, since it covers more ground
+                           // in that time, exactly like a Photoshop lasso stroke
+    let points = [];
+    let hasMoved = false;
+
+    function resize(){
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    window.addEventListener('mousemove', (e) => {
+      hasMoved = true;
+      points.push({x: e.clientX, y: e.clientY, t: performance.now()});
+    });
+
+    function draw(){
+      const now = performance.now();
+      points = points.filter(p => now - p.t < TRAIL_MS);
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+      if(hasMoved && points.length > 1){
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = '#fff';
+        for(let i = 1; i < points.length; i++){
+          const age = (now - points[i].t) / TRAIL_MS; // 0 = fresh, 1 = about to expire
+          ctx.globalAlpha = 1 - age;
+          ctx.lineWidth = 2.2 - age * 1.4;
+          ctx.beginPath();
+          ctx.moveTo(points[i-1].x, points[i-1].y);
+          ctx.lineTo(points[i].x, points[i].y);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+      }
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  })();
 </script>
 
 </body>

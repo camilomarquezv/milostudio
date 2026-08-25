@@ -195,6 +195,19 @@ automating the Drive → repo sync is possible later if it becomes a recurring c
   stable identifier) — translated labels are a separate lookup (`roleKey()` + `role.*` keys in
   `translations`). Don't rename `data-role` values without updating `roleKey()`'s map.
 
+## Cursor trail
+Added 2026-08-25, inspired by a reference site the user liked (a green "lasso" line following the
+cursor). It's `#cursorTrail`, a full-viewport `<canvas>` (last script block before `</body>`):
+tracks `mousemove` in a rolling ~220ms buffer and draws a line through those points every
+`requestAnimationFrame`, fading/tapering each segment by age. **The speed-responsiveness is free**
+— no velocity math needed — because the trail is a fixed *time* window: a fast mouse covers more
+screen distance in that window, so the line is naturally longer; a slow or stationary mouse draws
+a short or empty one. The canvas has `mix-blend-mode:difference` with a white stroke, so it
+inverts against whatever's underneath instead of needing per-section color logic — reads dark on
+light sections, light on dark ones (About, Contact) automatically. Skips entirely
+(`prefers-reduced-motion: reduce` or `hover: none` — touch devices) via an early `return` in the
+IIFE, so it never attaches listeners or runs the draw loop there.
+
 ## Deployment
 No build tooling — but since images now live as real files in `/images`, deployment needs a host
 that serves the whole folder, not just Netlify Drop's single-file upload:
