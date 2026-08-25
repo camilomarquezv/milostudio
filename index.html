@@ -823,7 +823,12 @@
     heroPin.style.height = (heroStage.offsetHeight + HERO_SCROLL_ROOM) + 'px';
   }
 
+  // Plays once on load so a visitor who never scrolls still sees the logo assemble instead of a
+  // blank/scattered first frame (looked like a broken page). Scroll only takes over afterward.
+  let introDone = false;
+
   function update(){
+    if(!introDone) return; // scroll doesn't drive the logo until the load-in intro has finished
     const rect = heroPin.getBoundingClientRect();
     const total = heroPin.offsetHeight - heroStage.offsetHeight;
     const scrolled = clamp(-rect.top, 0, total);
@@ -836,6 +841,27 @@
     scrollCue.style.opacity = progress > 0.05 ? 0 : 1;
   }
 
+  const HERO_INTRO_MS = 1100;
+  function playIntro(){
+    const start = performance.now();
+    function step(now){
+      const t = Math.min(1, (now - start) / HERO_INTRO_MS);
+      const frameIdx = Math.min(HERO_FRAME_COUNT - 1, Math.round(t * (HERO_FRAME_COUNT - 1)));
+      const frameSrc = heroFrames[frameIdx].src;
+      if(logoFrameImg.src !== frameSrc) logoFrameImg.src = frameSrc;
+      if(t < 1){
+        requestAnimationFrame(step);
+      } else {
+        introDone = true;
+        // Only sync to scroll if the user actually scrolled during the intro — otherwise
+        // update() would see scrollY still at 0 and immediately revert the just-finished
+        // assembly back to the scattered first frame, undoing the whole point of the intro.
+        if(window.scrollY > 5) update();
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
   let ticking = false;
   window.addEventListener('scroll', () => {
     if(!ticking){
@@ -846,7 +872,17 @@
   window.addEventListener('resize', () => { sizeHeroPin(); update(); });
   logoFrameImg.addEventListener('load', () => { sizeHeroPin(); update(); });
   sizeHeroPin();
-  update();
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduceMotion || window.scrollY > 50){
+    // reduced-motion: skip straight to the assembled state, no animated intro.
+    // scrollY > 50: not a fresh landing (refresh with restored scroll, or a #anchor jump) — just
+    // sync to whatever's already scrolled instead of restarting the intro from the top.
+    introDone = true;
+    update();
+  } else {
+    playIntro();
+  }
 
 </script>
 

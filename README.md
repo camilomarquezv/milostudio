@@ -50,6 +50,20 @@ and Services came first.
      1080×622 and the logo is capped at `width:min(78vw,980px)` so it's never upscaled/pixelated —
      on very high-DPI (2x+) displays it won't be quite as crisp as a native-2x asset, since 1080px
      is the hard ceiling from the source clip.
+     **Auto-plays once on load** (added 2026-08-25): a visitor who lands on the page and doesn't
+     scroll right away used to just see the blank/scattered first frame — looked broken. Now
+     `playIntro()` animates frames 1→20 over `HERO_INTRO_MS` (1100ms) automatically as soon as the
+     script runs, independent of scroll. While it's running, `update()` (the scroll handler) is a
+     no-op — gated behind an `introDone` flag — so a scroll event mid-intro can't fight the timer
+     and cause flicker. Once the intro finishes, if the user still hasn't scrolled
+     (`window.scrollY` still ~0) the logo just stays on the assembled frame 20 rather than being
+     force-synced back to frame 1 (an early version of this called `update()` unconditionally right
+     after the intro, which immediately undid it at scrollY 0 — don't reintroduce that). From that
+     point on, scroll drives it normally, same as before, including scrolling back up to
+     re-scatter it. Two edge cases skip the animated intro and jump straight to the correct
+     scroll-synced frame instead: `prefers-reduced-motion: reduce`, and `scrollY > 50` at load time
+     (a refresh with restored scroll position, or landing via a `#anchor` — not a fresh top-of-page
+     visit, so replaying the intro from scratch would be wrong).
    - **Headline** (`#heroContent`, plain non-pinned section right after `#heroPin`): eyebrow, `h1`,
      paragraph, CTA row, and the brand marquee — just a normal `.reveal` fade-in-on-scroll block
      (same IntersectionObserver pattern used everywhere else on the page), not tied to the logo's
