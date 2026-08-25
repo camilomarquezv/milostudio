@@ -176,6 +176,19 @@
   .services-dots .sdot.is-active{background:var(--ink); transform:scale(1.3);}
   .service-visual{display:none; height:min(46vh,380px); aspect-ratio:3/4; border-radius:6px; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(22,27,34,.08); flex-shrink:0;}
   .service-visual img{width:100%; height:100%; object-fit:cover; display:block; filter:saturate(1) contrast(1.02);}
+  /* Before/after compare (Retouching slide only) — a real drag slider, not the third-party
+     Juxtapose embed the user first sent, so the source images can be resized/compressed like
+     every other asset on the site instead of loading at whatever resolution the embed serves.
+     Both images are full-bleed and stacked; only .compare-before's clip-path changes on drag —
+     simpler and more robust than the common alternative (a width-clipped wrapper around a
+     fixed-pixel-width inner image, which needs JS to keep resynced on window resize). */
+  .service-compare{display:none; position:relative; height:min(300px,38vw); aspect-ratio:2/1; border-radius:6px; overflow:hidden; cursor:ew-resize; -webkit-user-select:none; user-select:none; box-shadow:0 1px 3px rgba(22,27,34,.08); flex-shrink:0; touch-action:none;}
+  .compare-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; pointer-events:none;}
+  .compare-handle{position:absolute; top:0; bottom:0; left:50%; width:2px; background:var(--paper); transform:translateX(-50%); pointer-events:none; box-shadow:0 0 0 1px rgba(22,27,34,.15);}
+  .compare-grip{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:36px; height:36px; border-radius:50%; background:var(--paper); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(22,27,34,.35); font-size:.8rem; letter-spacing:-.05em;}
+  .compare-label{position:absolute; bottom:10px; font-size:.68rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--paper); background:rgba(22,27,34,.62); padding:4px 9px; border-radius:2px; pointer-events:none;}
+  .compare-label.before{left:10px;}
+  .compare-label.after{right:10px;}
   .service-counter{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; color:var(--steel); margin-bottom:0.8rem;}
   .service-info h3{font-size:clamp(1.8rem,3.4vw,2.8rem); font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
   .service-info p{font-size:1rem; line-height:1.65; color:var(--slate); max-width:52ch;}
@@ -184,6 +197,7 @@
     .service-num-col{flex-direction:row; align-items:center; justify-content:space-between;}
     .services-dots{flex-direction:row;}
     .service-visual{height:auto; width:min(72vw,320px); aspect-ratio:3/4; margin:0 auto;}
+    .service-compare{height:auto; width:min(92vw,460px); aspect-ratio:2/1; margin:0 auto;}
   }
 
   /* ===== TEAM BUILDER ===== */
@@ -621,6 +635,13 @@
           </div>
           <div class="service-visual" id="serviceVisual">
             <img id="serviceImg" src="" alt="">
+          </div>
+          <div class="service-compare" id="serviceCompare">
+            <img id="compareAfter" class="compare-img" src="" alt="">
+            <img id="compareBefore" class="compare-img" src="" alt="">
+            <div class="compare-handle" id="compareHandle"><span class="compare-grip">↔</span></div>
+            <span class="compare-label before">Before</span>
+            <span class="compare-label after">After</span>
           </div>
           <div class="service-info">
             <span class="service-counter" id="serviceCounter">01 / 04</span>
@@ -1234,7 +1255,7 @@
   // here since it's a catalog/e-commerce shoot, not a brand campaign. .service-visual is
   // display:none by default and only shown for slides with an `img` set below.
   const servicesData = [
-    {key: 'service1', folder: 'images/services/retouching'},
+    {key: 'service1', folder: 'images/services/retouching', compareBefore: 'images/services/retouching/before.jpg', compareAfter: 'images/services/retouching/after.jpg'},
     {key: 'service2', folder: 'images/services/photography'},
     {key: 'service3', folder: 'images/services/creative_direction'},
     {key: 'service4', folder: 'images/services/ecommerce', img: 'images/campaigns/fila/01.jpg', projectKey: 'fila'},
@@ -1244,6 +1265,10 @@
   const serviceBigNum = document.getElementById('serviceBigNum');
   const serviceCounter = document.getElementById('serviceCounter');
   const serviceVisual = document.getElementById('serviceVisual');
+  const serviceCompare = document.getElementById('serviceCompare');
+  const compareBeforeImg = document.getElementById('compareBefore');
+  const compareAfterImg = document.getElementById('compareAfter');
+  const compareHandle = document.getElementById('compareHandle');
   const serviceImg = document.getElementById('serviceImg');
   const serviceTitleEl = document.getElementById('serviceTitle');
   const serviceDescEl = document.getElementById('serviceDesc');
@@ -1275,6 +1300,14 @@
     } else {
       serviceVisual.style.display = 'none';
     }
+    if(s.compareBefore){
+      compareBeforeImg.src = s.compareBefore;
+      compareAfterImg.src = s.compareAfter;
+      serviceCompare.style.display = 'block';
+      setComparePosition(50);
+    } else {
+      serviceCompare.style.display = 'none';
+    }
     serviceDots.forEach((d, i) => d.classList.toggle('is-active', i === activeService));
   }
 
@@ -1282,6 +1315,32 @@
     const s = servicesData[activeService];
     if(s.projectKey) openProjectModal(s.projectKey, serviceImg.src);
   });
+
+  // Before/after drag slider — real native drag (pointer events, unified mouse+touch), not the
+  // third-party Juxtapose embed the user first sent. Only compareBefore's clip-path moves; both
+  // images stay full-bleed and stacked, so there's no wrapper-width/inner-image resync to keep
+  // straight on window resize like the classic clipped-wrapper technique needs.
+  function setComparePosition(pct){
+    pct = clamp(pct, 0, 100);
+    compareBeforeImg.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+    compareHandle.style.left = pct + '%';
+  }
+  let compareDragging = false;
+  function updateCompareFromEvent(e){
+    const rect = serviceCompare.getBoundingClientRect();
+    const pct = ((e.clientX - rect.left) / rect.width) * 100;
+    setComparePosition(pct);
+  }
+  serviceCompare.addEventListener('pointerdown', (e) => {
+    compareDragging = true;
+    serviceCompare.setPointerCapture(e.pointerId);
+    updateCompareFromEvent(e);
+  });
+  serviceCompare.addEventListener('pointermove', (e) => {
+    if(compareDragging) updateCompareFromEvent(e);
+  });
+  serviceCompare.addEventListener('pointerup', () => { compareDragging = false; });
+  serviceCompare.addEventListener('pointercancel', () => { compareDragging = false; });
 
   function sizeServicesPin(){
     servicesPin.style.height = (servicesSticky.offsetHeight + SERVICES_SCROLL_ROOM) + 'px';

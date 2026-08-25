@@ -261,9 +261,38 @@ markup doesn't matter to them).
    sticky content is the *same total height* whether or not the current slide has a photo —
    `sizeServicesPin()` only measures once at load/resize, not per slide, so without this a taller
    image-slide appearing later would desync the scroll math (verified: `.services-sticky`'s
-   `offsetHeight` is identical — 964px at 1280×800 — across all 4 slides). The other 3 folders
-   (`images/services/retouching|photography|creative_direction/`) are still empty, ready the same
-   way if photos show up for those too. The section head's copy was also fixed from "Two things we
+   `offsetHeight` is identical — 964px at 1280×800 — across all 4 slides).
+   **Before/after drag slider on Retouching (`service1`, added 2026-08-25):** user first sent a
+   Knight Lab Juxtapose `<iframe>` embed and wanted it "at a lower resolution so it loads fast" —
+   pointed out that's not actually possible with a third-party embed (no control over what
+   resolution Knight Lab serves), so built a native equivalent instead:
+   `#serviceCompare`/`#compareBefore`/`#compareAfter`/`#compareHandle`, same show/hide pattern as
+   `#serviceVisual` (`display:none` by default, `servicesData[0].compareBefore`/`.compareAfter`
+   toggle it). Both images are full-bleed and stacked (`position:absolute; inset:0`, both
+   `object-fit:cover`); only `#compareBefore`'s `clip-path: inset(0 <100-pct>% 0 0)` changes as
+   the handle moves — deliberately *not* the more common technique (a width-`%`-clipped wrapper
+   around a *fixed-pixel-width* inner image sized to match the full container), which needs a
+   resize listener to keep the inner image's pixel width in sync with the container or the two
+   photos drift out of alignment. `pointerdown`/`pointermove`/`pointerup` (unified mouse+touch,
+   `setPointerCapture` so drags keep tracking even if the pointer leaves the element) compute the
+   pointer's `%` position across `#serviceCompare`'s own `getBoundingClientRect()` and call
+   `setComparePosition(pct)`, which is also just called directly with `50` on every
+   `renderServiceSlide()` so the handle always starts centered. Landscape box
+   (`aspect-ratio:2/1`, `height:min(300px,38vw)`) rather than the portrait 3:4 used elsewhere,
+   since the source photos are 2:1 landscape and forcing them into a portrait crop would lose most
+   of the frame. Source photos (`DSG_Vikram_260403_Adidas_335_Hos before/after.jpg`, 3000×1500,
+   2.6–3.9MB each) resized to 1100px wide + JPEG q82 → `images/services/retouching/before.jpg` /
+   `after.jpg`, 100–148KB, in line with the rest of the site's image sizes. **Verification note:**
+   the browser preview tool's `computer` click/drag actions timed out repeatedly against this
+   element (a `computer`-tool-level issue, not a page freeze — `document.title` and other JS
+   still responded fine via `javascript_exec` immediately after each timeout); confirmed the drag
+   mechanic instead by dispatching real `PointerEvent`s (`pointerdown` → `pointermove` →
+   `pointerup`) directly and checking `#compareHandle`'s resulting position, then a screenshot
+   showing the handle visually at the expected spot — see
+   [[feedback_browser_preview_heavy_page]] for other cases of this same tool's `computer`-action
+   unreliability. The other 2 folders (`images/services/photography|creative_direction/`) are
+   still empty, ready the same way if photos show up for those too. The section head's copy was
+   also fixed from "Two things we
    do really well" to "Four things" — there have always been 4
    cards. Also: `#heroContent`'s padding is now `clamp(20px,3vh,36px)` on *both* top and bottom
    (was top-only) — the bottom half used to stack with `#work`'s own top padding and leave a large
