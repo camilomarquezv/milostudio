@@ -90,7 +90,9 @@ single `01.jpg` renders as a plain photo, exactly like before.
    transparency.)
 2. Add the matching path(s) to that project's `images` array in `projectData` inside
    `index.html`, e.g. `images: ['images/campaigns/nike/01.jpg', 'images/campaigns/nike/02.jpg']`.
-   The array order is the slide order.
+   The array order is the slide order. **If you delete a photo from a folder, also remove its path
+   from that project's `images` array** — otherwise the slider tries to load a file that's gone
+   and shows a broken image.
 3. Commit and push (or re-sync, if using the Google Drive workflow below) — no other code changes
    needed.
 
