@@ -260,7 +260,11 @@
      stage — with the aspect-ratio'd image as a 3rd grid track alongside 1fr, that shrink-to-fit
      math collapses the text column down to almost nothing. Force it to actually use the space. */
   .campaigns-sticky > .wrap{width:100%;}
-  .campaigns-slide{display:grid; grid-template-columns:140px auto 1fr; gap:clamp(24px,4vw,56px); align-items:center; padding:clamp(32px,5vw,56px) 0;}
+  /* minmax caps the text column instead of letting 1fr stretch it edge-to-edge, and
+     justify-content:center centers that now-intrinsic-width cluster within the wrap — otherwise
+     on wide viewports the short campaign note left a lot of empty space on the right, making the
+     whole composition (numbers + photo) read as pushed to the left. */
+  .campaigns-slide{display:grid; grid-template-columns:140px auto minmax(200px,300px); justify-content:center; gap:clamp(24px,4vw,56px); align-items:center; padding:clamp(32px,5vw,56px) 0;}
   .campaign-num-col{display:flex; flex-direction:column; gap:1.6rem;}
   .campaign-bignum{font-size:clamp(3rem,7vw,5.5rem); font-weight:800; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums;}
   .campaigns-dots{display:flex; flex-direction:column; gap:10px;}

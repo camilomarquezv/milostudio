@@ -93,7 +93,8 @@ markup doesn't matter to them).
    sticky content's height + a fixed 1200px `CAMPAIGNS_SCROLL_ROOM`). Scrolling advances through
    all 9 in order, one at a time (`updateCampaignsScroll()`, campaigns `<script>` block near the
    bottom, right after the services slider block). Layout is a 3-column
-   `.campaigns-slide{grid-template-columns:140px auto 1fr}` — big number + vertical dot nav (same
+   `.campaigns-slide{grid-template-columns:140px auto minmax(200px,300px); justify-content:center}`
+   — big number + vertical dot nav (same
    `.service-bignum`/`.services-dots` pattern, renamed `.campaign-bignum`/`.campaigns-dots`), a
    `.campaign-stage` photo (`aspect-ratio:3/4`, `border-radius:6px` — carried over from the grid
    version's corner/ratio fix), then title + counter + campaign note (`projectData[key].sub`,
@@ -113,7 +114,12 @@ markup doesn't matter to them).
    note below. `goToCampaign()` wraps around at both ends (index 8 → next → 0). Same "override
    until the next scroll event" behavior as the coverflow's own arrows/dots — clicking doesn't
    move the scroll position, so continued scrolling picks up from wherever raw scroll progress
-   maps to.
+   maps to. **Composition centered (2026-08-25):** the text column used to be a plain `1fr`, which
+   on wide viewports stretched it edge-to-edge — a short note like "Dafiti LATAM Campaign" left a
+   lot of *invisible* space to its right, so the actually-visible content (number, photo, text)
+   read as pushed toward the left even though the grid technically filled the row. Capped it to
+   `minmax(200px,300px)` and added `justify-content:center` on `.campaigns-slide` so the now
+   fixed-width three-column cluster centers as a block within `.wrap` instead of stretching.
    **Non-obvious fix needed for this layout specifically:** `.campaigns-sticky` is `display:flex`
    (so it can vertically center the slide, same as `.services-sticky`/`.coverflow-sticky`) — but
    its `.wrap` child has no explicit width, so as a flex item it sizes to shrink-to-fit instead of
@@ -154,7 +160,16 @@ markup doesn't matter to them).
    extraction script builds each range's frame list separately (same per-frame resize/palette
    logic as always) and concatenates the two lists before the shared-palette quantize + GIF save
    step — the palette is still sampled from one mid-sequence frame across the *combined* list, not
-   per-segment, so both halves share one 64-color palette and cut together cleanly. **Payless
+   per-segment, so both halves share one 64-color palette and cut together cleanly.
+   **Valentino swapped for a new source clip, same day:** user sent a different, tighter-edited
+   `valentino.mov` (6.0s vs. the original 7.8s, same underlying BTS footage — heels, laptop,
+   makeup, tripod — just re-cut faster) and asked to use it instead. Same two-range technique,
+   re-scanned for this clip's own cut points (contact-sheet montages at 0.4s then 0.1s resolution,
+   same method as the original cut): ~0–0.45s (heels, laptop small in the corner but not
+   dominant — this edit never has a fully laptop-free moment, faster-paced than the original) +
+   ~2.45–3.6s (makeup application, clean before the tripod swings into frame around 3.6s) →
+   16 frames/0.7MB, smaller than the original re-cut since this source clip is shorter overall.
+   **Payless
    added 2026-08-25** (a "Back to School" campaign clip — kids running, product close-ups, no
    awkward segment to cut around like Valentino's laptop) at the same 5.5s length as Iceberg →
    2.6MB/55 frames, the largest of the six since it's a much busier, more varied clip (more scene
