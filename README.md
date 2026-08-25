@@ -115,9 +115,18 @@ automating the Drive → repo sync is possible later if it becomes a recurring c
   Imirage→Red Muse, Tag→Tag FILM Editorial, Adidas→Adidas Retouch HH Global. Everything else
   falls back to the general Behance profile link. More can be added to `projectData[key].behance`
   as they're confirmed.
-- No contact form (intentionally removed — wasn't functional). If a real form backend appears
-  (e.g. Formspree, a serverless function), it could replace/augment the WhatsApp block in
-  `#contact`.
+- **Contact form needs a Web3Forms access key before it will actually send anything** (added
+  2026-08-24). It's the `<form id="contactForm">` at the bottom of `#contact`, POSTing to
+  `https://api.web3forms.com/submit` via `fetch` (the last `<script>` block, right before
+  `</body>`) so it shows an inline success/error message instead of redirecting. Right now
+  the hidden `access_key` input still has the placeholder value `YOUR_WEB3FORMS_ACCESS_KEY` —
+  submitting as-is gets a 400 from Web3Forms (confirmed working end-to-end otherwise). To activate:
+  1. Go to [web3forms.com](https://web3forms.com), enter `camilomarquezv@outlook.com`, and it
+     emails you a real access key — no account/password needed.
+  2. Paste that key into the `value="..."` of the hidden `access_key` input in `index.html`,
+     replacing the placeholder.
+  3. Commit and redeploy. Submissions will land in that inbox.
+  Has a honeypot field (`botcheck`) for basic spam filtering, per Web3Forms' own convention.
 - Team-builder role labels are keyed off English strings in `data-role` (used internally as a
   stable identifier) — translated labels are a separate lookup (`roleKey()` + `role.*` keys in
   `translations`). Don't rename `data-role` values without updating `roleKey()`'s map.

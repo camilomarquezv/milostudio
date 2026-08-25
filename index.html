@@ -298,6 +298,22 @@
   .contact-direct-note{font-size:0.85rem; color:var(--paper); opacity:0.7; margin-top:1.1rem; max-width:34ch; line-height:1.5;}
   @media (max-width:800px){.contact-grid{grid-template-columns:1fr;}}
 
+  .contact-form-wrap{margin-top:2.6rem; padding-top:2.4rem; border-top:1px solid rgba(242,244,245,0.14);}
+  .contact-form{margin-top:1.2rem; display:flex; flex-direction:column; gap:1.1rem; max-width:640px;}
+  .form-honeypot{position:absolute; left:-9999px; width:1px; height:1px; opacity:0;}
+  .form-row{display:grid; grid-template-columns:1fr 1fr; gap:1.1rem;}
+  .form-field label{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--mist); margin-bottom:0.45rem;}
+  .form-field input, .form-field textarea{width:100%; background:rgba(242,244,245,0.06); border:1px solid rgba(242,244,245,0.25); border-radius:2px; padding:0.7rem 0.85rem; color:var(--paper); font-family:inherit; font-size:0.92rem; resize:vertical;}
+  .form-field input:focus, .form-field textarea:focus{outline:none; border-color:var(--paper);}
+  .form-field input::placeholder, .form-field textarea::placeholder{color:rgba(242,244,245,0.4);}
+  .form-submit{align-self:flex-start; background:var(--paper); color:var(--ink); font-weight:700; padding:0.85rem 1.9rem; border-radius:2px; border:none; cursor:pointer; font-size:0.85rem; transition:background 0.2s ease, opacity 0.2s ease;}
+  .form-submit:hover{background:var(--mist);}
+  .form-submit:disabled{opacity:0.6; cursor:default;}
+  .form-status{font-size:0.85rem; margin-top:-0.3rem; min-height:1.2em;}
+  .form-status.success{color:#8FD19E;}
+  .form-status.error{color:#E69A9A;}
+  @media (max-width:560px){.form-row{grid-template-columns:1fr;}}
+
   /* ===== FOOTER ===== */
   footer{padding:2rem 0; border-top:1px solid var(--line);}
   .footer-row{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;}
@@ -579,6 +595,30 @@
           <p class="contact-direct-note" data-i18n="contact.note">Fastest way to reach the studio directly — tell us your brand and what you're producing.</p>
         </div>
       </div>
+      <div class="contact-form-wrap reveal">
+        <span class="eyebrow" style="color:var(--mist);" data-i18n="contact.formEyebrow">Or Send a Message</span>
+        <form id="contactForm" class="contact-form" action="https://api.web3forms.com/submit" method="POST">
+          <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_ACCESS_KEY">
+          <input type="hidden" name="subject" value="New inquiry from the MILO Studio website">
+          <input type="checkbox" name="botcheck" class="form-honeypot" tabindex="-1" autocomplete="off">
+          <div class="form-row">
+            <div class="form-field">
+              <label for="cfName" data-i18n="contact.form.name">Name</label>
+              <input type="text" id="cfName" name="name" required>
+            </div>
+            <div class="form-field">
+              <label for="cfEmail" data-i18n="contact.form.email">Email</label>
+              <input type="email" id="cfEmail" name="email" required>
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="cfMessage" data-i18n="contact.form.message">What are you producing?</label>
+            <textarea id="cfMessage" name="message" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="form-submit" data-i18n="contact.form.submit">Send Message</button>
+          <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+        </form>
+      </div>
     </div>
   </div>
 </section>
@@ -668,6 +708,14 @@
     'contact.copy': {en:"Send over the brand, the brief, and the timeline. We'll come back with the team and the plan.", es:'Envíanos la marca, el brief y los tiempos. Te responderemos con el equipo y el plan.'},
     'contact.callEyebrow': {en:'Call or WhatsApp', es:'Llama o Escribe por WhatsApp'},
     'contact.note': {en:"Fastest way to reach the studio directly — tell us your brand and what you're producing.", es:'La forma más rápida de contactar al estudio directamente — cuéntanos tu marca y qué estás produciendo.'},
+    'contact.formEyebrow': {en:'Or Send a Message', es:'O Envía un Mensaje'},
+    'contact.form.name': {en:'Name', es:'Nombre'},
+    'contact.form.email': {en:'Email', es:'Correo'},
+    'contact.form.message': {en:'What are you producing?', es:'¿Qué estás produciendo?'},
+    'contact.form.submit': {en:'Send Message', es:'Enviar Mensaje'},
+    'contact.form.sending': {en:'Sending…', es:'Enviando…'},
+    'contact.form.success': {en:"Message sent — we'll get back to you soon.", es:'Mensaje enviado — te responderemos pronto.'},
+    'contact.form.error': {en:'Something went wrong. Please try again or email us directly.', es:'Algo salió mal. Intenta de nuevo o escríbenos directamente por correo.'},
 
     'footer.campaigns': {en:'Campaigns', es:'Campañas'},
     'footer.contact': {en:'Contact', es:'Contacto'},
@@ -977,6 +1025,43 @@
       const savedSlide = currentSlide;
       openProjectModal(currentProjectKey, currentProjectImg);
       goToSlide(savedSlide);
+    }
+  });
+</script>
+
+<script>
+  const contactForm = document.getElementById('contactForm');
+  const formStatus = document.getElementById('formStatus');
+
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = contactForm.querySelector('.form-submit');
+    const originalLabel = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = t('contact.form.sending');
+    formStatus.textContent = '';
+    formStatus.classList.remove('success', 'error');
+
+    try {
+      const res = await fetch(contactForm.action, {
+        method: 'POST',
+        body: new FormData(contactForm),
+        headers: { 'Accept': 'application/json' }
+      });
+      const result = await res.json();
+      if(result.success){
+        formStatus.textContent = t('contact.form.success');
+        formStatus.classList.add('success');
+        contactForm.reset();
+      } else {
+        throw new Error(result.message || 'submit failed');
+      }
+    } catch (err){
+      formStatus.textContent = t('contact.form.error');
+      formStatus.classList.add('error');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalLabel;
     }
   });
 </script>
