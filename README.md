@@ -141,7 +141,7 @@ markup doesn't matter to them).
    apply:** if another pinned/flex-centered slide layout ends up with 3+ grid columns where one
    has an intrinsic (non-1fr) size, check the text column's actual rendered width — don't assume a
    working 2-column sticky pattern generalizes cleanly to 3 columns.
-   **Hover video preview on Nike/Adidas/Zegna/Iceberg/Valentino/Payless/Ray-Ban** (Nike/Adidas/
+   **Hover video preview on Nike/Adidas/Zegna/Iceberg/Valentino/Payless/Ray-Ban/LCI** (Nike/Adidas/
    Zegna added 2026-08-25, carried through both redesigns; the rest added later the same day):
    `#campaignHoverGif`, `position:absolute; inset:0; opacity:0` inside `.campaign-stage`,
    cross-fading to `opacity:1` on `.campaign-stage:hover`. `renderCampaignSlide()` only points its
@@ -189,7 +189,12 @@ markup doesn't matter to them).
    Same recipe, but bumped the palette from 64 → 96 colors (`quantize(colors=96, ...)`) since flat
    B&W tolerates a small palette far better than skin tones and sky gradients do — went straight
    to 96 rather than starting at 64 and finding out the hard way. 5.0s, straight cut from the
-   start (no bad segment to avoid, unlike Valentino) → 1.2MB/50 frames. The files live at
+   start (no bad segment to avoid, unlike Valentino) → 1.2MB/50 frames. **LCI added 2026-08-25**
+   (`lci video.MP4`, 720×1280, B&W): a lighting reveal — starts dark, a light sweeps in over ~2s
+   to reveal the model from the "Gestión de Industrias Creativas" poster, holds the lit pose
+   through the rest of the clip. Straight cut, 5.0s from the start (same as Iceberg/Payless) →
+   2.1MB/50 frames — on the heavier side since the sweeping-light transition compresses worse than
+   a held static pose, same reason Payless ran larger than the others. The files live at
    `images/campaigns/<key>/hover.gif` alongside each project's `01.jpg`. **To add another:** drop
    the clip anywhere, run the same OpenCV/Pillow recipe (single range, or multiple concatenated
    ranges if only part of the clip is usable), copy the result to
