@@ -1169,26 +1169,30 @@
       points.push({x: e.clientX, y: e.clientY, t: performance.now()});
     });
 
+    let dashOffset = 0;
+
     function draw(){
       const now = performance.now();
       points = points.filter(p => now - p.t < TRAIL_MS);
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
       if(hasMoved && points.length > 1){
-        ctx.lineCap = 'round';
+        // Photoshop lasso "marching ants": one dashed stroke through the whole trail, not a
+        // smooth solid line, with the dash pattern crawling along it for the classic animated feel.
+        ctx.lineCap = 'butt';
         ctx.lineJoin = 'round';
         ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([5, 4]);
+        ctx.lineDashOffset = -dashOffset;
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
         for(let i = 1; i < points.length; i++){
-          const age = (now - points[i].t) / TRAIL_MS; // 0 = fresh, 1 = about to expire
-          ctx.globalAlpha = 1 - age;
-          ctx.lineWidth = 2.2 - age * 1.4;
-          ctx.beginPath();
-          ctx.moveTo(points[i-1].x, points[i-1].y);
           ctx.lineTo(points[i].x, points[i].y);
-          ctx.stroke();
         }
-        ctx.globalAlpha = 1;
+        ctx.stroke();
       }
+      dashOffset += 0.5;
       requestAnimationFrame(draw);
     }
     requestAnimationFrame(draw);

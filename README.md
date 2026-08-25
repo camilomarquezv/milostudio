@@ -196,15 +196,19 @@ automating the Drive → repo sync is possible later if it becomes a recurring c
   `translations`). Don't rename `data-role` values without updating `roleKey()`'s map.
 
 ## Cursor trail
-Added 2026-08-25, inspired by a reference site the user liked (a green "lasso" line following the
-cursor). It's `#cursorTrail`, a full-viewport `<canvas>` (last script block before `</body>`):
-tracks `mousemove` in a rolling ~220ms buffer and draws a line through those points every
-`requestAnimationFrame`, fading/tapering each segment by age. **The speed-responsiveness is free**
-— no velocity math needed — because the trail is a fixed *time* window: a fast mouse covers more
-screen distance in that window, so the line is naturally longer; a slow or stationary mouse draws
-a short or empty one. The canvas has `mix-blend-mode:difference` with a white stroke, so it
-inverts against whatever's underneath instead of needing per-section color logic — reads dark on
-light sections, light on dark ones (About, Contact) automatically. Skips entirely
+Added 2026-08-25, inspired by a reference site the user liked (a "lasso" line following the
+cursor), then refined the same day to actually look like Photoshop's lasso/marching-ants selection
+outline rather than a smooth solid line. It's `#cursorTrail`, a full-viewport `<canvas>` (last
+script block before `</body>`): tracks `mousemove` in a rolling ~220ms buffer and strokes ONE
+dashed path (`ctx.setLineDash([5,4])`) through those points every `requestAnimationFrame`, with
+`lineDashOffset` incrementing each frame so the dashes visibly crawl along the line ("marching
+ants"). **The speed-responsiveness is free** — no velocity math needed — because the trail is a
+fixed *time* window: a fast mouse covers more screen distance in that window, so the line is
+naturally longer; a slow or stationary mouse draws a short or empty one. The canvas has
+`mix-blend-mode:difference` with a white stroke, so it inverts against whatever's underneath
+instead of needing per-section color logic — reads dark on light sections, light on dark ones
+(About, Contact) automatically; verified this actually renders correctly on both (a screenshot
+over the dark Contact section clearly showed the dashed line). Skips entirely
 (`prefers-reduced-motion: reduce` or `hover: none` — touch devices) via an early `return` in the
 IIFE, so it never attaches listeners or runs the draw loop there.
 
