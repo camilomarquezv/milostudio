@@ -84,8 +84,9 @@ markup doesn't matter to them).
      pixelated at real size once live, so it's back to the original text ticker. The GIF file is
      still in `images/site/` (unused) in case a higher-res version shows up later; nothing
      references it now.
-3. **Campaigns** (`#campaigns`) — 9 brand campaigns (Nike, Adidas, Zegna, Valentino, Iceberg,
-   Payless, Calvin Klein, Desigual, Fila). Went through two redesigns the same day (2026-08-25):
+3. **Campaigns** (`#campaigns`) — 8 brand campaigns (Nike, Adidas, Zegna, Valentino, Iceberg,
+   Payless, Calvin Klein, Desigual — Fila moved out to Services' E-Commerce slide, see item 7).
+   Went through two redesigns the same day (2026-08-25):
    first a static two-column grid of tall cards, then — per user feedback wanting "each project as
    its own scroll, showing on its own" like the Services slider — **rebuilt as a scroll-scrubbed
    single-project slider**, the same pin pattern as the hero logo / coverflow / services
@@ -231,14 +232,25 @@ markup doesn't matter to them).
    4 services in order (Retouching → Photography → Creative Direction → E-Commerce), each showing
    a big number, a counter (`01 / 04`), title, description, and dot nav (click a dot to jump).
    Text content comes straight from the existing `service1..4.title/.desc` translation keys via
-   `t()`, not `data-i18n` (the slide is JS-rendered, like the project modal). **No photo column**
-   — briefly had a `#serviceVisual` placeholder box, but the user decided text-only reads fine and
-   had it removed the same day; `.services-slide` is a 2-column grid now (`140px 1fr` — number
-   column + info column). The empty `images/services/<key>/` folders (`retouching`,
-   `photography`, `creative_direction`, `ecommerce`) are still there in case photos come back
-   later — see the comment at the top of the `services` `<script>` block (right after the
-   coverflow one) for how to restore the 3-column layout + `<img>` if so. The section head's copy
-   was also fixed from "Two things we do really well" to "Four things" — there have always been 4
+   `t()`, not `data-i18n` (the slide is JS-rendered, like the project modal). **Mostly text-only,
+   one photo (added 2026-08-25):** briefly had a `#serviceVisual` placeholder box for all 4 slides,
+   removed the same day since the user decided text-only reads fine — but the E-Commerce & Catalog
+   slide (`service4`) got a real photo back when Fila moved out of the Campaigns slider into here
+   (per user feedback — Fila's shoot reads as catalog/e-commerce work, not a brand campaign;
+   reuses the same `images/campaigns/fila/01.jpg` file, no new image asset needed). `.services-slide`
+   is a 3-column grid (`140px auto 1fr`) where the middle `#serviceVisual` column is `display:none`
+   by default and collapses to ~0 width on its own — `servicesData[i].img` (only set for
+   `service4`) toggles it to `display:block` and points `#serviceImg`'s `src` at it in
+   `renderServiceSlide()`. Clicking it opens the project modal via `servicesData[i].projectKey`
+   (`'fila'`), same `openProjectModal()` used everywhere else. **Height gotcha:** `.services-slide`
+   carries an explicit `min-height:min(46vh,380px)` matching `.service-visual`'s own height, so the
+   sticky content is the *same total height* whether or not the current slide has a photo —
+   `sizeServicesPin()` only measures once at load/resize, not per slide, so without this a taller
+   image-slide appearing later would desync the scroll math (verified: `.services-sticky`'s
+   `offsetHeight` is identical — 964px at 1280×800 — across all 4 slides). The other 3 folders
+   (`images/services/retouching|photography|creative_direction/`) are still empty, ready the same
+   way if photos show up for those too. The section head's copy was also fixed from "Two things we
+   do really well" to "Four things" — there have always been 4
    cards. Also: `#heroContent`'s padding is now `clamp(20px,3vh,36px)` on *both* top and bottom
    (was top-only) — the bottom half used to stack with `#work`'s own top padding and leave a large
    empty gap below the brand marquee.

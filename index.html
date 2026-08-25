@@ -162,19 +162,28 @@
      scroll room, .services-sticky pins in place while scroll progress drives the active index. */
   .services-pin{position:relative;}
   .services-sticky{position:sticky; top:0; min-height:100vh; display:flex; align-items:center;}
-  .services-slide{display:grid; grid-template-columns:140px 1fr; gap:clamp(24px,4vw,56px); align-items:center; padding:clamp(32px,5vw,56px) 0;}
+  /* Middle "auto" column only takes up space when .service-visual has visible content — most
+     slides are text-only (see the note below the JS servicesData array), so an empty
+     display:none image collapses this track to ~0 width automatically, no per-slide CSS needed. */
+  /* min-height matches .service-visual's own height so the sticky content is the same overall
+     size whether or not the current slide has an image — sizeServicesPin() only measures once at
+     load, so a taller image-slide appearing later would otherwise desync the scroll math. */
+  .services-slide{display:grid; grid-template-columns:140px auto 1fr; gap:clamp(24px,4vw,56px); align-items:center; padding:clamp(32px,5vw,56px) 0; min-height:min(46vh,380px);}
   .service-num-col{display:flex; flex-direction:column; gap:1.6rem;}
   .service-bignum{font-size:clamp(3rem,7vw,5.5rem); font-weight:800; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums;}
   .services-dots{display:flex; flex-direction:column; gap:10px;}
   .services-dots .sdot{width:8px; height:8px; border-radius:50%; background:var(--mist); border:none; cursor:pointer; padding:0; transition:background .25s ease, transform .25s ease;}
   .services-dots .sdot.is-active{background:var(--ink); transform:scale(1.3);}
+  .service-visual{display:none; height:min(46vh,380px); aspect-ratio:3/4; border-radius:6px; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(22,27,34,.08); flex-shrink:0;}
+  .service-visual img{width:100%; height:100%; object-fit:cover; display:block; filter:saturate(1) contrast(1.02);}
   .service-counter{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; color:var(--steel); margin-bottom:0.8rem;}
   .service-info h3{font-size:clamp(1.8rem,3.4vw,2.8rem); font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
   .service-info p{font-size:1rem; line-height:1.65; color:var(--slate); max-width:52ch;}
   @media (max-width:860px){
-    .services-slide{grid-template-columns:1fr; text-align:left;}
+    .services-slide{grid-template-columns:1fr; text-align:left; min-height:0;}
     .service-num-col{flex-direction:row; align-items:center; justify-content:space-between;}
     .services-dots{flex-direction:row;}
+    .service-visual{height:auto; width:min(72vw,320px); aspect-ratio:3/4; margin:0 auto;}
   }
 
   /* ===== TEAM BUILDER ===== */
@@ -609,6 +618,9 @@
           <div class="service-num-col">
             <span class="service-bignum" id="serviceBigNum">01</span>
             <div class="services-dots" id="servicesDots"></div>
+          </div>
+          <div class="service-visual" id="serviceVisual">
+            <img id="serviceImg" src="" alt="">
           </div>
           <div class="service-info">
             <span class="service-counter" id="serviceCounter">01 / 04</span>
@@ -1215,20 +1227,22 @@
 
 <script>
   // ===== Services slider ===== (same scroll-scrub pin pattern as the hero logo / coverflow)
-  // Text-only for now (no photo column) — user decided it reads fine without images. To bring
-  // photos back later: drop a file at images/services/<key>/01.jpg per entry below, restore the
-  // 3-column .services-slide grid + .service-visual block (see git history around 2026-08-25 for
-  // the removed markup/CSS), and set the <img>'s src per slide in renderServiceSlide().
+  // Text-only for most slides (user decided it reads fine without images) except E-Commerce &
+  // Catalog, which reuses the Fila campaign photo — Fila moved out of the Campaigns slider into
+  // here since it's a catalog/e-commerce shoot, not a brand campaign. .service-visual is
+  // display:none by default and only shown for slides with an `img` set below.
   const servicesData = [
     {key: 'service1', folder: 'images/services/retouching'},
     {key: 'service2', folder: 'images/services/photography'},
     {key: 'service3', folder: 'images/services/creative_direction'},
-    {key: 'service4', folder: 'images/services/ecommerce'},
+    {key: 'service4', folder: 'images/services/ecommerce', img: 'images/campaigns/fila/01.jpg', projectKey: 'fila'},
   ];
   const servicesPin = document.getElementById('servicesPin');
   const servicesSticky = document.querySelector('.services-sticky');
   const serviceBigNum = document.getElementById('serviceBigNum');
   const serviceCounter = document.getElementById('serviceCounter');
+  const serviceVisual = document.getElementById('serviceVisual');
+  const serviceImg = document.getElementById('serviceImg');
   const serviceTitleEl = document.getElementById('serviceTitle');
   const serviceDescEl = document.getElementById('serviceDesc');
   const servicesDotsWrap = document.getElementById('servicesDots');
@@ -1252,8 +1266,20 @@
     serviceCounter.textContent = `${String(activeService + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
     serviceTitleEl.textContent = t(s.key + '.title');
     serviceDescEl.textContent = t(s.key + '.desc');
+    if(s.img){
+      serviceImg.src = s.img;
+      serviceImg.alt = t(s.key + '.title');
+      serviceVisual.style.display = 'block';
+    } else {
+      serviceVisual.style.display = 'none';
+    }
     serviceDots.forEach((d, i) => d.classList.toggle('is-active', i === activeService));
   }
+
+  document.getElementById('serviceVisual').addEventListener('click', () => {
+    const s = servicesData[activeService];
+    if(s.projectKey) openProjectModal(s.projectKey, serviceImg.src);
+  });
 
   function sizeServicesPin(){
     servicesPin.style.height = (servicesSticky.offsetHeight + SERVICES_SCROLL_ROOM) + 'px';
@@ -1296,7 +1322,6 @@
     {key: 'payless', label: 'Payless'},
     {key: 'calvin_k', label: 'Calvin Klein'},
     {key: 'desigual', label: 'Desigual'},
-    {key: 'fila', label: 'Fila'},
   ];
   const campaignHoverKeys = new Set(['nike', 'adidas', 'zegna', 'iceberg', 'valentino', 'payless']);
   const campaignsPin = document.getElementById('campaignsPin');
