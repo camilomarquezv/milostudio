@@ -72,6 +72,17 @@ and Services came first.
      Also has `background:var(--paper)` (added 2026-08-25) so the body's dot grid is hidden behind
      the headline *and* the marquee (`.hero-marquee` is a child of `#heroContent`, not `.wrap`) —
      the grid resumes right after, at Campaigns, which has no such override.
+     **The brand marquee is a single animated GIF** (`images/site/brand-marquee.gif`, added
+     2026-08-25), not the CSS-driven scrolling `<span>` ticker it used to be — the user supplied a
+     pre-made looping logo strip (Zegna, Adidas, Ferragamo, Nike, Iceberg, Ray-Ban, Harmont &
+     Blaine, Hackett, Hawkers, Sisley, Valentino, Calvin Klein, Kenzo, +more), so the scroll motion
+     is baked into the GIF's own frames — no `@keyframes`/`animation` needed, `.hero-marquee img`
+     is just `width:100%; height:auto`. The original file was 4.95MB (308 frames); re-encoded with
+     Pillow to every 3rd frame (103 frames, 90ms each — same ~9.3s loop) + a 32-color palette,
+     dropping it to 1.77MB with no visible quality loss (it's just black logos on white). If this
+     GIF ever needs replacing, keep in mind the original had an unused transparency flag in its
+     GIF info but was fully opaque white in practice — check actual pixel alpha, not just
+     `im.info`, before assuming a new source file is or isn't transparent.
 3. **Editorial** (`#work`) — 3D "coverflow" carousel (CSS `rotateY`/`translateZ`, no library) of
    7 magazine covers (Penida, Elegant, Imirage, Shuba, Scorpio Vin, MOB, Tag). Click a side cover
    to center it; click the centered one to open the project modal. The section head only has the

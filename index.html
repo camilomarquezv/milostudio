@@ -118,14 +118,10 @@
 
 
 
-  .marquee-band{margin-top:clamp(32px,6vw,60px); background:var(--ink); color:var(--paper); overflow:hidden;}
-  .marquee-track{display:flex; width:max-content; animation:scroll 30s linear infinite; padding:14px 0;}
-  @keyframes scroll{from{transform:translateX(0);} to{transform:translateX(-50%);}}
-  .marquee-track span{font-size:0.8rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; padding:0 2rem; white-space:nowrap; opacity:0.8;}
-  .marquee-track span::after{content:"·"; margin-left:2rem; color:var(--steel);}
-  .hero-marquee{margin-top:clamp(40px,6vw,68px);}
-  .hero-marquee .marquee-track{padding:12px 0;}
-  .hero-marquee .marquee-track span{font-size:0.7rem; padding:0 1.35rem;}
+  /* Animated brand-logo strip (GIF supplied by the user, already self-scrolling frame-by-frame —
+     no CSS animation needed here, just sizing). Native 1133x145; scales down on narrow viewports. */
+  .hero-marquee{margin-top:clamp(40px,6vw,68px); overflow:hidden;}
+  .hero-marquee img{display:block; width:100%; height:auto;}
 
 
   /* ===== CURSOR TRAIL ===== */
@@ -387,11 +383,8 @@
       </div>
     </div>
   </div>
-  <div class="marquee-band hero-marquee">
-    <div class="marquee-track">
-      <span>Nike</span><span>Adidas</span><span>Zegna</span><span>Valentino</span><span>Ferragamo</span><span>Calvin Klein</span><span>Kenzo</span><span>Sisley</span><span>Ray-Ban</span><span>Dafiti</span><span>Hawkers</span><span>Iceberg</span>
-      <span>Nike</span><span>Adidas</span><span>Zegna</span><span>Valentino</span><span>Ferragamo</span><span>Calvin Klein</span><span>Kenzo</span><span>Sisley</span><span>Ray-Ban</span><span>Dafiti</span><span>Hawkers</span><span>Iceberg</span>
-    </div>
+  <div class="hero-marquee">
+    <img src="images/site/brand-marquee.gif" alt="Brand logos: Zegna, Adidas, Ferragamo, Nike, Iceberg, Ray-Ban, Harmont &amp; Blaine, Hackett, Hawkers, Sisley, Valentino, Calvin Klein, Kenzo, and more">
   </div>
 </section>
 
