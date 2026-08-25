@@ -71,11 +71,11 @@
   .burger span{width:22px; height:2px; background:var(--ink);}
 
   /* ===== SCROLL-PINNED HERO ===== */
-  .hero-pin{position:relative; height:160vh; padding:0;} /* override the generic section{padding} rule — .hero-stage needs to be full-bleed for its background to fully hide the grid, no gap */
+  .hero-pin{position:relative; padding:0;} /* height set in JS to match .hero-stage's natural (content-fit) height plus a fixed scroll-scrub distance — see sizeHeroPin() */
   .hero-stage{
-    position:sticky; top:0; height:100vh; overflow:hidden;
+    position:sticky; top:0; overflow:hidden;
     display:flex; align-items:flex-start; justify-content:center;
-    padding-top:clamp(88px,16vh,168px);
+    padding:clamp(64px,9vh,110px) 0 clamp(32px,5vh,56px);
     background:var(--paper); /* same exact base tone as the rest of the page — just without the dot grid drawn on top, so there's no seam at the section's own edge */
   }
 
@@ -88,7 +88,8 @@
     mask-image: radial-gradient(ellipse 72% 78% at 50% 50%, #000 68%, transparent 100%);
   }
 
-  .hero-content{padding:clamp(48px,8vw,88px) 0 0; text-align:center;}
+  #heroContent{padding-top:clamp(20px,3vh,36px);} /* the generic section{padding} rule gives plenty of bottom space already — override just the top so the headline sits close under the logo, not double-padded */
+  .hero-content{text-align:center;}
   .hero-content h1{
     font-size:clamp(2rem, 5vw, 3.6rem); font-weight:800; line-height:1.05; margin-top:0.8rem;
   }
@@ -329,7 +330,7 @@
 <section class="hero-pin" id="heroPin">
   <div class="hero-stage">
     <div class="logo-layer" id="logoLayer">
-      <img src="images/site/hero-sequence/frame-01.jpg" alt="MILO" id="logoFrameImg">
+      <img src="images/site/hero-sequence/frame-01.jpg" alt="MILO" id="logoFrameImg" width="1080" height="622">
     </div>
     <div class="scroll-cue" id="scrollCue"><span data-i18n="hero.scroll">Scroll</span><div class="line"></div></div>
   </div>
@@ -750,6 +751,7 @@
 </script>
 <script>
   const heroPin = document.getElementById('heroPin');
+  const heroStage = document.querySelector('.hero-stage');
   const logoFrameImg = document.getElementById('logoFrameImg');
   const scrollCue = document.getElementById('scrollCue');
 
@@ -759,6 +761,7 @@
   // wordmark). Preloaded once so swapping .src during scroll is instant, no flicker. The logo
   // stays put once assembled — no blur/fade-out; the headline reveals in the section below it.
   const HERO_FRAME_COUNT = 20;
+  const HERO_SCROLL_ROOM = 420; // px of scroll dedicated to the frame-scrub, independent of viewport size
   const heroFrames = [];
   for(let i = 1; i <= HERO_FRAME_COUNT; i++){
     const img = new Image();
@@ -766,9 +769,17 @@
     heroFrames.push(img);
   }
 
+  // .hero-stage is sized by its own content (padding + the logo's natural aspect ratio), not a
+  // fixed 100vh, so there's no dead space below a logo that's shorter than the viewport. .hero-pin
+  // just needs to be exactly that height plus HERO_SCROLL_ROOM for the sticky release timing (and
+  // this update()'s progress math) to line up.
+  function sizeHeroPin(){
+    heroPin.style.height = (heroStage.offsetHeight + HERO_SCROLL_ROOM) + 'px';
+  }
+
   function update(){
     const rect = heroPin.getBoundingClientRect();
-    const total = heroPin.offsetHeight - window.innerHeight;
+    const total = heroPin.offsetHeight - heroStage.offsetHeight;
     const scrolled = clamp(-rect.top, 0, total);
     const progress = total > 0 ? scrolled / total : 0;
 
@@ -786,7 +797,9 @@
       ticking = true;
     }
   });
-  window.addEventListener('resize', update);
+  window.addEventListener('resize', () => { sizeHeroPin(); update(); });
+  logoFrameImg.addEventListener('load', () => { sizeHeroPin(); update(); });
+  sizeHeroPin();
   update();
 
 </script>

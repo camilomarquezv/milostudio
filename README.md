@@ -23,30 +23,38 @@ and Services came first.
    still Services → Build a Team → Editorial → Studio, which no longer matches page order below.
 2. **Hero, split into two sections** (redesigned 2026-08-24 — used to be one pinned section with
    a blur/fade transition into a floating glass-panel headline; that's gone):
-   - **Logo header** (`#heroPin` → `.hero-stage`, `position:sticky`, `height:160vh` on the outer
-     `.hero-pin`): scroll-scrubs through `images/site/hero-sequence/frame-01.jpg`…`frame-20.jpg`
-     (20 JPEGs extracted from a `milo.mov` clip of the MILO letters flying together, all preloaded
-     as `Image()` objects on load so swapping `#logoFrameImg`'s `src` is instant) across the
-     entire pin scroll range — frame 1 is scattered pieces, frame 20 is the assembled wordmark.
-     Once assembled the logo just stays put; there's no blur/fade/scale-out anymore. Positioned
-     near the top of the sticky viewport (`padding-top` on `.hero-stage`, not vertically centered)
-     so it reads like a second header bar. `.hero-stage` has `background:var(--paper)` — the
-     **same** flat color as the body's own base tone — specifically to override the generic
-     `section{padding:...}` rule (every `<section>` gets padding, including this one, which used
-     to leave a gap between the fixed header and the sticky stage where the body's dot grid showed
-     through — fixed via `.hero-pin{padding:0}`) and to blend seamlessly against the grid pattern
-     drawn on `body`, since the video frames' own rendered background is a very close but not
-     pixel-identical tone. The logo `<img>` also has a soft radial `mask-image` fading its outer
-     ~30% margin to transparent, so its rectangular edge never reads as a hard-edged box regardless
-     of tiny per-frame color variance. Frames are native 1080×622 (the source video's resolution)
-     and the logo is capped at `width:min(78vw,980px)` so it's never upscaled/pixelated — on very
-     high-DPI (2x+) displays it won't be quite as crisp as a native-2x asset, since 1080px is the
-     hard ceiling from the source clip.
+   - **Logo header** (`#heroPin` → `.hero-stage`, `position:sticky`): scroll-scrubs through
+     `images/site/hero-sequence/frame-01.jpg`…`frame-20.jpg` (20 JPEGs extracted from a `milo.mov`
+     clip of the MILO letters flying together, all preloaded as `Image()` objects on load so
+     swapping `#logoFrameImg`'s `src` is instant) across the pin's scroll range — frame 1 is
+     scattered pieces, frame 20 is the assembled wordmark. Once assembled the logo just stays put;
+     there's no blur/fade/scale-out. Positioned near the top of the sticky stage (`padding` on
+     `.hero-stage`, not vertically centered) so it reads like a second header bar.
+     **`.hero-stage` has no fixed height** — it's sized by its own content (`padding-top` +
+     `padding-bottom` + the logo's natural rendered height from its `width:min(78vw,980px)`), not
+     a flat `100vh`, specifically so there's no dead space below a short logo on tall viewports.
+     Because of that, `.hero-pin`'s height is set in JS (`sizeHeroPin()`, in the hero-pin
+     `<script>` block) to `.hero-stage`'s measured height + a fixed `HERO_SCROLL_ROOM` (420px) of
+     scroll-scrub distance, re-run on resize and on the logo image's `load` event — **don't** put
+     a height back on `.hero-pin` or `.hero-stage` in CSS, it'll fight this. `.hero-stage` also has
+     `background:var(--paper)` — the **same** flat color as the body's own base tone — specifically
+     to override the generic `section{padding:...}` rule (every `<section>` gets padding, including
+     this one, which used to leave a gap between the fixed header and the sticky stage where the
+     body's dot grid showed through — fixed via `.hero-pin{padding:0}`) and to blend seamlessly
+     against the grid pattern drawn on `body`, since the video frames' own rendered background is a
+     very close but not pixel-identical tone. The logo `<img>` also has a soft radial `mask-image`
+     fading its outer ~30% margin to transparent, so its rectangular edge never reads as a
+     hard-edged box regardless of tiny per-frame color variance, and carries explicit
+     `width="1080" height="622"` HTML attributes (the frames' native size) so the browser reserves
+     the right box size before the image finishes loading, avoiding layout jump. Frames are native
+     1080×622 and the logo is capped at `width:min(78vw,980px)` so it's never upscaled/pixelated —
+     on very high-DPI (2x+) displays it won't be quite as crisp as a native-2x asset, since 1080px
+     is the hard ceiling from the source clip.
    - **Headline** (`#heroContent`, plain non-pinned section right after `#heroPin`): eyebrow, `h1`,
      paragraph, CTA row, and the brand marquee — just a normal `.reveal` fade-in-on-scroll block
      (same IntersectionObserver pattern used everywhere else on the page), not tied to the logo's
-     scroll-scrub at all. It appears once the user scrolls past the logo header and it comes into
-     view, so the two never overlap or compete visually.
+     scroll-scrub at all. `#heroContent` overrides just the generic section rule's *top* padding
+     (down to `clamp(20px,3vh,36px)`) so it sits close under the logo instead of double-padded.
 3. **Editorial** (`#work`) — 3D "coverflow" carousel (CSS `rotateY`/`translateZ`, no library) of
    7 magazine covers (Penida, Elegant, Imirage, Shuba, Scorpio Vin, MOB, Tag). Click a side cover
    to center it; click the centered one to open the project modal.
