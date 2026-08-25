@@ -55,9 +55,15 @@ and Services came first.
      (same IntersectionObserver pattern used everywhere else on the page), not tied to the logo's
      scroll-scrub at all. `#heroContent` overrides just the generic section rule's *top* padding
      (down to `clamp(20px,3vh,36px)`) so it sits close under the logo instead of double-padded.
+     Also has `background:var(--paper)` (added 2026-08-25) so the body's dot grid is hidden behind
+     the headline *and* the marquee (`.hero-marquee` is a child of `#heroContent`, not `.wrap`) —
+     the grid resumes right after, at Campaigns, which has no such override.
 3. **Editorial** (`#work`) — 3D "coverflow" carousel (CSS `rotateY`/`translateZ`, no library) of
    7 magazine covers (Penida, Elegant, Imirage, Shuba, Scorpio Vin, MOB, Tag). Click a side cover
-   to center it; click the centered one to open the project modal. **Scroll-scrubbed** (added
+   to center it; click the centered one to open the project modal. The section head only has the
+   eyebrow+`h2` now (the `.desc` paragraph that used to sit next to it — `editorial.desc` — was
+   removed 2026-08-25, user found it redundant next to the `.lead` paragraph in
+   `.editorial-intro` right below; the translation key is gone too, not just unused). **Scroll-scrubbed** (added
    2026-08-25, same pattern as the hero logo): the carousel itself sits in `.coverflow-sticky`
    inside a `#coverflowPin` wrapper, and while that's pinned, scrolling advances the centered
    cover from Penida straight through to Tag (`updateCoverflowScroll()`, in the coverflow

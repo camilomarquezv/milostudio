@@ -88,7 +88,7 @@
     mask-image: radial-gradient(ellipse 72% 78% at 50% 50%, #000 68%, transparent 100%);
   }
 
-  #heroContent{padding-top:clamp(20px,3vh,36px);} /* the generic section{padding} rule gives plenty of bottom space already — override just the top so the headline sits close under the logo, not double-padded */
+  #heroContent{padding-top:clamp(20px,3vh,36px); background:var(--paper);} /* the generic section{padding} rule gives plenty of bottom space already — override just the top so the headline sits close under the logo, not double-padded. Solid background (no grid) through the headline and marquee — the dot grid resumes right after, at Campaigns */
   .hero-content{text-align:center;}
   .hero-content h1{
     font-size:clamp(2rem, 5vw, 3.6rem); font-weight:800; line-height:1.05; margin-top:0.8rem;
@@ -391,7 +391,6 @@
   <div class="wrap">
     <div class="section-head reveal">
       <div><span class="eyebrow" data-i18n="editorial.eyebrow">Editorial</span><h2 style="margin-top:0.7rem;" data-i18n="editorial.h2">Stories made to be opened.</h2></div>
-      <p class="desc" data-i18n="editorial.desc">Editorial work lives here as physical objects — magazine covers you can browse and open for the full story.</p>
     </div>
 
     <div class="editorial-intro reveal">
@@ -718,7 +717,6 @@
 
     'editorial.eyebrow': {en:'Editorial', es:'Editorial'},
     'editorial.h2': {en:'Stories made to be opened.', es:'Historias hechas para abrirse.'},
-    'editorial.desc': {en:'Editorial work lives here as physical objects — magazine covers you can browse and open for the full story.', es:'El trabajo editorial vive aquí como objetos físicos — portadas de revista que puedes explorar y abrir para ver la historia completa.'},
     'editorial.lead': {en:'Instead of a conventional grid, the editorial archive is presented as a shelf of publications fanned out for browsing. Click a cover to bring it forward.', es:'En lugar de una grilla convencional, el archivo editorial se presenta como un estante de publicaciones abiertas en abanico para explorar. Haz clic en una portada para traerla al frente.'},
     'editorial.hint': {en:'Click the centered cover to open the project', es:'Haz clic en la portada centrada para abrir el proyecto'},
 
