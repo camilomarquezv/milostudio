@@ -308,11 +308,13 @@ site used to be a single ~1.3MB HTML file with everything inlined; extracting th
 
 ```
 images/
-  site/            — logo-mark.png (header), hero-wordmark.png, about-bts.jpg, footer-logo.jpg
+  site/            — logo-mark.png (header AND footer, 2026-08-25 — footer-logo.jpg is unused
+                      now, it had a baked-in background the user didn't want), about-bts.jpg
   editorial/<key>/ — 01.jpg, 02.jpg, ... per magazine cover (penida, elegant, imirage, shuba,
                       scorpiovin, mob, tag)
   campaigns/<key>/ — 01.jpg, 02.jpg, ... per brand (nike, adidas, zegna, valentino, iceberg,
-                      payless, calvin_k, desigual, fila)
+                      payless, calvin_k, desigual, fila) — fila's 01.jpg is now used by the
+                      Services E-Commerce slide instead of the campaigns slider, see below
 ```
 
 Clicking an editorial cover or a campaign tile opens `#projectModal`, which now renders a
