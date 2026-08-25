@@ -94,7 +94,12 @@ and Services came first.
    `#contact`, and focuses the name field. Hidden again (`.builder-cta` without `.show`) when
    nothing's selected, so it never shows an empty quote request.
 8. **Process** (`#process`) — 4-step process (Briefing → Team Assembly → Production → Retouch &
-   Deliver)
+   Deliver). Each `.process-row` inverts on hover (added 2026-08-25) — dark `var(--ink)`
+   background, title goes `var(--paper)`, the number goes `var(--accent)`, description goes
+   `var(--mist)`. The row uses a negative-margin/matching-padding trick
+   (`margin:0 clamp(-20px,-3vw,-32px)` cancelling `padding:1.7rem clamp(20px,3vw,32px)`) so the
+   hover background bleeds full-width to `.process-list`'s own edge instead of stopping at the
+   row's normal content width.
 9. **Project Modal** (`#projectModal`) — shared lightbox for both editorial covers and campaign
    tiles; pulls from the `projectData` JS object; includes a Behance deep-link when we have the
    real project URL, otherwise links to the profile

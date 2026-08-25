@@ -178,10 +178,18 @@
 
   /* ===== PROCESS ===== */
   .process-list{border-top:1px solid var(--line); background:var(--paper); border-radius:4px; padding:0 clamp(20px,3vw,32px);}
-  .process-row{display:grid; grid-template-columns:70px 1fr 1.4fr; gap:2rem; padding:1.7rem 0; border-bottom:1px solid var(--line); align-items:baseline;}
-  .process-row .pnum{font-size:1.3rem; font-weight:800; color:var(--steel);}
-  .process-row h3{font-size:1.15rem; font-weight:700;}
-  .process-row p{font-size:0.88rem; line-height:1.5; color:var(--slate); max-width:52ch;}
+  .process-row{
+    display:grid; grid-template-columns:70px 1fr 1.4fr; gap:2rem; padding:1.7rem clamp(20px,3vw,32px);
+    margin:0 clamp(-20px,-3vw,-32px); border-bottom:1px solid var(--line); align-items:baseline;
+    border-radius:3px; transition:background .3s ease;
+  }
+  .process-row .pnum{font-size:1.3rem; font-weight:800; color:var(--steel); transition:color .3s ease;}
+  .process-row h3{font-size:1.15rem; font-weight:700; transition:color .3s ease;}
+  .process-row p{font-size:0.88rem; line-height:1.5; color:var(--slate); max-width:52ch; transition:color .3s ease;}
+  .process-row:hover{background:var(--ink); border-bottom-color:var(--ink);}
+  .process-row:hover .pnum{color:var(--accent);}
+  .process-row:hover h3{color:var(--paper);}
+  .process-row:hover p{color:var(--mist);}
   @media (max-width:700px){.process-row{grid-template-columns:44px 1fr; row-gap:0.4rem;} .process-row p{grid-column:2/3;}}
 
   /* ===== EDITORIAL / MAGAZINES (3D Coverflow) ===== */
