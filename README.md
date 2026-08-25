@@ -124,23 +124,26 @@ markup doesn't matter to them).
    apply:** if another pinned/flex-centered slide layout ends up with 3+ grid columns where one
    has an intrinsic (non-1fr) size, check the text column's actual rendered width — don't assume a
    working 2-column sticky pattern generalizes cleanly to 3 columns.
-   **Hover video preview on Nike/Adidas/Zegna/Iceberg** (Nike/Adidas/Zegna added 2026-08-25,
-   carried through both redesigns; Iceberg added later the same day): `#campaignHoverGif`,
-   `position:absolute; inset:0; opacity:0` inside `.campaign-stage`, cross-fading to `opacity:1`
-   on `.campaign-stage:hover`. `renderCampaignSlide()` only points its `src` at
-   `images/campaigns/<key>/hover.gif` (and un-hides it) for keys in the `campaignHoverKeys` Set —
-   `display:none` and `removeAttribute('src')` for the rest, since setting `src=""` on an `<img>`
-   makes it re-request the current page URL, a real gotcha. Source was BTS `.mov` clips the user
-   supplied one at a time (`nike.mov`, `adidas.mov`, `zegna.mov`, then `iceberg.mov` — all B&W,
-   portrait, 30–60fps originals, Iceberg natively 1440×1920 which is already exactly 3:4); each
-   converted to GIF with Pillow/OpenCV since there's no ffmpeg on this machine. First pass (full
-   frame count, 480px wide, dithered) came out to 10–14MB *each* — GIF compresses photographic/
-   video content far worse than flat-color content. Settled recipe, reused as-is for Iceberg: 260px
-   wide, ~10fps (every 3rd–5th source frame depending on original fps), capped to 3.5s, a single
-   64-color palette sampled from a mid-clip frame, and **no dithering** (`dither=Image.NONE` —
-   dithering adds per-pixel noise that LZW/GIF compresses badly; a flat-ish quantized image
-   compresses much better and these are B&W BTS clips so banding isn't very visible at this size
-   anyway). Landed at 0.6–1.5MB each (Iceberg: 1.1MB/35 frames). The files live at
+   **Hover video preview on Nike/Adidas/Zegna/Iceberg/Valentino** (Nike/Adidas/Zegna added
+   2026-08-25, carried through both redesigns; Iceberg and Valentino added later the same day):
+   `#campaignHoverGif`, `position:absolute; inset:0; opacity:0` inside `.campaign-stage`,
+   cross-fading to `opacity:1` on `.campaign-stage:hover`. `renderCampaignSlide()` only points its
+   `src` at `images/campaigns/<key>/hover.gif` (and un-hides it) for keys in the
+   `campaignHoverKeys` Set — `display:none` and `removeAttribute('src')` for the rest, since
+   setting `src=""` on an `<img>` makes it re-request the current page URL, a real gotcha. Source
+   was BTS `.mov` clips the user supplied one at a time (`nike.mov`, `adidas.mov`, `zegna.mov`,
+   `iceberg.mov`, `valentino.mov` — all B&W, portrait originals; Iceberg natively 1440×1920,
+   already exactly 3:4, Valentino 1080×1920/9:16, cropped to 3:4 by the stage's own
+   `object-fit:cover` same as any other campaign photo); each converted to GIF with Pillow/OpenCV
+   since there's no ffmpeg on this machine. First pass (full frame count, 480px wide, dithered)
+   came out to 10–14MB *each* — GIF compresses photographic/video content far worse than
+   flat-color content. Settled recipe, reused as-is since: 260px wide, ~10fps (every 3rd–5th
+   source frame depending on original fps), capped to 3.5s, a single 64-color palette sampled from
+   a mid-clip frame, and **no dithering** (`dither=Image.NONE` — dithering adds per-pixel noise
+   that LZW/GIF compresses badly; a flat-ish quantized image compresses much better and these are
+   B&W BTS clips so banding isn't very visible at this size anyway). Landed at 0.6–1.8MB each
+   (Iceberg: 1.1MB/35 frames, Valentino: 1.8MB/35 frames — the tallest of the five since 9:16
+   source means more vertical pixels per frame at the same 260px width). The files live at
    `images/campaigns/<key>/hover.gif` alongside each project's `01.jpg`. **To add another:** drop
    the clip anywhere, run the same OpenCV/Pillow recipe, copy the result to
    `images/campaigns/<key>/hover.gif`, and add `<key>` to `campaignHoverKeys` in the campaigns
