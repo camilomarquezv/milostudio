@@ -250,9 +250,9 @@
   /* Two-column grid of tall cards (ref: orionix.framer.website's work grid) — photo on top,
      brand + note below. Taller frame than the old flex-grow row layout so the hover video on
      Nike/Adidas/Zegna plays much bigger. */
-  .campaigns-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:48px 28px;}
+  .campaigns-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:64px 48px;}
   .campaign-tile{cursor:pointer;}
-  .campaign-media{position:relative; border-radius:18px; overflow:hidden; height:clamp(320px,34vw,540px); box-shadow:0 1px 3px rgba(22,27,34,.08); transition:box-shadow .4s ease, transform .4s ease;}
+  .campaign-media{position:relative; border-radius:6px; overflow:hidden; aspect-ratio:3/4; box-shadow:0 1px 3px rgba(22,27,34,.08); transition:box-shadow .4s ease, transform .4s ease;}
   .campaign-tile:hover .campaign-media{transform:translateY(-4px); box-shadow:0 26px 54px rgba(22,27,34,.18);}
   .campaign-media img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1) contrast(1.02);}
   /* A few tiles (Nike, Adidas, Zegna) have a BTS video clip that plays on hover, overlaid on top
@@ -264,8 +264,7 @@
   .campaign-info h3{font-size:clamp(1.15rem,1.6vw,1.5rem); font-weight:800;}
   .campaign-info p{color:var(--slate); font-size:.9rem; text-align:right;}
   @media (max-width:700px){
-    .campaigns-grid{grid-template-columns:1fr; gap:32px;}
-    .campaign-media{height:clamp(300px,110vw,440px);}
+    .campaigns-grid{grid-template-columns:1fr; gap:44px;}
   }
 
   /* ===== PROJECT MODAL ===== */

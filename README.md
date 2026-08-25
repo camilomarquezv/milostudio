@@ -96,15 +96,17 @@ and Services came first.
 4. **Campaigns** (`#campaigns`) — grid of 9 brand campaign tiles (Nike, Adidas, Zegna, Valentino,
    Iceberg, Payless, Calvin Klein, Desigual, Fila), same modal on click. **Redesigned 2026-08-25**
    as a two-column grid of tall cards (`.campaigns-grid{display:grid; grid-template-columns:repeat(2,1fr)}`),
-   referencing orionix.framer.website's work grid — photo on top in a rounded `.campaign-media`
-   box (`height:clamp(320px,34vw,540px)`, `border-radius:18px`), brand name + campaign note below
-   in a plain `.campaign-info` row (the note text comes straight from each `projectData` entry's
-   `sub` field via `renderCampaignInfo()`, re-run on `milo:langchange` same as the other JS-built
-   bilingual bits — not a `data-i18n` attribute, since it's per-brand copy, not a site-wide key).
-   This replaced the earlier flex-grow hover-expand layout (tiles growing into their row on hover)
-   — doesn't make sense with fixed-size grid cards, so the whole tile now just lifts slightly
-   (`translateY(-4px)` + bigger shadow) on hover instead. Single column on mobile
-   (`max-width:700px` breakpoint).
+   referencing orionix.framer.website's work grid — photo on top in a `.campaign-media` box
+   (`aspect-ratio:3/4`, `border-radius:6px` — user first got 18px radius + a tighter/vh-based
+   height and asked for a straighter 3:4 portrait crop with less-rounded corners and more room
+   between cards, hence `aspect-ratio` over a `clamp()` height and `gap:64px 48px` on the grid),
+   brand name + campaign note below in a plain `.campaign-info` row (the note text comes straight
+   from each `projectData` entry's `sub` field via `renderCampaignInfo()`, re-run on
+   `milo:langchange` same as the other JS-built bilingual bits — not a `data-i18n` attribute,
+   since it's per-brand copy, not a site-wide key). This replaced the earlier flex-grow
+   hover-expand layout (tiles growing into their row on hover) — doesn't make sense with
+   fixed-size grid cards, so the whole tile now just lifts slightly (`translateY(-4px)` + bigger
+   shadow) on hover instead. Single column on mobile (`max-width:700px` breakpoint, `gap:44px`).
    **Hover video preview on 3 tiles** (Nike, Adidas, Zegna — added 2026-08-25, kept as-is through
    the redesign above): each of those three has a second `<img class="tile-hover-gif"
    loading="lazy">` inside `.campaign-media`, `position:absolute; inset:0; opacity:0`,
