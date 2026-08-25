@@ -16,22 +16,25 @@ Netlify/Vercel) rather than dragging a single file into Netlify Drop — see "De
 - Language: site is bilingual EN/ES (see i18n section below), all copy in English by default
 
 ## Page structure (in `<body>` order)
+Reordered 2026-08-24 so Editorial and Campaigns show right after the hero — before that, About
+and Services came first.
 1. **Header/Nav** — logo, links (Services, Build a Team, Editorial, Studio, Start a Project),
-   language toggle button (`#langToggle`)
+   language toggle button (`#langToggle`). Nav link order was NOT changed in the reorder — it's
+   still Services → Build a Team → Editorial → Studio, which no longer matches page order below.
 2. **Hero** (`#heroPin`) — scroll-pinned section: giant MILO wordmark blurs/frosts on scroll,
    headline fades in over a glass panel (see hero-pin JS block)
-3. **About** (`#about`) — dark section, studio bio + 3 stats, B&W behind-the-scenes photo
-4. **Services** (`#services`) — 4 service cards (Retouching, Photography, Creative Direction,
-   E-Commerce)
-5. **Team Builder** (`#team-builder`) — interactive: click role chips (Photographer, Stylist,
-   MUA, Casting, Producer, Retoucher, Motion/Video, Set Design) to build a live "team" string
-6. **Process** (`#process`) — 4-step process (Briefing → Team Assembly → Production → Retouch &
-   Deliver)
-7. **Editorial** (`#work`) — 3D "coverflow" carousel (CSS `rotateY`/`translateZ`, no library) of
+3. **Editorial** (`#work`) — 3D "coverflow" carousel (CSS `rotateY`/`translateZ`, no library) of
    7 magazine covers (Penida, Elegant, Imirage, Shuba, Scorpio Vin, MOB, Tag). Click a side cover
    to center it; click the centered one to open the project modal.
-8. **Campaigns** (`#campaigns`) — grid of 9 brand campaign tiles (Nike, Adidas, Zegna, Valentino,
+4. **Campaigns** (`#campaigns`) — grid of 9 brand campaign tiles (Nike, Adidas, Zegna, Valentino,
    Iceberg, Payless, Calvin Klein, Desigual, Fila), same modal on click
+5. **Services** (`#services`) — 4 service cards (Retouching, Photography, Creative Direction,
+   E-Commerce)
+6. **About** (`#about`) — dark section, studio bio + 3 stats, B&W behind-the-scenes photo
+7. **Team Builder** (`#team-builder`) — interactive: click role chips (Photographer, Stylist,
+   MUA, Casting, Producer, Retoucher, Motion/Video, Set Design) to build a live "team" string
+8. **Process** (`#process`) — 4-step process (Briefing → Team Assembly → Production → Retouch &
+   Deliver)
 9. **Project Modal** (`#projectModal`) — shared lightbox for both editorial covers and campaign
    tiles; pulls from the `projectData` JS object; includes a Behance deep-link when we have the
    real project URL, otherwise links to the profile
