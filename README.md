@@ -137,15 +137,25 @@ markup doesn't matter to them).
    `object-fit:cover` same as any other campaign photo); each converted to GIF with Pillow/OpenCV
    since there's no ffmpeg on this machine. First pass (full frame count, 480px wide, dithered)
    came out to 10–14MB *each* — GIF compresses photographic/video content far worse than
-   flat-color content. Settled recipe, reused as-is since: 260px wide, ~10fps (every 3rd–5th
-   source frame depending on original fps), capped to 3.5s, a single 64-color palette sampled from
-   a mid-clip frame, and **no dithering** (`dither=Image.NONE` — dithering adds per-pixel noise
-   that LZW/GIF compresses badly; a flat-ish quantized image compresses much better and these are
-   B&W BTS clips so banding isn't very visible at this size anyway). Landed at 0.6–1.8MB each
-   (Iceberg: 1.1MB/35 frames, Valentino: 1.8MB/35 frames — the tallest of the five since 9:16
-   source means more vertical pixels per frame at the same 260px width). The files live at
-   `images/campaigns/<key>/hover.gif` alongside each project's `01.jpg`. **To add another:** drop
-   the clip anywhere, run the same OpenCV/Pillow recipe, copy the result to
+   flat-color content. Settled recipe: 260px wide, ~10fps (every 3rd–5th source frame depending on
+   original fps), a single 64-color palette sampled from a mid-clip frame, and **no dithering**
+   (`dither=Image.NONE` — dithering adds per-pixel noise that LZW/GIF compresses badly; a flat-ish
+   quantized image compresses much better and these are B&W BTS clips so banding isn't very
+   visible at this size anyway). Nike/Adidas/Zegna capped to a straight 3.5s from the start of the
+   clip (0.6–1.5MB each). **Iceberg and Valentino re-cut 2026-08-25** per feedback that both felt
+   short and Valentino's opening was mostly a laptop, not product: Iceberg extended to 5.5s
+   (close to its full ~5.9s length — was cut short before showing the model against the branded
+   wall, now shows it) → 1.8MB/55 frames. Valentino rebuilt from **two separate time ranges of the
+   same clip concatenated into one GIF**, not a single contiguous span: ~1.8–2.5s (heels lined up
+   on the table, after the opening laptop shot pans away) + ~4.5–6.15s (makeup being applied to
+   the model, a completely different moment later in the same 7.8s source) → 1.1MB/24 frames. The
+   extraction script builds each range's frame list separately (same per-frame resize/palette
+   logic as always) and concatenates the two lists before the shared-palette quantize + GIF save
+   step — the palette is still sampled from one mid-sequence frame across the *combined* list, not
+   per-segment, so both halves share one 64-color palette and cut together cleanly. The files live
+   at `images/campaigns/<key>/hover.gif` alongside each project's `01.jpg`. **To add another:**
+   drop the clip anywhere, run the same OpenCV/Pillow recipe (single range, or multiple
+   concatenated ranges if only part of the clip is usable), copy the result to
    `images/campaigns/<key>/hover.gif`, and add `<key>` to `campaignHoverKeys` in the campaigns
    `<script>` block — that's the only JS change needed.
 4. **Editorial** (`#work`) — 3D "coverflow" carousel (CSS `rotateY`/`translateZ`, no library) of
