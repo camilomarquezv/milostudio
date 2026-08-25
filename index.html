@@ -153,18 +153,32 @@
   @media (max-width:860px){.about-grid{grid-template-columns:1fr;}}
 
   /* ===== SERVICES ===== */
-  .services-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
-  .service-card{background:var(--paper); padding:2rem 1.6rem; min-height:300px; display:flex; flex-direction:column; justify-content:space-between; transition:background 0.25s ease;}
-  .service-card .num{font-size:0.75rem; font-weight:700; color:var(--steel);}
-  .service-card h3{font-size:1.3rem; font-weight:800; margin:1.4rem 0 0.7rem;}
-  .service-card p{font-size:0.88rem; line-height:1.5; color:var(--slate);}
-  .service-card.lead{background:var(--ink); color:var(--paper);}
-  .service-card.lead .num{color:var(--mist);}
-  .service-card.lead p{color:var(--mist); opacity:0.92;}
-  .service-card:hover{background:var(--paper-dim);}
-  .service-card.lead:hover{background:var(--slate);}
-  @media (max-width:980px){.services-grid{grid-template-columns:1fr 1fr;}}
-  @media (max-width:620px){.services-grid{grid-template-columns:1fr;}}
+  /* ===== SERVICES SLIDER ===== */
+  /* Same scroll-scrub pin pattern as the hero logo and editorial coverflow: .services-pin gives
+     scroll room, .services-sticky pins in place while scroll progress drives the active index. */
+  .services-pin{position:relative;}
+  .services-sticky{position:sticky; top:0; min-height:100vh; display:flex; align-items:center;}
+  .services-slide{display:grid; grid-template-columns:120px 1fr 320px; gap:clamp(24px,4vw,56px); align-items:center; padding:clamp(32px,5vw,56px) 0;}
+  .service-num-col{display:flex; flex-direction:column; gap:1.6rem;}
+  .service-bignum{font-size:clamp(3rem,7vw,5.5rem); font-weight:800; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums;}
+  .services-dots{display:flex; flex-direction:column; gap:10px;}
+  .services-dots .sdot{width:8px; height:8px; border-radius:50%; background:var(--mist); border:none; cursor:pointer; padding:0; transition:background .25s ease, transform .25s ease;}
+  .services-dots .sdot.is-active{background:var(--ink); transform:scale(1.3);}
+  .service-visual{
+    position:relative; aspect-ratio:16/10; border-radius:6px; overflow:hidden;
+    background:linear-gradient(135deg, var(--paper-dim) 0%, var(--mist) 100%);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .service-visual img{width:100%; height:100%; object-fit:cover; display:block;}
+  .service-visual-placeholder-label{font-size:0.75rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--steel); opacity:0.6;}
+  .service-counter{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; color:var(--steel); margin-bottom:0.8rem;}
+  .service-info h3{font-size:clamp(1.4rem,2.2vw,1.9rem); font-weight:800; margin-bottom:0.9rem; line-height:1.15;}
+  .service-info p{font-size:0.92rem; line-height:1.6; color:var(--slate);}
+  @media (max-width:860px){
+    .services-slide{grid-template-columns:1fr; text-align:left;}
+    .service-num-col{flex-direction:row; align-items:center; justify-content:space-between;}
+    .services-dots{flex-direction:row;}
+  }
 
   /* ===== TEAM BUILDER ===== */
   .builder{background:var(--paper-dim); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
@@ -297,8 +311,8 @@
   .contact h2{font-size:clamp(2rem,4.6vw,3.4rem); font-weight:800; color:var(--paper);}
   .contact-copy p{font-size:1rem; line-height:1.5; margin-top:1rem; max-width:38ch; opacity:0.8;}
   .contact-direct{display:flex; flex-direction:column; justify-content:center; height:100%;}
-  .whatsapp-cta{margin-top:1rem; display:inline-flex; align-items:center; gap:0.65rem; background:#25D366; color:#0b1a10; padding:16px 26px; border-radius:100px; width:fit-content; transition:transform 0.15s ease, background 0.2s ease; box-shadow:0 8px 24px rgba(37,211,102,0.25);}
-  .whatsapp-cta:hover{background:#20bd5a; transform:translateY(-1px);}
+  .whatsapp-cta{margin-top:1rem; display:inline-flex; align-items:center; gap:0.65rem; background:var(--paper); color:var(--ink); padding:16px 26px; border-radius:100px; width:fit-content; transition:transform 0.15s ease, background 0.2s ease; box-shadow:0 8px 24px rgba(0,0,0,0.18);}
+  .whatsapp-cta:hover{background:var(--mist); transform:translateY(-1px);}
   .whatsapp-cta-number{font-size:clamp(1.2rem,2.6vw,1.6rem); font-weight:800; letter-spacing:-0.01em;}
   .contact-direct-note{font-size:0.85rem; color:var(--paper); opacity:0.7; margin-top:1.1rem; max-width:34ch; line-height:1.5;}
   @media (max-width:800px){.contact-grid{grid-template-columns:1fr;}}
@@ -508,25 +522,28 @@
 <section id="services">
   <div class="wrap">
     <div class="section-head reveal">
-      <div><span class="eyebrow" data-i18n="services.eyebrow">What We Do</span><h2 style="margin-top:0.7rem;" data-i18n="services.h2">Two things we do really well.</h2></div>
+      <div><span class="eyebrow" data-i18n="services.eyebrow">What We Do</span><h2 style="margin-top:0.7rem;" data-i18n="services.h2">Four things we do really well.</h2></div>
       <p class="desc" data-i18n="services.desc">And a few more that round out a full production — all under one brief, one team, one delivery.</p>
     </div>
-    <div class="services-grid reveal">
-      <div class="service-card lead">
-        <span class="num">01</span>
-        <div><h3 data-i18n="service1.title">Retouching &amp; Post-Production</h3><p data-i18n="service1.desc">Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.</p></div>
-      </div>
-      <div class="service-card lead">
-        <span class="num">02</span>
-        <div><h3 data-i18n="service2.title">Photography &amp; Production</h3><p data-i18n="service2.desc">Full campaign shoots managed start to finish: casting, location, lighting, and on-set direction.</p></div>
-      </div>
-      <div class="service-card">
-        <span class="num">03</span>
-        <div><h3 data-i18n="service3.title">Creative Direction</h3><p data-i18n="service3.desc">Concept, mood, and visual strategy defined up front, so every asset serves one clear campaign vision.</p></div>
-      </div>
-      <div class="service-card">
-        <span class="num">04</span>
-        <div><h3 data-i18n="service4.title">E-Commerce &amp; Catalog</h3><p data-i18n="service4.desc">High-volume, consistent product and model imagery built for online retail, without losing quality control.</p></div>
+  </div>
+
+  <div class="services-pin" id="servicesPin">
+    <div class="services-sticky">
+      <div class="wrap">
+        <div class="services-slide">
+          <div class="service-num-col">
+            <span class="service-bignum" id="serviceBigNum">01</span>
+            <div class="services-dots" id="servicesDots"></div>
+          </div>
+          <div class="service-visual" id="serviceVisual">
+            <span class="service-visual-placeholder-label">MILO Studio</span>
+          </div>
+          <div class="service-info">
+            <span class="service-counter" id="serviceCounter">01 / 04</span>
+            <h3 id="serviceTitle">Retouching &amp; Post-Production</h3>
+            <p id="serviceDesc">Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -676,7 +693,7 @@
     'about.stat3': {en:'EU + LATAM Markets', es:'Mercados UE + LATAM'},
 
     'services.eyebrow': {en:'What We Do', es:'Qué Hacemos'},
-    'services.h2': {en:'Two things we do really well.', es:'Dos cosas que hacemos muy bien.'},
+    'services.h2': {en:'Four things we do really well.', es:'Cuatro cosas que hacemos muy bien.'},
     'services.desc': {en:'And a few more that round out a full production — all under one brief, one team, one delivery.', es:'Y algunas más que completan una producción integral — todo bajo un solo brief, un equipo, una entrega.'},
     'service1.title': {en:'Retouching & Post-Production', es:'Retoque y Postproducción'},
     'service1.desc': {en:'Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.', es:'Retoque de belleza, moda y producto con estándar editorial — corrección de color y acabado fiel a la identidad de marca.'},
@@ -1095,7 +1112,79 @@
       openProjectModal(currentProjectKey, currentProjectImg);
       goToSlide(savedSlide);
     }
+    if(typeof renderServiceSlide === 'function') renderServiceSlide();
   });
+</script>
+
+<script>
+  // ===== Services slider ===== (same scroll-scrub pin pattern as the hero logo / coverflow)
+  // Photos pending from the user — once provided, drop them at
+  // images/services/<key>/01.jpg and add `img: 'images/services/<key>/01.jpg'` per entry below,
+  // then swap the placeholder label for an <img id="serviceImg"> inside #serviceVisual and set
+  // its src in renderServiceSlide().
+  const servicesData = [
+    {key: 'service1', folder: 'images/services/retouching'},
+    {key: 'service2', folder: 'images/services/photography'},
+    {key: 'service3', folder: 'images/services/creative_direction'},
+    {key: 'service4', folder: 'images/services/ecommerce'},
+  ];
+  const servicesPin = document.getElementById('servicesPin');
+  const servicesSticky = document.querySelector('.services-sticky');
+  const serviceBigNum = document.getElementById('serviceBigNum');
+  const serviceCounter = document.getElementById('serviceCounter');
+  const serviceTitleEl = document.getElementById('serviceTitle');
+  const serviceDescEl = document.getElementById('serviceDesc');
+  const servicesDotsWrap = document.getElementById('servicesDots');
+  const SERVICES_SCROLL_ROOM = 700;
+  let activeService = 0;
+
+  servicesData.forEach((s, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'sdot';
+    dot.type = 'button';
+    dot.setAttribute('aria-label', 'Go to service ' + (i + 1));
+    dot.addEventListener('click', () => { activeService = i; renderServiceSlide(); });
+    servicesDotsWrap.appendChild(dot);
+  });
+  const serviceDots = Array.from(servicesDotsWrap.children);
+
+  function renderServiceSlide(){
+    const s = servicesData[activeService];
+    const n = servicesData.length;
+    serviceBigNum.textContent = String(activeService + 1).padStart(2, '0');
+    serviceCounter.textContent = `${String(activeService + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
+    serviceTitleEl.textContent = t(s.key + '.title');
+    serviceDescEl.textContent = t(s.key + '.desc');
+    serviceDots.forEach((d, i) => d.classList.toggle('is-active', i === activeService));
+  }
+
+  function sizeServicesPin(){
+    servicesPin.style.height = (servicesSticky.offsetHeight + SERVICES_SCROLL_ROOM) + 'px';
+  }
+
+  function updateServicesScroll(){
+    const rect = servicesPin.getBoundingClientRect();
+    const total = servicesPin.offsetHeight - servicesSticky.offsetHeight;
+    const scrolled = clamp(-rect.top, 0, total);
+    const progress = total > 0 ? scrolled / total : 0;
+    const idx = Math.min(servicesData.length - 1, Math.round(progress * (servicesData.length - 1)));
+    if(idx !== activeService){
+      activeService = idx;
+      renderServiceSlide();
+    }
+  }
+
+  sizeServicesPin();
+  window.addEventListener('resize', sizeServicesPin);
+  let servicesTicking = false;
+  window.addEventListener('scroll', () => {
+    if(!servicesTicking){
+      requestAnimationFrame(() => { updateServicesScroll(); servicesTicking = false; });
+      servicesTicking = true;
+    }
+  });
+  renderServiceSlide();
+  updateServicesScroll();
 </script>
 
 <script>

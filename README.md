@@ -89,8 +89,20 @@ and Services came first.
    (`.campaigns-grid:hover .campaign-tile`) is two classes + one pseudo-class, so the hovered
    tile's own grow rule must be at least as specific (`.campaigns-grid:hover
    .campaign-tile:hover`) or the shrink rule wins for it too and hovering has no visible effect.
-5. **Services** (`#services`) — 4 service cards (Retouching, Photography, Creative Direction,
-   E-Commerce)
+5. **Services** (`#services`) — redesigned 2026-08-25 from a static 4-card grid into a
+   scroll-scrubbed slider (same pin pattern as the hero logo and editorial coverflow —
+   `#servicesPin` → `.services-sticky`, height computed in JS via `sizeServicesPin()` as the
+   sticky content's height + a fixed 700px `SERVICES_SCROLL_ROOM`). Scrolling advances through the
+   4 services in order (Retouching → Photography → Creative Direction → E-Commerce), each showing
+   a big number, a counter (`01 / 04`), title, description, and dot nav (click a dot to jump).
+   Text content comes straight from the existing `service1..4.title/.desc` translation keys via
+   `t()`, not `data-i18n` (the slide is JS-rendered, like the project modal). **`#serviceVisual`
+   is still a placeholder** (`images/services/<key>/` folders exist — `retouching`,
+   `photography`, `creative_direction`, `ecommerce` — but are empty): once real photos arrive,
+   drop one per folder, add an `<img id="serviceImg">` inside `#serviceVisual` in place of the
+   `.service-visual-placeholder-label` span, and set its `src` per slide in `renderServiceSlide()`
+   (`services` `<script>` block, right after the coverflow one). The section head's copy was also
+   fixed from "Two things we do really well" to "Four things" — there have always been 4 cards.
 6. **About** (`#about`) — dark section, studio bio + 3 stats, B&W behind-the-scenes photo
 7. **Team Builder** (`#team-builder`) — interactive: click role chips (Photographer, Stylist,
    MUA, Casting, Producer, Retoucher, Motion/Video, Set Design) to build a live "team" string.
