@@ -102,16 +102,18 @@ markup doesn't matter to them).
    swaps `src`/text on every index change, same technique as the services slider's single
    text-swap and the coverflow's caption swap. **Prev/next arrows** (added 2026-08-25, same day
    — user wanted a manual way to catch a campaign missed by scrolling too fast): reuse the
-   existing `.arrow-btn`/`.arrow-prev`/`.arrow-next` styling from the coverflow, plus a
-   `.campaign-arrow` modifier (34px, smaller than the coverflow's 44px) since the user asked for
-   them smaller. They're direct children of `.campaigns-sticky` — not of `.campaign-stage-wrap` —
-   specifically so `arrow-prev{left:0}`/`arrow-next{right:0}` resolve against the *sticky*
-   element's box (full viewport width, and already a positioned element via `position:sticky`)
-   rather than against the ~400px-wide photo. First version had them flanking the photo directly;
-   user asked to move them "all the way to the page's own edge/corner" instead, hence the
-   reparent. `goToCampaign()` wraps around at both ends (index 8 → next → 0). Same "override until
-   the next scroll event" behavior as the coverflow's own arrows/dots — clicking doesn't move the
-   scroll position, so continued scrolling picks up from wherever raw scroll progress maps to.
+   existing `.arrow-btn`/`.arrow-prev`/`.arrow-next` styling, plus an `.edge-arrow` modifier
+   (34px, smaller than the default 44px) since the user asked for them smaller. They're direct
+   children of `.campaigns-sticky` — not of `.campaign-stage-wrap` — specifically so
+   `arrow-prev{left:0}`/`arrow-next{right:0}` resolve against the *sticky* element's box (full
+   viewport width, and already a positioned element via `position:sticky`) rather than against
+   the ~400px-wide photo. First version had them flanking the photo directly; user asked to move
+   them "all the way to the page's own edge/corner" instead, hence the reparent. The coverflow's
+   arrows were moved the same way right after, for consistency between the two — see item 4's
+   note below. `goToCampaign()` wraps around at both ends (index 8 → next → 0). Same "override
+   until the next scroll event" behavior as the coverflow's own arrows/dots — clicking doesn't
+   move the scroll position, so continued scrolling picks up from wherever raw scroll progress
+   maps to.
    **Non-obvious fix needed for this layout specifically:** `.campaigns-sticky` is `display:flex`
    (so it can vertically center the slide, same as `.services-sticky`/`.coverflow-sticky`) — but
    its `.wrap` child has no explicit width, so as a flex item it sizes to shrink-to-fit instead of
@@ -152,10 +154,15 @@ markup doesn't matter to them).
    extraction script builds each range's frame list separately (same per-frame resize/palette
    logic as always) and concatenates the two lists before the shared-palette quantize + GIF save
    step — the palette is still sampled from one mid-sequence frame across the *combined* list, not
-   per-segment, so both halves share one 64-color palette and cut together cleanly. The files live
-   at `images/campaigns/<key>/hover.gif` alongside each project's `01.jpg`. **To add another:**
-   drop the clip anywhere, run the same OpenCV/Pillow recipe (single range, or multiple
-   concatenated ranges if only part of the clip is usable), copy the result to
+   per-segment, so both halves share one 64-color palette and cut together cleanly. **Payless
+   added 2026-08-25** (a "Back to School" campaign clip — kids running, product close-ups, no
+   awkward segment to cut around like Valentino's laptop) at the same 5.5s length as Iceberg →
+   2.6MB/55 frames, the largest of the six since it's a much busier, more varied clip (more scene
+   changes compress worse under GIF/LZW than a mostly-static product shot does — tried a 4.5s cut
+   too, only saved ~300KB, so kept the fuller 5.5s). The files live at
+   `images/campaigns/<key>/hover.gif` alongside each project's `01.jpg`. **To add another:** drop
+   the clip anywhere, run the same OpenCV/Pillow recipe (single range, or multiple concatenated
+   ranges if only part of the clip is usable), copy the result to
    `images/campaigns/<key>/hover.gif`, and add `<key>` to `campaignHoverKeys` in the campaigns
    `<script>` block — that's the only JS change needed.
 4. **Editorial** (`#work`) — 3D "coverflow" carousel (CSS `rotateY`/`translateZ`, no library) of
@@ -172,7 +179,13 @@ markup doesn't matter to them).
    sticky content's own height plus a fixed `COVERFLOW_SCROLL_ROOM` (520px), not a flat vh, so
    there's no dead scroll space if the carousel is short relative to the viewport. Clicking a
    cover or a dot still works at any time and simply overrides `active` until the next scroll
-   event recomputes it from scroll position.
+   event recomputes it from scroll position. **Arrows moved to the page edges (2026-08-25)** to
+   match the campaigns slider, added right after that slider got its own edge arrows — `#prevBtn`/
+   `#nextBtn` are now direct children of `.coverflow-sticky` (`.arrow-btn arrow-prev/next
+   edge-arrow`) instead of `.coverflow-stage`, same reasoning as the campaigns slider: `left:0`/
+   `right:0` needs a full-viewport-width positioned ancestor to land at the actual page edge, not
+   the narrower carousel stage. `.coverflow-stage` keeps `position:relative` regardless — its
+   `::before` ground-shadow pseudo-element still needs it, only the arrows moved out.
 5. **Process** (`#process`) — 4-step process (Briefing → Team Assembly → Production → Retouch &
    Deliver). Each `.process-row` inverts on hover (added 2026-08-25) — dark `var(--ink)`
    background, title goes `var(--paper)`, the number goes `var(--accent)`, description goes
@@ -180,7 +193,22 @@ markup doesn't matter to them).
    (`margin:0 clamp(-20px,-3vw,-32px)` cancelling `padding:1.7rem clamp(20px,3vw,32px)`) so the
    hover background bleeds full-width to `.process-list`'s own edge instead of stopping at the
    row's normal content width.
-6. **About** (`#about`) — dark section, studio bio + 3 stats, B&W behind-the-scenes photo
+6. **About** (`#about`) — dark section, studio bio + 3 stats, B&W behind-the-scenes photo.
+   **Stats count up on scroll (added 2026-08-25):** `#statRow`'s three `.stat-num` spans
+   (`data-target="10+"`, `"20+"`, `"2"`) start at `"00"` in the HTML and animate up via
+   `requestAnimationFrame` (ease-out cubic, 900ms) the first time `#statRow` scrolls into view — a
+   dedicated `IntersectionObserver` (threshold 0.12, same as the site's generic `.reveal` one, but
+   separate since this one runs a counting animation instead of toggling a class). The three are
+   staggered 250ms apart (`setTimeout(() => animateCount(el, 900), i * 250)`) rather than starting
+   together, so they land in sequence — 10+ first, then 20+, then 2 — instead of all finishing at
+   once. Numbers pad to 2 digits mid-count (`"07"`, not `"7"`) and snap to the exact original text
+   (`"10+"`, with the `+`) on the final frame rather than relying on the animated math to land
+   precisely on it. Skips straight to the final values under `prefers-reduced-motion: reduce`.
+   **Gotcha hit while testing:** `requestAnimationFrame` doesn't advance in a backgrounded/
+   unfocused browser tab (Chromium throttles rAF for hidden tabs) — a test that scrolls the stat
+   row into view but doesn't front the tab will see the counters stuck at `"00"` even though the
+   code is correct; front the tab (or check `document.hidden`) before concluding a counting
+   animation isn't firing.
 7. **Services** (`#services`) — redesigned 2026-08-25 from a static 4-card grid into a
    scroll-scrubbed slider (same pin pattern as the hero logo and editorial coverflow —
    `#servicesPin` → `.services-sticky`, height computed in JS via `sizeServicesPin()` as the

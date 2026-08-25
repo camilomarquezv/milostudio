@@ -239,11 +239,15 @@
   .arrow-btn:hover{background:var(--ink);color:var(--paper);}
   .arrow-prev{left:0;}
   .arrow-next{right:0;}
+  /* Both the coverflow's and campaigns slider's arrows are children of their section's
+     .*-sticky element (full viewport width, already positioned via position:sticky) rather than
+     of the narrower carousel/photo itself, so arrow-prev/arrow-next's left:0/right:0 lands flush
+     against the actual page edge — and smaller than the default 44px, per feedback. */
+  .edge-arrow{width:34px; height:34px; font-size:0.95rem; z-index:5;}
 
   @media (max-width:900px){
     .editorial-intro{grid-template-columns:1fr;}.editorial-index{justify-self:start;text-align:left;}
     .mag-cover{width:150px;height:212px;margin:-106px 0 0 -75px;}
-    .arrow-btn{width:36px;height:36px;}
   }
 
   /* ===== CAMPAIGNS SLIDER ===== */
@@ -256,11 +260,6 @@
      stage — with the aspect-ratio'd image as a 3rd grid track alongside 1fr, that shrink-to-fit
      math collapses the text column down to almost nothing. Force it to actually use the space. */
   .campaigns-sticky > .wrap{width:100%;}
-  /* Prev/next arrows anchor to .campaigns-sticky itself (full viewport width, and already a
-     positioned element via position:sticky) rather than to the photo, so they sit flush at the
-     page's own edges — arrow-prev/arrow-next's left:0/right:0 lands right at the browser edge —
-     and stay put at a fixed spot while the photo/number/text column widths change per breakpoint. */
-  .campaign-arrow{width:34px; height:34px; font-size:0.95rem; z-index:5;}
   .campaigns-slide{display:grid; grid-template-columns:140px auto 1fr; gap:clamp(24px,4vw,56px); align-items:center; padding:clamp(32px,5vw,56px) 0;}
   .campaign-num-col{display:flex; flex-direction:column; gap:1.6rem;}
   .campaign-bignum{font-size:clamp(3rem,7vw,5.5rem); font-weight:800; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums;}
@@ -432,8 +431,8 @@
 
   <div class="campaigns-pin" id="campaignsPin">
     <div class="campaigns-sticky">
-      <button class="arrow-btn arrow-prev campaign-arrow" id="campaignPrevBtn" aria-label="Previous campaign">‹</button>
-      <button class="arrow-btn arrow-next campaign-arrow" id="campaignNextBtn" aria-label="Next campaign">›</button>
+      <button class="arrow-btn arrow-prev edge-arrow" id="campaignPrevBtn" aria-label="Previous campaign">‹</button>
+      <button class="arrow-btn arrow-next edge-arrow" id="campaignNextBtn" aria-label="Next campaign">›</button>
       <div class="wrap">
         <div class="campaigns-slide">
           <div class="campaign-num-col">
@@ -484,10 +483,10 @@
 
   <div class="coverflow-pin" id="coverflowPin">
     <div class="coverflow-sticky">
+      <button class="arrow-btn arrow-prev edge-arrow" id="prevBtn" aria-label="Previous cover">‹</button>
+      <button class="arrow-btn arrow-next edge-arrow" id="nextBtn" aria-label="Next cover">›</button>
       <div class="wrap">
         <div class="coverflow-stage reveal" aria-label="Editorial magazine covers">
-          <button class="arrow-btn arrow-prev" id="prevBtn" aria-label="Previous cover">‹</button>
-          <button class="arrow-btn arrow-next" id="nextBtn" aria-label="Next cover">›</button>
           <div class="coverflow-track" id="coverTrack">
             <button class="mag-cover" type="button" data-index="0" data-project="penida" aria-label="Open Penida">
               <div class="mag-cover-inner">
@@ -579,10 +578,10 @@
             <p data-i18n="about.p1">MILO Studio is led by Camilo Márquez Villegas, an art director and fashion photographer with ten years producing campaigns for luxury and lifestyle brands across Latin America and Europe.</p>
             <p data-i18n="about.p2">Clients brief MILO once. We assemble the stylists, makeup artists, models, and retouchers the project actually calls for, and manage them as one accountable studio — from concept to delivery.</p>
           </div>
-          <div class="stat-row">
-            <div><span class="stat-num">10+</span><span class="stat-label" data-i18n="about.stat1">Years in Production</span></div>
-            <div><span class="stat-num">20+</span><span class="stat-label" data-i18n="about.stat2">Brands &amp; Designers</span></div>
-            <div><span class="stat-num">2</span><span class="stat-label" data-i18n="about.stat3">EU + LATAM Markets</span></div>
+          <div class="stat-row" id="statRow">
+            <div><span class="stat-num" data-target="10+">00</span><span class="stat-label" data-i18n="about.stat1">Years in Production</span></div>
+            <div><span class="stat-num" data-target="20+">00</span><span class="stat-label" data-i18n="about.stat2">Brands &amp; Designers</span></div>
+            <div><span class="stat-num" data-target="2">00</span><span class="stat-label" data-i18n="about.stat3">EU + LATAM Markets</span></div>
           </div>
         </div>
       </div>
@@ -936,6 +935,39 @@
   }, {threshold:0.12});
   revealEls.forEach(el => io.observe(el));
 
+  // Stat counters (About section: 10+ Years, 20+ Brands, 2 Markets) count up from 00 the first
+  // time they scroll into view, staggered so each one lands in turn rather than all at once.
+  const statRow = document.getElementById('statRow');
+  if(statRow){
+    const statEls = Array.from(statRow.querySelectorAll('.stat-num'));
+    const statsReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function animateCount(el, duration){
+      const m = el.dataset.target.match(/^(\d+)(.*)$/);
+      if(!m) return;
+      const target = parseInt(m[1], 10);
+      const suffix = m[2];
+      const start = performance.now();
+      function tick(now){
+        const p = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = p < 1 ? String(Math.round(eased * target)).padStart(2, '0') : target + suffix;
+        if(p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+    const statsIO = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(!entry.isIntersecting) return;
+        statEls.forEach((el, i) => {
+          if(statsReduceMotion){ el.textContent = el.dataset.target; }
+          else { setTimeout(() => animateCount(el, 900), i * 250); }
+        });
+        statsIO.unobserve(entry.target);
+      });
+    }, {threshold:0.12});
+    statsIO.observe(statRow);
+  }
+
   const chips = document.querySelectorAll('.role-chip');
   const teamList = document.getElementById('team-list');
   const quoteBtn = document.getElementById('quoteBtn');
@@ -1262,7 +1294,7 @@
     {key: 'desigual', label: 'Desigual'},
     {key: 'fila', label: 'Fila'},
   ];
-  const campaignHoverKeys = new Set(['nike', 'adidas', 'zegna', 'iceberg', 'valentino']);
+  const campaignHoverKeys = new Set(['nike', 'adidas', 'zegna', 'iceberg', 'valentino', 'payless']);
   const campaignsPin = document.getElementById('campaignsPin');
   const campaignsSticky = document.querySelector('.campaigns-sticky');
   const campaignBigNum = document.getElementById('campaignBigNum');
