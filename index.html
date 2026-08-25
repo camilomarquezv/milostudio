@@ -256,16 +256,18 @@
      stage — with the aspect-ratio'd image as a 3rd grid track alongside 1fr, that shrink-to-fit
      math collapses the text column down to almost nothing. Force it to actually use the space. */
   .campaigns-sticky > .wrap{width:100%;}
+  /* Prev/next arrows anchor to .campaigns-sticky itself (full viewport width, and already a
+     positioned element via position:sticky) rather than to the photo, so they sit flush at the
+     page's own edges — arrow-prev/arrow-next's left:0/right:0 lands right at the browser edge —
+     and stay put at a fixed spot while the photo/number/text column widths change per breakpoint. */
+  .campaign-arrow{width:34px; height:34px; font-size:0.95rem; z-index:5;}
   .campaigns-slide{display:grid; grid-template-columns:140px auto 1fr; gap:clamp(24px,4vw,56px); align-items:center; padding:clamp(32px,5vw,56px) 0;}
   .campaign-num-col{display:flex; flex-direction:column; gap:1.6rem;}
   .campaign-bignum{font-size:clamp(3rem,7vw,5.5rem); font-weight:800; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums;}
   .campaigns-dots{display:flex; flex-direction:column; gap:10px;}
   .campaigns-dots .cdot{width:8px; height:8px; border-radius:50%; background:var(--mist); border:none; cursor:pointer; padding:0; transition:background .25s ease, transform .25s ease;}
   .campaigns-dots .cdot.is-active{background:var(--ink); transform:scale(1.3);}
-  /* Separate wrapper from .campaign-stage itself: the stage clips (overflow:hidden) for the
-     rounded-corner photo crop, so the prev/next arrows live on this outer element instead, or
-     they'd be clipped along with everything else. */
-  .campaign-stage-wrap{position:relative; flex-shrink:0;}
+  .campaign-stage-wrap{flex-shrink:0;}
   .campaign-stage{position:relative; height:min(58vh,560px); aspect-ratio:3/4; border-radius:6px; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(22,27,34,.08);}
   .campaign-stage img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1) contrast(1.02);}
   /* Nike/Adidas/Zegna have a BTS video clip that plays on hover, overlaid on top of the static
@@ -430,6 +432,8 @@
 
   <div class="campaigns-pin" id="campaignsPin">
     <div class="campaigns-sticky">
+      <button class="arrow-btn arrow-prev campaign-arrow" id="campaignPrevBtn" aria-label="Previous campaign">‹</button>
+      <button class="arrow-btn arrow-next campaign-arrow" id="campaignNextBtn" aria-label="Next campaign">›</button>
       <div class="wrap">
         <div class="campaigns-slide">
           <div class="campaign-num-col">
@@ -437,8 +441,6 @@
             <div class="campaigns-dots" id="campaignsDots"></div>
           </div>
           <div class="campaign-stage-wrap">
-            <button class="arrow-btn arrow-prev" id="campaignPrevBtn" aria-label="Previous campaign">‹</button>
-            <button class="arrow-btn arrow-next" id="campaignNextBtn" aria-label="Next campaign">›</button>
             <div class="campaign-stage" id="campaignStage">
               <img id="campaignImg" src="images/campaigns/nike/01.jpg" alt="Nike campaign">
               <img id="campaignHoverGif" src="images/campaigns/nike/hover.gif" alt="" class="tile-hover-gif" loading="lazy">
@@ -1260,7 +1262,7 @@
     {key: 'desigual', label: 'Desigual'},
     {key: 'fila', label: 'Fila'},
   ];
-  const campaignHoverKeys = new Set(['nike', 'adidas', 'zegna']);
+  const campaignHoverKeys = new Set(['nike', 'adidas', 'zegna', 'iceberg']);
   const campaignsPin = document.getElementById('campaignsPin');
   const campaignsSticky = document.querySelector('.campaigns-sticky');
   const campaignBigNum = document.getElementById('campaignBigNum');

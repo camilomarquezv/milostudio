@@ -101,13 +101,17 @@ markup doesn't matter to them).
    *same* DOM elements (one `<img id="campaignImg">`, not 9 separate tiles) — `renderCampaignSlide()`
    swaps `src`/text on every index change, same technique as the services slider's single
    text-swap and the coverflow's caption swap. **Prev/next arrows** (added 2026-08-25, same day
-   — user wanted a manual way to catch a campaign missed by scrolling too fast): reuses the
-   existing `.arrow-btn`/`.arrow-prev`/`.arrow-next` styling from the coverflow. They live on a
-   `.campaign-stage-wrap` element wrapping `.campaign-stage`, not inside the stage itself, since
-   the stage has `overflow:hidden` for its rounded photo crop and would clip them. `goToCampaign()`
-   wraps around at both ends (index 8 → next → 0). Same "override until the next scroll event"
-   behavior as the coverflow's own arrows/dots — clicking doesn't move the scroll position, so
-   continued scrolling picks up from wherever raw scroll progress maps to, same as before.
+   — user wanted a manual way to catch a campaign missed by scrolling too fast): reuse the
+   existing `.arrow-btn`/`.arrow-prev`/`.arrow-next` styling from the coverflow, plus a
+   `.campaign-arrow` modifier (34px, smaller than the coverflow's 44px) since the user asked for
+   them smaller. They're direct children of `.campaigns-sticky` — not of `.campaign-stage-wrap` —
+   specifically so `arrow-prev{left:0}`/`arrow-next{right:0}` resolve against the *sticky*
+   element's box (full viewport width, and already a positioned element via `position:sticky`)
+   rather than against the ~400px-wide photo. First version had them flanking the photo directly;
+   user asked to move them "all the way to the page's own edge/corner" instead, hence the
+   reparent. `goToCampaign()` wraps around at both ends (index 8 → next → 0). Same "override until
+   the next scroll event" behavior as the coverflow's own arrows/dots — clicking doesn't move the
+   scroll position, so continued scrolling picks up from wherever raw scroll progress maps to.
    **Non-obvious fix needed for this layout specifically:** `.campaigns-sticky` is `display:flex`
    (so it can vertically center the slide, same as `.services-sticky`/`.coverflow-sticky`) — but
    its `.wrap` child has no explicit width, so as a flex item it sizes to shrink-to-fit instead of
@@ -120,21 +124,27 @@ markup doesn't matter to them).
    apply:** if another pinned/flex-centered slide layout ends up with 3+ grid columns where one
    has an intrinsic (non-1fr) size, check the text column's actual rendered width — don't assume a
    working 2-column sticky pattern generalizes cleanly to 3 columns.
-   **Hover video preview on Nike/Adidas/Zegna** (added 2026-08-25, carried through both redesigns):
-   `#campaignHoverGif`, `position:absolute; inset:0; opacity:0` inside `.campaign-stage`,
-   cross-fading to `opacity:1` on `.campaign-stage:hover`. `renderCampaignSlide()` only points its
-   `src` at `images/campaigns/<key>/hover.gif` (and un-hides it) for those 3 keys — `display:none`
-   and `removeAttribute('src')` for the other 6, since setting `src=""` on an `<img>` makes it
-   re-request the current page URL, a real gotcha. Source was 3 BTS `.mov` clips the user supplied
-   (`nike.mov`, `adidas.mov`, `zegna.mov` — all B&W, portrait, 30–60fps originals); converted to
-   GIF with Pillow/OpenCV since there's no ffmpeg on this machine. First pass (full frame count,
-   480px wide, dithered) came out to 10–14MB *each* — GIF compresses photographic/video content far
-   worse than flat-color content. Re-encoded at 260px wide, ~10fps (every 3rd–5th source frame
-   depending on original fps), capped to 3.5s, a single 64-color palette sampled from a mid-clip
-   frame, and **no dithering** (`dither=Image.NONE` — dithering adds per-pixel noise that LZW/GIF
-   compresses badly; a flat-ish quantized image compresses much better and these are B&W BTS clips
-   so banding isn't very visible at this size anyway). Landed at 0.6–1.5MB each. The files live at
-   `images/campaigns/<key>/hover.gif` alongside each project's `01.jpg`.
+   **Hover video preview on Nike/Adidas/Zegna/Iceberg** (Nike/Adidas/Zegna added 2026-08-25,
+   carried through both redesigns; Iceberg added later the same day): `#campaignHoverGif`,
+   `position:absolute; inset:0; opacity:0` inside `.campaign-stage`, cross-fading to `opacity:1`
+   on `.campaign-stage:hover`. `renderCampaignSlide()` only points its `src` at
+   `images/campaigns/<key>/hover.gif` (and un-hides it) for keys in the `campaignHoverKeys` Set —
+   `display:none` and `removeAttribute('src')` for the rest, since setting `src=""` on an `<img>`
+   makes it re-request the current page URL, a real gotcha. Source was BTS `.mov` clips the user
+   supplied one at a time (`nike.mov`, `adidas.mov`, `zegna.mov`, then `iceberg.mov` — all B&W,
+   portrait, 30–60fps originals, Iceberg natively 1440×1920 which is already exactly 3:4); each
+   converted to GIF with Pillow/OpenCV since there's no ffmpeg on this machine. First pass (full
+   frame count, 480px wide, dithered) came out to 10–14MB *each* — GIF compresses photographic/
+   video content far worse than flat-color content. Settled recipe, reused as-is for Iceberg: 260px
+   wide, ~10fps (every 3rd–5th source frame depending on original fps), capped to 3.5s, a single
+   64-color palette sampled from a mid-clip frame, and **no dithering** (`dither=Image.NONE` —
+   dithering adds per-pixel noise that LZW/GIF compresses badly; a flat-ish quantized image
+   compresses much better and these are B&W BTS clips so banding isn't very visible at this size
+   anyway). Landed at 0.6–1.5MB each (Iceberg: 1.1MB/35 frames). The files live at
+   `images/campaigns/<key>/hover.gif` alongside each project's `01.jpg`. **To add another:** drop
+   the clip anywhere, run the same OpenCV/Pillow recipe, copy the result to
+   `images/campaigns/<key>/hover.gif`, and add `<key>` to `campaignHoverKeys` in the campaigns
+   `<script>` block — that's the only JS change needed.
 4. **Editorial** (`#work`) — 3D "coverflow" carousel (CSS `rotateY`/`translateZ`, no library) of
    7 magazine covers (Penida, Elegant, Imirage, Shuba, Scorpio Vin, MOB, Tag). Click a side cover
    to center it; click the centered one to open the project modal. The section head only has the
