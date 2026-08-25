@@ -84,9 +84,17 @@ markup doesn't matter to them).
      pixelated at real size once live, so it's back to the original text ticker. The GIF file is
      still in `images/site/` (unused) in case a higher-res version shows up later; nothing
      references it now.
-3. **Campaigns** (`#campaigns`) — 8 brand campaigns (Nike, Adidas, Zegna, Valentino, Iceberg,
-   Payless, Calvin Klein, Desigual — Fila moved out to Services' E-Commerce slide, see item 7).
-   Went through two redesigns the same day (2026-08-25):
+3. **Campaigns** (`#campaigns`) — 10 brand campaigns (Nike, Adidas, Zegna, Valentino, Iceberg,
+   Payless, Calvin Klein, Desigual, LCI, Ray-Ban — Fila moved out to Services' E-Commerce slide,
+   see item 7). **LCI and Ray-Ban added 2026-08-25:** LCI is a set of 6 finished ad posters for
+   an education program (`images/campaigns/lci/`, cover = the brand-wide "Your Creativity, Your
+   Rules." shot rather than any single program poster, since it's the least tied to one specific
+   course); Ray-Ban is a 3-photo Ray-Ban × Meta smart-glasses shoot (`images/campaigns/rayban/`)
+   plus a hover video (see below). Both sets came in already close to the site's usual image size
+   convention (~600–900px wide) but noticeably heavier (LCI ~700KB–1.4MB, Ray-Ban ~200KB) than the
+   30–70KB `01.jpg` covers elsewhere — resized to 780px wide (matching the existing portrait
+   covers) and re-compressed to JPEG q82, landing at 44–110KB each, in line with the rest of the
+   gallery images site-wide. Went through two redesigns the same day (2026-08-25):
    first a static two-column grid of tall cards, then — per user feedback wanting "each project as
    its own scroll, showing on its own" like the Services slider — **rebuilt as a scroll-scrubbed
    single-project slider**, the same pin pattern as the hero logo / coverflow / services
@@ -133,8 +141,8 @@ markup doesn't matter to them).
    apply:** if another pinned/flex-centered slide layout ends up with 3+ grid columns where one
    has an intrinsic (non-1fr) size, check the text column's actual rendered width — don't assume a
    working 2-column sticky pattern generalizes cleanly to 3 columns.
-   **Hover video preview on Nike/Adidas/Zegna/Iceberg/Valentino** (Nike/Adidas/Zegna added
-   2026-08-25, carried through both redesigns; Iceberg and Valentino added later the same day):
+   **Hover video preview on Nike/Adidas/Zegna/Iceberg/Valentino/Payless/Ray-Ban** (Nike/Adidas/
+   Zegna added 2026-08-25, carried through both redesigns; the rest added later the same day):
    `#campaignHoverGif`, `position:absolute; inset:0; opacity:0` inside `.campaign-stage`,
    cross-fading to `opacity:1` on `.campaign-stage:hover`. `renderCampaignSlide()` only points its
    `src` at `images/campaigns/<key>/hover.gif` (and un-hides it) for keys in the
@@ -170,12 +178,18 @@ markup doesn't matter to them).
    dominant — this edit never has a fully laptop-free moment, faster-paced than the original) +
    ~2.45–3.6s (makeup application, clean before the tripod swings into frame around 3.6s) →
    16 frames/0.7MB, smaller than the original re-cut since this source clip is shorter overall.
-   **Payless
-   added 2026-08-25** (a "Back to School" campaign clip — kids running, product close-ups, no
-   awkward segment to cut around like Valentino's laptop) at the same 5.5s length as Iceberg →
-   2.6MB/55 frames, the largest of the six since it's a much busier, more varied clip (more scene
-   changes compress worse under GIF/LZW than a mostly-static product shot does — tried a 4.5s cut
-   too, only saved ~300KB, so kept the fuller 5.5s). The files live at
+   **Payless added 2026-08-25** (a "Back to School" campaign clip — kids running, product
+   close-ups, no awkward segment to cut around like Valentino's laptop) at the same 5.5s length as
+   Iceberg → 2.6MB/55 frames, the largest of the B&W clips since it's a much busier, more varied
+   clip (more scene changes compress worse under GIF/LZW than a mostly-static product shot does —
+   tried a 4.5s cut too, only saved ~300KB, so kept the fuller 5.5s). **Ray-Ban added 2026-08-25**
+   alongside the LCI/Ray-Ban campaign additions (item 3 above) — first *color* hover clip on the
+   site (all the others are B&W BTS footage): a subway-billboard shot of the Ray-Ban × Meta ad
+   cycling between its day and night (Transitions lens) versions, trains blurring past behind it.
+   Same recipe, but bumped the palette from 64 → 96 colors (`quantize(colors=96, ...)`) since flat
+   B&W tolerates a small palette far better than skin tones and sky gradients do — went straight
+   to 96 rather than starting at 64 and finding out the hard way. 5.0s, straight cut from the
+   start (no bad segment to avoid, unlike Valentino) → 1.2MB/50 frames. The files live at
    `images/campaigns/<key>/hover.gif` alongside each project's `01.jpg`. **To add another:** drop
    the clip anywhere, run the same OpenCV/Pillow recipe (single range, or multiple concatenated
    ranges if only part of the clip is usable), copy the result to
@@ -313,8 +327,8 @@ images/
   editorial/<key>/ — 01.jpg, 02.jpg, ... per magazine cover (penida, elegant, imirage, shuba,
                       scorpiovin, mob, tag)
   campaigns/<key>/ — 01.jpg, 02.jpg, ... per brand (nike, adidas, zegna, valentino, iceberg,
-                      payless, calvin_k, desigual, fila) — fila's 01.jpg is now used by the
-                      Services E-Commerce slide instead of the campaigns slider, see below
+                      payless, calvin_k, desigual, lci, rayban, fila) — fila's 01.jpg is now used
+                      by the Services E-Commerce slide instead of the campaigns slider, see below
 ```
 
 Clicking an editorial cover or a campaign tile opens `#projectModal`, which now renders a
