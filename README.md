@@ -21,18 +21,32 @@ and Services came first.
 1. **Header/Nav** — logo, links (Services, Build a Team, Editorial, Studio, Start a Project),
    language toggle button (`#langToggle`). Nav link order was NOT changed in the reorder — it's
    still Services → Build a Team → Editorial → Studio, which no longer matches page order below.
-2. **Hero** (`#heroPin`) — scroll-pinned section, two phases driven by one `update()` function in
-   the hero-pin `<script>` block:
-   - **Assembly (0–35% of the pin's scroll range):** scrubs through `images/site/hero-sequence/`
-     (20 JPEG frames, `frame-01.jpg`…`frame-20.jpg`, extracted 2026-08-24 from a `milo.mov` clip
-     of the letters flying together) by swapping `#logoFrameImg`'s `src` — frame 1 is scattered
-     pieces, frame 20 is the fully-formed wordmark. All 20 are preloaded as `Image()` objects on
-     load so swapping is instant. Frames are native 1080×622 (the source video's resolution) —
-     the logo is capped at `width:min(78vw,980px)` in CSS specifically so it's never upscaled
-     past that and doesn't soften/pixelate; on very high-DPI (2x+) displays it won't be quite as
-     crisp as a native-2x asset would be, since 1080px is the ceiling.
-   - **Blur/fade (35–100%):** once assembled, the same blur-up/fade-down/scale-up treatment as
-     before takes over, and the headline fades in over the glass panel.
+2. **Hero, split into two sections** (redesigned 2026-08-24 — used to be one pinned section with
+   a blur/fade transition into a floating glass-panel headline; that's gone):
+   - **Logo header** (`#heroPin` → `.hero-stage`, `position:sticky`, `height:160vh` on the outer
+     `.hero-pin`): scroll-scrubs through `images/site/hero-sequence/frame-01.jpg`…`frame-20.jpg`
+     (20 JPEGs extracted from a `milo.mov` clip of the MILO letters flying together, all preloaded
+     as `Image()` objects on load so swapping `#logoFrameImg`'s `src` is instant) across the
+     entire pin scroll range — frame 1 is scattered pieces, frame 20 is the assembled wordmark.
+     Once assembled the logo just stays put; there's no blur/fade/scale-out anymore. Positioned
+     near the top of the sticky viewport (`padding-top` on `.hero-stage`, not vertically centered)
+     so it reads like a second header bar. `.hero-stage` has `background:var(--paper)` — the
+     **same** flat color as the body's own base tone — specifically to override the generic
+     `section{padding:...}` rule (every `<section>` gets padding, including this one, which used
+     to leave a gap between the fixed header and the sticky stage where the body's dot grid showed
+     through — fixed via `.hero-pin{padding:0}`) and to blend seamlessly against the grid pattern
+     drawn on `body`, since the video frames' own rendered background is a very close but not
+     pixel-identical tone. The logo `<img>` also has a soft radial `mask-image` fading its outer
+     ~30% margin to transparent, so its rectangular edge never reads as a hard-edged box regardless
+     of tiny per-frame color variance. Frames are native 1080×622 (the source video's resolution)
+     and the logo is capped at `width:min(78vw,980px)` so it's never upscaled/pixelated — on very
+     high-DPI (2x+) displays it won't be quite as crisp as a native-2x asset, since 1080px is the
+     hard ceiling from the source clip.
+   - **Headline** (`#heroContent`, plain non-pinned section right after `#heroPin`): eyebrow, `h1`,
+     paragraph, CTA row, and the brand marquee — just a normal `.reveal` fade-in-on-scroll block
+     (same IntersectionObserver pattern used everywhere else on the page), not tied to the logo's
+     scroll-scrub at all. It appears once the user scrolls past the logo header and it comes into
+     view, so the two never overlap or compete visually.
 3. **Editorial** (`#work`) — 3D "coverflow" carousel (CSS `rotateY`/`translateZ`, no library) of
    7 magazine covers (Penida, Elegant, Imirage, Shuba, Scorpio Vin, MOB, Tag). Click a side cover
    to center it; click the centered one to open the project modal.

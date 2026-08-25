@@ -71,42 +71,29 @@
   .burger span{width:22px; height:2px; background:var(--ink);}
 
   /* ===== SCROLL-PINNED HERO ===== */
-  .hero-pin{position:relative; height:260vh;}
-  .hero-stage{position:sticky; top:0; height:100vh; overflow:hidden; display:flex; align-items:center; justify-content:center;}
-
-  .logo-layer{
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    will-change:filter, opacity, transform;
+  .hero-pin{position:relative; height:160vh; padding:0;} /* override the generic section{padding} rule — .hero-stage needs to be full-bleed for its background to fully hide the grid, no gap */
+  .hero-stage{
+    position:sticky; top:0; height:100vh; overflow:hidden;
+    display:flex; align-items:flex-start; justify-content:center;
+    padding-top:clamp(88px,16vh,168px);
+    background:var(--paper); /* same exact base tone as the rest of the page — just without the dot grid drawn on top, so there's no seam at the section's own edge */
   }
+
+  .logo-layer{ width:100%; display:flex; justify-content:center; }
   .logo-layer img{
-    width:min(78vw, 980px);
-    height:auto;
-    will-change:filter, opacity, transform;
+    width:min(78vw, 980px); height:auto; display:block;
+    /* soft-fade the frame's own rectangular edge so it blends into .hero-stage's matching
+       background instead of reading as a floating box, regardless of tiny per-frame render noise */
+    -webkit-mask-image: radial-gradient(ellipse 72% 78% at 50% 50%, #000 68%, transparent 100%);
+    mask-image: radial-gradient(ellipse 72% 78% at 50% 50%, #000 68%, transparent 100%);
   }
 
-  .glass-panel{
-    position:absolute;
-    top:50%; left:50%;
-    transform:translate(-50%,-50%);
-    width:min(90vw, 900px);
-    padding:clamp(36px,6vw,64px);
-    border-radius:8px;
-    text-align:center;
-    background:rgba(242,244,245,0);
-    border:1px solid rgba(22,27,34,0);
-    opacity:0;
-    will-change:opacity, background, backdrop-filter;
-  }
-  .glass-panel .eyebrow{
-    font-size:0.72rem; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:var(--steel);
-    display:inline-flex; align-items:center; gap:0.5em;
-  }
-  .glass-panel .eyebrow::before{content:""; width:6px; height:6px; background:var(--accent); border-radius:50%; display:inline-block;}
-  .glass-panel h1{
+  .hero-content{padding:clamp(48px,8vw,88px) 0 0; text-align:center;}
+  .hero-content h1{
     font-size:clamp(2rem, 5vw, 3.6rem); font-weight:800; line-height:1.05; margin-top:0.8rem;
   }
-  .glass-panel h1 em{font-style:italic; font-weight:500; color:var(--slate);}
-  .glass-panel p{font-size:1rem; line-height:1.55; color:var(--slate); max-width:44ch; margin:1.1rem auto 0;}
+  .hero-content h1 em{font-style:italic; font-weight:500; color:var(--slate);}
+  .hero-content p{font-size:1rem; line-height:1.55; color:var(--slate); max-width:44ch; margin:1.1rem auto 0;}
   .hero-cta-row{display:flex; gap:0.8rem; margin-top:1.6rem; justify-content:center; flex-wrap:wrap;}
   .btn{display:inline-flex; align-items:center; gap:0.5em; padding:13px 24px; font-size:0.85rem; font-weight:700; border-radius:2px; border:1.5px solid var(--ink); transition:all 0.2s ease;}
   .btn-solid{background:var(--ink); color:var(--paper);}
@@ -131,7 +118,7 @@
   @keyframes scroll{from{transform:translateX(0);} to{transform:translateX(-50%);}}
   .marquee-track span{font-size:0.8rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; padding:0 2rem; white-space:nowrap; opacity:0.8;}
   .marquee-track span::after{content:"·"; margin-left:2rem; color:var(--steel);}
-  .hero-marquee{margin-top:clamp(22px,3vw,34px); width:calc(100% + clamp(72px,12vw,128px)); margin-left:calc(-1 * clamp(36px,6vw,64px));}
+  .hero-marquee{margin-top:clamp(40px,6vw,68px);}
   .hero-marquee .marquee-track{padding:12px 0;}
   .hero-marquee .marquee-track span{font-size:0.7rem; padding:0 1.35rem;}
 
@@ -338,13 +325,20 @@
   </div>
 </header>
 
-<!-- HERO -->
+<!-- HERO: logo assembly (pinned, scroll-scrubbed) -->
 <section class="hero-pin" id="heroPin">
   <div class="hero-stage">
     <div class="logo-layer" id="logoLayer">
       <img src="images/site/hero-sequence/frame-01.jpg" alt="MILO" id="logoFrameImg">
     </div>
-    <div class="glass-panel" id="glassPanel">
+    <div class="scroll-cue" id="scrollCue"><span data-i18n="hero.scroll">Scroll</span><div class="line"></div></div>
+  </div>
+</section>
+
+<!-- HERO: headline, reveals below the logo once assembled -->
+<section id="heroContent">
+  <div class="wrap">
+    <div class="hero-content reveal">
       <span class="eyebrow" data-i18n="hero.eyebrow">Bogotá — Worldwide</span>
       <h1 data-i18n-html="hero.h1">Full-service <em>fashion</em> production &amp; retouching.</h1>
       <p data-i18n="hero.p">MILO Studio assembles the stylists, casting, and retouchers your campaign needs — one brief, one accountable team.</p>
@@ -352,14 +346,13 @@
         <a href="#work" class="btn btn-solid" data-i18n="hero.cta1">See the Work</a>
         <a href="#contact" class="btn btn-outline" data-i18n="hero.cta2">Start a Project</a>
       </div>
-      <div class="marquee-band hero-marquee">
-        <div class="marquee-track">
-          <span>Nike</span><span>Adidas</span><span>Zegna</span><span>Valentino</span><span>Ferragamo</span><span>Calvin Klein</span><span>Kenzo</span><span>Sisley</span><span>Ray-Ban</span><span>Dafiti</span><span>Hawkers</span><span>Iceberg</span>
-          <span>Nike</span><span>Adidas</span><span>Zegna</span><span>Valentino</span><span>Ferragamo</span><span>Calvin Klein</span><span>Kenzo</span><span>Sisley</span><span>Ray-Ban</span><span>Dafiti</span><span>Hawkers</span><span>Iceberg</span>
-        </div>
-      </div>
     </div>
-    <div class="scroll-cue" id="scrollCue"><span data-i18n="hero.scroll">Scroll</span><div class="line"></div></div>
+  </div>
+  <div class="marquee-band hero-marquee">
+    <div class="marquee-track">
+      <span>Nike</span><span>Adidas</span><span>Zegna</span><span>Valentino</span><span>Ferragamo</span><span>Calvin Klein</span><span>Kenzo</span><span>Sisley</span><span>Ray-Ban</span><span>Dafiti</span><span>Hawkers</span><span>Iceberg</span>
+      <span>Nike</span><span>Adidas</span><span>Zegna</span><span>Valentino</span><span>Ferragamo</span><span>Calvin Klein</span><span>Kenzo</span><span>Sisley</span><span>Ray-Ban</span><span>Dafiti</span><span>Hawkers</span><span>Iceberg</span>
+    </div>
   </div>
 </section>
 
@@ -757,18 +750,15 @@
 </script>
 <script>
   const heroPin = document.getElementById('heroPin');
-  const logoLayer = document.getElementById('logoLayer');
   const logoFrameImg = document.getElementById('logoFrameImg');
-  const glassPanel = document.getElementById('glassPanel');
   const scrollCue = document.getElementById('scrollCue');
 
   function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
-  function easeInOutCubic(t){ return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
 
   // Scroll-scrubbed logo assembly: frames 1-20 come from milo.mov (scattered pieces -> full
-  // wordmark). Preloaded once so swapping .src during scroll is instant, no flicker.
+  // wordmark). Preloaded once so swapping .src during scroll is instant, no flicker. The logo
+  // stays put once assembled — no blur/fade-out; the headline reveals in the section below it.
   const HERO_FRAME_COUNT = 20;
-  const HERO_ASSEMBLY_END = 0.35; // fraction of pin scroll spent assembling before blur/fade starts
   const heroFrames = [];
   for(let i = 1; i <= HERO_FRAME_COUNT; i++){
     const img = new Image();
@@ -782,34 +772,9 @@
     const scrolled = clamp(-rect.top, 0, total);
     const progress = total > 0 ? scrolled / total : 0;
 
-    // phase 1: scrub through the frame sequence as the logo assembles
-    const assemblyT = clamp(progress / HERO_ASSEMBLY_END, 0, 1);
-    const frameIdx = Math.min(HERO_FRAME_COUNT - 1, Math.round(assemblyT * (HERO_FRAME_COUNT - 1)));
+    const frameIdx = Math.min(HERO_FRAME_COUNT - 1, Math.round(progress * (HERO_FRAME_COUNT - 1)));
     const frameSrc = heroFrames[frameIdx].src;
     if(logoFrameImg.src !== frameSrc) logoFrameImg.src = frameSrc;
-
-    // phase 2: once assembled, blur up / fade down / scale up into the headline, as before
-    const blurProgress = clamp((progress - HERO_ASSEMBLY_END) / (1 - HERO_ASSEMBLY_END), 0, 1);
-    const eased = easeInOutCubic(clamp(blurProgress * 1.4, 0, 1)); // finish transition a bit before pin ends
-
-    const blur = eased * 16;
-    const logoOpacity = 1 - eased * 0.85;
-    const logoScale = 1 + eased * 0.06;
-    logoLayer.style.filter = `blur(${blur}px)`;
-    logoLayer.style.opacity = logoOpacity;
-    logoLayer.style.transform = `scale(${logoScale})`;
-
-    // glass panel: fog up as it appears
-    const panelOpacity = clamp((eased - 0.15) / 0.7, 0, 1);
-    const panelBlur = 18 * panelOpacity;
-    const panelBg = 0.55 * panelOpacity;
-    const panelBorder = 0.14 * panelOpacity;
-    glassPanel.style.opacity = panelOpacity;
-    glassPanel.style.backdropFilter = `blur(${panelBlur}px)`;
-    glassPanel.style.webkitBackdropFilter = `blur(${panelBlur}px)`;
-    glassPanel.style.background = `rgba(242,244,245,${panelBg})`;
-    glassPanel.style.borderColor = `rgba(22,27,34,${panelBorder})`;
-    glassPanel.style.transform = `translate(-50%,-50%) translateY(${(1-panelOpacity)*14}px)`;
 
     scrollCue.style.opacity = progress > 0.05 ? 0 : 1;
   }
