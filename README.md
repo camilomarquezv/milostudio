@@ -250,6 +250,12 @@ markup doesn't matter to them).
    `right:0` needs a full-viewport-width positioned ancestor to land at the actual page edge, not
    the narrower carousel stage. `.coverflow-stage` keeps `position:relative` regardless — its
    `::before` ground-shadow pseudo-element still needs it, only the arrows moved out.
+   **Off-center covers desaturate toward grayscale (2026-08-25)** — `layoutCovers()`'s per-cover
+   `filter` used to only dim brightness slightly (still fairly colorful even far from center); now
+   it's `grayscale(min(0.88, 0.32 + abs*0.14)) brightness(...)`, so the centered cover is the only
+   one in full color and the rest fade toward gray the further they are from it. `.mag-cover`'s
+   existing `filter .5s ease` transition (unchanged) is what makes this cross-fade smoothly as
+   `active` changes — the JS only sets the target value.
 5. **Process** (`#process`) — 4-step process (Briefing → Team Assembly → Production → Retouch &
    Deliver). Each `.process-row` inverts on hover (added 2026-08-25) — dark `var(--ink)`
    background, title goes `var(--paper)`, the number goes `var(--accent)`, description goes
@@ -362,6 +368,18 @@ markup doesn't matter to them).
   blue on iOS, correctly dark in every desktop browser tested). If a future button looks
   differently-colored than intended on a real device even though it looks right in desktop
   Chrome, check this reset is still in place before assuming the component's own CSS is wrong.
+- **Pinch-zoom disabled site-wide** (`<meta name="viewport" content="...maximum-scale=1.0,
+  user-scalable=no">`, added 2026-08-25) — user reported the page "breaking"/jumping on mobile
+  Safari when pinch-zoomed. Root cause: this site leans on `position:sticky` for 4 major pinned
+  sections (hero, coverflow, services, campaigns), each combined with CSS `transform` (rotateY,
+  scale, translateX) driven by scroll math — a known WebKit compositor bug class where `sticky`
+  elements don't recompute correctly against a pinch-zoomed visual viewport, causing them to swim/
+  jump mid-scroll. This isn't fixable with better scroll-math JS since it's a browser rendering
+  bug, not a calculation error, so the standard mitigation for this class of pinned-scroll site
+  (common on agency/portfolio sites with this kind of scrollytelling) is disabling zoom entirely.
+  **Trade-off worth knowing:** this does remove the ability for low-vision visitors to pinch-zoom
+  the page to read text — acceptable here since the trigger was a real, reproducible visual bug,
+  but flag it if the user ever asks about accessibility compliance later.
 
 ## Bilingual (EN/ES) system — how it works
 - Every translatable static text element has `data-i18n="key"` (or `data-i18n-html="hero.h1"`

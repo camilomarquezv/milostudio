@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MILO Studio — Fashion Production &amp; Retouching</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1175,7 +1175,12 @@
       const scale = 1 - Math.min(abs * 0.09, 0.4);
       c.style.transform = `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`;
       c.style.zIndex = 100 - abs;
-      c.style.filter = abs === 0 ? 'brightness(1)' : `brightness(${1 - abs*0.06})`;
+      // Off-center covers fade toward grayscale (capped at 88% so they don't go flat black/white)
+      // and the centered one is always full color — makes the "current" cover read clearly as
+      // you scroll, instead of everything staying equally colorful. .mag-cover's own `filter .5s
+      // ease` transition (declared in CSS) is what makes this cross-fade smoothly, not this JS.
+      const grayscale = abs === 0 ? 0 : Math.min(0.88, 0.32 + abs * 0.14);
+      c.style.filter = `grayscale(${grayscale}) brightness(${abs === 0 ? 1 : 1 - abs * 0.04})`;
       c.classList.toggle('is-active', i === active);
     });
     dots.forEach((d, i) => d.classList.toggle('is-active', i === active));
