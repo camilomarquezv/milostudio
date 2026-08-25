@@ -73,7 +73,12 @@ and Services came first.
    E-Commerce)
 6. **About** (`#about`) — dark section, studio bio + 3 stats, B&W behind-the-scenes photo
 7. **Team Builder** (`#team-builder`) — interactive: click role chips (Photographer, Stylist,
-   MUA, Casting, Producer, Retoucher, Motion/Video, Set Design) to build a live "team" string
+   MUA, Casting, Producer, Retoucher, Motion/Video, Set Design) to build a live "team" string.
+   A **"Get a Quote"/"Cotizar" button** (`#quoteBtn`, added 2026-08-25) appears in the output box
+   once at least one role is selected — clicking it fills the contact form's message textarea
+   (`#cfMessage`) with the selected roles (translated, via `team.quoteMessage`), smooth-scrolls to
+   `#contact`, and focuses the name field. Hidden again (`.builder-cta` without `.show`) when
+   nothing's selected, so it never shows an empty quote request.
 8. **Process** (`#process`) — 4-step process (Briefing → Team Assembly → Production → Retouch &
    Deliver)
 9. **Project Modal** (`#projectModal`) — shared lightbox for both editorial covers and campaign

@@ -172,6 +172,8 @@
   #team-list .empty{opacity:0.45; font-style:italic; font-weight:400; font-size:1rem;}
   .team-tag{display:inline-block; text-decoration:underline; text-decoration-color:var(--steel); text-underline-offset:4px; margin-right:0.15em;}
   .builder-note{font-size:0.82rem; color:var(--slate); line-height:1.5;}
+  .builder-cta{display:none; align-self:flex-start; margin-top:1.3rem;}
+  .builder-cta.show{display:inline-flex;}
   @media (max-width:860px){.builder-inner{grid-template-columns:1fr;}}
 
   /* ===== PROCESS ===== */
@@ -553,6 +555,7 @@
       <div class="builder-output">
         <div><span class="eyebrow" data-i18n="team.yourTeam">Your Team</span><div id="team-list"><span class="empty" data-i18n="team.empty">Select roles to build your crew →</span></div></div>
         <p class="builder-note" data-i18n="team.note">This is how every MILO project starts: a briefing, then a team sized to it — never more than the project needs, never less than it takes to do it right.</p>
+        <a href="#contact" class="btn btn-solid builder-cta" id="quoteBtn" data-i18n="team.quoteCta">Get a Quote</a>
       </div>
     </div>
   </div>
@@ -668,6 +671,8 @@
     'team.yourTeam': {en:'Your Team', es:'Tu Equipo'},
     'team.empty': {en:'Select roles to build your crew →', es:'Selecciona roles para armar tu equipo →'},
     'team.note': {en:'This is how every MILO project starts: a briefing, then a team sized to it — never more than the project needs, never less than it takes to do it right.', es:'Así empieza cada proyecto MILO: un briefing y luego un equipo a su medida — nunca más de lo que el proyecto necesita, nunca menos de lo que se requiere para hacerlo bien.'},
+    'team.quoteCta': {en:'Get a Quote', es:'Cotizar'},
+    'team.quoteMessage': {en:"I'd like a quote for a team with: {roles}.", es:'Me gustaría cotizar un equipo con: {roles}.'},
     'role.photographer': {en:'Photographer', es:'Fotógrafo(a)'},
     'role.stylist': {en:'Stylist', es:'Estilista'},
     'role.makeup': {en:'Makeup Artist', es:'Maquillador(a)'},
@@ -827,16 +832,26 @@
 
   const chips = document.querySelectorAll('.role-chip');
   const teamList = document.getElementById('team-list');
+  const quoteBtn = document.getElementById('quoteBtn');
   let selected = [];
   function renderTeam(){
     teamList.innerHTML = selected.length === 0
       ? `<span class="empty">${t('team.empty')}</span>`
       : selected.map(role => `<span class="team-tag">${t('role.' + roleKey(role))}</span>`).join(' + ');
+    quoteBtn.classList.toggle('show', selected.length > 0);
   }
   function roleKey(role){
     const map = {'Photographer':'photographer','Stylist':'stylist','Makeup Artist':'makeup','Model Casting':'casting','Producer':'producer','Retoucher':'retoucher','Motion / Video':'motion','Set Design':'setdesign'};
     return map[role] || role;
   }
+  quoteBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const roleLabels = selected.map(role => t('role.' + roleKey(role))).join(', ');
+    const cfMessage = document.getElementById('cfMessage');
+    cfMessage.value = t('team.quoteMessage').replace('{roles}', roleLabels);
+    document.getElementById('contact').scrollIntoView({behavior:'smooth'});
+    document.getElementById('cfName').focus();
+  });
   chips.forEach(chip => {
     chip.addEventListener('click', () => {
       const role = chip.dataset.role;
