@@ -295,10 +295,14 @@
   .campaigns-dots .cdot.is-active{background:var(--ink); transform:scale(1.3);}
   .campaign-stage-wrap{flex-shrink:0;}
   .campaign-stage{position:relative; height:min(58vh,560px); aspect-ratio:3/4; border-radius:6px; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(22,27,34,.08);}
-  .campaign-stage img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1) contrast(1.02);}
-  /* Nike/Adidas/Zegna have a BTS video clip that plays on hover, overlaid on top of the static
-     photo and cross-faded in — the photo stays underneath so there's no flash of empty space
-     while the GIF loads. Hidden entirely (not just transparent) for the other 6 campaigns. */
+  .campaign-stage img, .campaign-stage video{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1) contrast(1.02);}
+  /* Most hover clips are B&W BTS footage overlaid as a GIF on top of the static photo and
+     cross-faded in — the photo stays underneath so there's no flash of empty space while it
+     loads. Ray-Ban is real color footage (the Ray-Ban x Meta ad) — GIF's 256-color ceiling
+     wasn't enough to keep it looking right even at a 96-color palette (user's call after seeing
+     it live), so it plays as an actual <video> (muted/looped/autoplay) instead — same
+     overlay/cross-fade treatment, just a different tag. Hidden entirely (not just transparent)
+     for campaigns with neither. */
   .campaign-stage .tile-hover-gif{position:absolute; inset:0; opacity:0; transition:opacity .35s ease;}
   .campaign-stage:hover .tile-hover-gif{opacity:1;}
   .campaign-info{max-width:46ch;}
@@ -470,6 +474,7 @@
             <div class="campaign-stage" id="campaignStage">
               <img id="campaignImg" src="images/campaigns/nike/01.jpg" alt="Nike campaign">
               <img id="campaignHoverGif" src="images/campaigns/nike/hover.gif" alt="" class="tile-hover-gif" loading="lazy">
+              <video id="campaignHoverVideo" class="tile-hover-gif" muted loop playsinline preload="none"></video>
             </div>
           </div>
           <div class="campaign-info">
@@ -1386,7 +1391,11 @@
     {key: 'lci', label: 'LCI'},
     {key: 'rayban', label: 'Ray-Ban'},
   ];
-  const campaignHoverKeys = new Set(['nike', 'adidas', 'zegna', 'iceberg', 'valentino', 'payless', 'rayban', 'lci']);
+  const campaignHoverKeys = new Set(['nike', 'adidas', 'zegna', 'iceberg', 'valentino', 'payless', 'lci']);
+  // Ray-Ban is real color footage — GIF's 256-color ceiling banded noticeably even at 96 colors,
+  // so it plays as an actual <video> instead. Separate map (not just another Set) since it needs
+  // a full path, not a same-named file in a shared folder pattern like the GIFs.
+  const campaignHoverVideos = {rayban: 'images/campaigns/rayban/hover.mp4'};
   const campaignsPin = document.getElementById('campaignsPin');
   const campaignsSticky = document.querySelector('.campaigns-sticky');
   const campaignBigNum = document.getElementById('campaignBigNum');
@@ -1394,6 +1403,7 @@
   const campaignStage = document.getElementById('campaignStage');
   const campaignImg = document.getElementById('campaignImg');
   const campaignHoverGif = document.getElementById('campaignHoverGif');
+  const campaignHoverVideo = document.getElementById('campaignHoverVideo');
   const campaignTitleEl = document.getElementById('campaignTitle');
   const campaignSubEl = document.getElementById('campaignSub');
   const campaignsDotsWrap = document.getElementById('campaignsDots');
@@ -1426,6 +1436,16 @@
     } else {
       campaignHoverGif.removeAttribute('src');
       campaignHoverGif.style.display = 'none';
+    }
+    if(campaignHoverVideos[c.key]){
+      campaignHoverVideo.src = campaignHoverVideos[c.key];
+      campaignHoverVideo.style.display = '';
+      campaignHoverVideo.play().catch(() => {}); // ignored: autoplay can be blocked pre-interaction, harmless for a muted hover preview
+    } else {
+      campaignHoverVideo.pause();
+      campaignHoverVideo.removeAttribute('src');
+      campaignHoverVideo.load();
+      campaignHoverVideo.style.display = 'none';
     }
     campaignDots.forEach((d, i) => d.classList.toggle('is-active', i === activeCampaign));
   }

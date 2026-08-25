@@ -142,7 +142,8 @@ markup doesn't matter to them).
    has an intrinsic (non-1fr) size, check the text column's actual rendered width — don't assume a
    working 2-column sticky pattern generalizes cleanly to 3 columns.
    **Hover video preview on Nike/Adidas/Zegna/Iceberg/Valentino/Payless/Ray-Ban/LCI** (Nike/Adidas/
-   Zegna added 2026-08-25, carried through both redesigns; the rest added later the same day):
+   Zegna added 2026-08-25, carried through both redesigns; the rest added later the same day —
+   Ray-Ban is a real `<video>`, not a GIF, see below):
    `#campaignHoverGif`, `position:absolute; inset:0; opacity:0` inside `.campaign-stage`,
    cross-fading to `opacity:1` on `.campaign-stage:hover`. `renderCampaignSlide()` only points its
    `src` at `images/campaigns/<key>/hover.gif` (and un-hides it) for keys in the
@@ -183,13 +184,36 @@ markup doesn't matter to them).
    Iceberg → 2.6MB/55 frames, the largest of the B&W clips since it's a much busier, more varied
    clip (more scene changes compress worse under GIF/LZW than a mostly-static product shot does —
    tried a 4.5s cut too, only saved ~300KB, so kept the fuller 5.5s). **Ray-Ban added 2026-08-25**
-   alongside the LCI/Ray-Ban campaign additions (item 3 above) — first *color* hover clip on the
-   site (all the others are B&W BTS footage): a subway-billboard shot of the Ray-Ban × Meta ad
-   cycling between its day and night (Transitions lens) versions, trains blurring past behind it.
-   Same recipe, but bumped the palette from 64 → 96 colors (`quantize(colors=96, ...)`) since flat
-   B&W tolerates a small palette far better than skin tones and sky gradients do — went straight
-   to 96 rather than starting at 64 and finding out the hard way. 5.0s, straight cut from the
-   start (no bad segment to avoid, unlike Valentino) → 1.2MB/50 frames. **LCI added 2026-08-25**
+   alongside the LCI/Ray-Ban campaign additions (item 3 above) — a subway-billboard shot of the
+   Ray-Ban × Meta ad cycling between its day and night (Transitions lens) versions, trains
+   blurring past behind it. First and only *color* hover clip on the site (all the others are B&W
+   BTS footage) — initially GIF'd the same way as the rest at a bumped 96-color palette
+   (`quantize(colors=96, ...)`, since flat B&W tolerates a small palette far better than skin
+   tones and sky gradients do), landed at 1.2MB/50 frames, but the user said it still "se daña
+   bastante" (degrades quite a bit) once live — GIF's 256-color hard ceiling just isn't enough for
+   real color footage at any reasonable file size. **Redone as a real `<video>` the same day**
+   instead of a GIF: `#campaignHoverVideo` (`muted loop playsinline`, `preload="none"`) sits
+   alongside `#campaignHoverGif` in the markup, both sharing the `.tile-hover-gif` class for the
+   overlay/cross-fade positioning (the CSS selector doesn't care about tag type). A new
+   `campaignHoverVideos` map (`{rayban: 'images/campaigns/rayban/hover.mp4'}`, separate from the
+   `campaignHoverKeys` Set since it needs a full path, not a same-folder-pattern filename)
+   controls which one shows; `renderCampaignSlide()` checks it first, and whichever of the two
+   isn't needed for the active campaign gets hidden + had its `src` cleared (`.pause()` +
+   `removeAttribute('src')` + `.load()` for the video, so it actually stops loading/playing
+   in the background, not just visually hidden). No ffmpeg on this machine, but macOS ships
+   `avconvert` (AVFoundation's CLI transcoder, bundled with Xcode Command Line Tools) which can
+   re-encode HEVC → H.264 directly: `avconvert --source "meta rayban.mov" --preset
+   PresetMediumQuality --output hover.mp4 --replace` scaled the source (2160×3662 HEVC, 13.9MB)
+   down to 284×480 H.264 at 781KB for the *entire* 7.35s clip — smaller than the 1.2MB/5s GIF
+   attempt, and with none of GIF's color banding, since H.264 doesn't have a fixed palette size
+   the way GIF does. **Real gotcha hit while verifying:** called `.play()` immediately after
+   setting `.src`, and it appeared to work (`paused` read back `false`) but silently reverted to
+   paused a moment later when checked again — turned out to be the same background-tab
+   `requestAnimationFrame`-throttling issue as the stat counters (see
+   [[feedback_browser_preview_heavy_page]]), just for video playback instead: Chromium also
+   throttles/pauses `<video>` playback in a backgrounded tab. Fronting the tab
+   (`tabs_select`) before re-checking confirmed it plays continuously and normally — not a bug in
+   the site, purely a testing-tool artifact of not having a real user focused on the tab. **LCI added 2026-08-25**
    (`lci video.MP4`, 720×1280, B&W): a lighting reveal — starts dark, a light sweeps in over ~2s
    to reveal the model from the "Gestión de Industrias Creativas" poster, holds the lit pose
    through the rest of the clip. Straight cut, 5.0s from the start (same as Iceberg/Payless) →
@@ -199,7 +223,12 @@ markup doesn't matter to them).
    the clip anywhere, run the same OpenCV/Pillow recipe (single range, or multiple concatenated
    ranges if only part of the clip is usable), copy the result to
    `images/campaigns/<key>/hover.gif`, and add `<key>` to `campaignHoverKeys` in the campaigns
-   `<script>` block — that's the only JS change needed.
+   `<script>` block — that's the only JS change needed. **If it's color footage, use the video
+   path instead** (GIF's palette ceiling won't hold up, per Ray-Ban above): run
+   `avconvert --source <clip> --preset PresetMediumQuality --output hover.mp4 --replace` (bump to
+   `Preset640x480` if `PresetMediumQuality`'s ~480px-tall output looks soft for the source's own
+   resolution), copy to `images/campaigns/<key>/hover.mp4`, and add `<key>: 'images/campaigns/<key>/hover.mp4'`
+   to the `campaignHoverVideos` map instead of `campaignHoverKeys`.
 4. **Editorial** (`#work`) — 3D "coverflow" carousel (CSS `rotateY`/`translateZ`, no library) of
    7 magazine covers (Penida, Elegant, Imirage, Shuba, Scorpio Vin, MOB, Tag). Click a side cover
    to center it; click the centered one to open the project modal. The section head only has the
