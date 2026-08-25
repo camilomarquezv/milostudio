@@ -222,13 +222,22 @@
   }
 
   /* ===== CAMPAIGNS GRID ===== */
-  .campaigns-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-  .campaign-tile{position:relative;border-radius:3px;overflow:hidden;aspect-ratio:4/5;cursor:pointer;}
-  .campaign-tile img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1) contrast(1.02);transition:transform .5s ease;}
-  .campaign-tile:hover img{transform:scale(1.06);}
+  /* Flexbox, not CSS Grid: hovering a tile grows its flex-grow (revealing more of the photo
+     instead of the fixed-crop aspect-ratio box) while its row siblings shrink to make room —
+     flex-basis/flex-grow tween smoothly, so the row visibly "parts" around the hovered tile
+     without any image ever overlapping another. */
+  .campaigns-grid{display:flex; flex-wrap:wrap; gap:14px;}
+  .campaign-tile{
+    position:relative;border-radius:3px;overflow:hidden;cursor:pointer;
+    flex:1 1 26%; height:clamp(240px,24vw,400px);
+    transition:flex-grow .5s cubic-bezier(.22,.9,.24,1);
+  }
+  .campaigns-grid:hover .campaign-tile{flex-grow:0.7;}
+  .campaigns-grid:hover .campaign-tile:hover{flex-grow:2.6;}
+  .campaign-tile img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1) contrast(1.02);}
   .campaign-tile .tag{position:absolute;left:12px;bottom:12px;background:rgba(22,27,34,.82);color:var(--paper);font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:6px 10px;border-radius:2px;}
-  @media (max-width:900px){.campaigns-grid{grid-template-columns:repeat(2,1fr);}}
-  @media (max-width:560px){.campaigns-grid{grid-template-columns:1fr;}}
+  @media (max-width:900px){.campaign-tile{flex-basis:40%;}}
+  @media (max-width:560px){.campaign-tile{flex-basis:100%; flex-grow:1 !important; height:clamp(220px,68vw,320px);}}
 
   /* ===== PROJECT MODAL ===== */
   .project-modal{position:fixed;inset:0;background:rgba(22,27,34,.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:28px;z-index:500;}

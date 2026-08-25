@@ -68,7 +68,21 @@ and Services came first.
    cover or a dot still works at any time and simply overrides `active` until the next scroll
    event recomputes it from scroll position.
 4. **Campaigns** (`#campaigns`) — grid of 9 brand campaign tiles (Nike, Adidas, Zegna, Valentino,
-   Iceberg, Payless, Calvin Klein, Desigual, Fila), same modal on click
+   Iceberg, Payless, Calvin Klein, Desigual, Fila), same modal on click. **Hover-expand grid**
+   (added 2026-08-25): `.campaigns-grid` is `display:flex; flex-wrap:wrap` (not CSS Grid) so that
+   `flex-grow`/`flex-basis` tween smoothly — hovering a tile grows it (`.campaigns-grid:hover
+   .campaign-tile:hover{flex-grow:2.6}`) while its row siblings shrink (`.campaigns-grid:hover
+   .campaign-tile{flex-grow:0.7}`) to make room, so a cropped tile (many of these photos are
+   landscape, e.g. Nike/Adidas are 900×600, but sit in a portrait-ish box) reveals more of its
+   true frame on hover instead of just zooming into the existing crop. **Important:** the base
+   `flex-basis` (`26%` desktop, `40%` at the 900px breakpoint) is deliberately *less* than an
+   exact three-per-row (or two-per-row) fit — if `flex-basis` exactly fills the row (e.g. the
+   original `calc(33.333% - gap-share)`), there's zero leftover space for `flex-grow` to
+   redistribute and hovering does nothing; don't "simplify" this back to an exact-fit calc.
+   Also note the `.campaign-tile:hover` specificity: the sibling-shrink rule
+   (`.campaigns-grid:hover .campaign-tile`) is two classes + one pseudo-class, so the hovered
+   tile's own grow rule must be at least as specific (`.campaigns-grid:hover
+   .campaign-tile:hover`) or the shrink rule wins for it too and hovering has no visible effect.
 5. **Services** (`#services`) — 4 service cards (Retouching, Photography, Creative Direction,
    E-Commerce)
 6. **About** (`#about`) — dark section, studio bio + 3 stats, B&W behind-the-scenes photo
