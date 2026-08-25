@@ -92,7 +92,7 @@
     mask-image: radial-gradient(ellipse 72% 78% at 50% 50%, #000 68%, transparent 100%);
   }
 
-  #heroContent{padding-top:clamp(20px,3vh,36px); background:var(--paper);} /* the generic section{padding} rule gives plenty of bottom space already — override just the top so the headline sits close under the logo, not double-padded. Solid background (no grid) through the headline and marquee — the dot grid resumes right after, at Campaigns */
+  #heroContent{padding:clamp(20px,3vh,36px) 0; background:var(--paper);} /* override both top AND bottom of the generic section{padding} rule — top so the headline sits close under the logo, bottom so the marquee (already a strong dark full-width band) doesn't leave a huge gap before the next section, which adds its own top padding on top of this one. Solid background (no grid) through the headline and marquee — the dot grid resumes right after, at Campaigns */
   .hero-content{text-align:center;}
   .hero-content h1{
     font-size:clamp(2rem, 5vw, 3.6rem); font-weight:800; line-height:1.05; margin-top:0.8rem;
@@ -162,22 +162,15 @@
      scroll room, .services-sticky pins in place while scroll progress drives the active index. */
   .services-pin{position:relative;}
   .services-sticky{position:sticky; top:0; min-height:100vh; display:flex; align-items:center;}
-  .services-slide{display:grid; grid-template-columns:120px 1fr 320px; gap:clamp(24px,4vw,56px); align-items:center; padding:clamp(32px,5vw,56px) 0;}
+  .services-slide{display:grid; grid-template-columns:140px 1fr; gap:clamp(24px,4vw,56px); align-items:center; padding:clamp(32px,5vw,56px) 0;}
   .service-num-col{display:flex; flex-direction:column; gap:1.6rem;}
   .service-bignum{font-size:clamp(3rem,7vw,5.5rem); font-weight:800; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums;}
   .services-dots{display:flex; flex-direction:column; gap:10px;}
   .services-dots .sdot{width:8px; height:8px; border-radius:50%; background:var(--mist); border:none; cursor:pointer; padding:0; transition:background .25s ease, transform .25s ease;}
   .services-dots .sdot.is-active{background:var(--ink); transform:scale(1.3);}
-  .service-visual{
-    position:relative; aspect-ratio:16/10; border-radius:6px; overflow:hidden;
-    background:linear-gradient(135deg, var(--paper-dim) 0%, var(--mist) 100%);
-    display:flex; align-items:center; justify-content:center;
-  }
-  .service-visual img{width:100%; height:100%; object-fit:cover; display:block;}
-  .service-visual-placeholder-label{font-size:0.75rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--steel); opacity:0.6;}
   .service-counter{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; color:var(--steel); margin-bottom:0.8rem;}
-  .service-info h3{font-size:clamp(1.4rem,2.2vw,1.9rem); font-weight:800; margin-bottom:0.9rem; line-height:1.15;}
-  .service-info p{font-size:0.92rem; line-height:1.6; color:var(--slate);}
+  .service-info h3{font-size:clamp(1.8rem,3.4vw,2.8rem); font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
+  .service-info p{font-size:1rem; line-height:1.65; color:var(--slate); max-width:52ch;}
   @media (max-width:860px){
     .services-slide{grid-template-columns:1fr; text-align:left;}
     .service-num-col{flex-direction:row; align-items:center; justify-content:space-between;}
@@ -538,9 +531,6 @@
           <div class="service-num-col">
             <span class="service-bignum" id="serviceBigNum">01</span>
             <div class="services-dots" id="servicesDots"></div>
-          </div>
-          <div class="service-visual" id="serviceVisual">
-            <span class="service-visual-placeholder-label">MILO Studio</span>
           </div>
           <div class="service-info">
             <span class="service-counter" id="serviceCounter">01 / 04</span>
@@ -1122,10 +1112,10 @@
 
 <script>
   // ===== Services slider ===== (same scroll-scrub pin pattern as the hero logo / coverflow)
-  // Photos pending from the user — once provided, drop them at
-  // images/services/<key>/01.jpg and add `img: 'images/services/<key>/01.jpg'` per entry below,
-  // then swap the placeholder label for an <img id="serviceImg"> inside #serviceVisual and set
-  // its src in renderServiceSlide().
+  // Text-only for now (no photo column) — user decided it reads fine without images. To bring
+  // photos back later: drop a file at images/services/<key>/01.jpg per entry below, restore the
+  // 3-column .services-slide grid + .service-visual block (see git history around 2026-08-25 for
+  // the removed markup/CSS), and set the <img>'s src per slide in renderServiceSlide().
   const servicesData = [
     {key: 'service1', folder: 'images/services/retouching'},
     {key: 'service2', folder: 'images/services/photography'},

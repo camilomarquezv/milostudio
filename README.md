@@ -96,13 +96,17 @@ and Services came first.
    4 services in order (Retouching → Photography → Creative Direction → E-Commerce), each showing
    a big number, a counter (`01 / 04`), title, description, and dot nav (click a dot to jump).
    Text content comes straight from the existing `service1..4.title/.desc` translation keys via
-   `t()`, not `data-i18n` (the slide is JS-rendered, like the project modal). **`#serviceVisual`
-   is still a placeholder** (`images/services/<key>/` folders exist — `retouching`,
-   `photography`, `creative_direction`, `ecommerce` — but are empty): once real photos arrive,
-   drop one per folder, add an `<img id="serviceImg">` inside `#serviceVisual` in place of the
-   `.service-visual-placeholder-label` span, and set its `src` per slide in `renderServiceSlide()`
-   (`services` `<script>` block, right after the coverflow one). The section head's copy was also
-   fixed from "Two things we do really well" to "Four things" — there have always been 4 cards.
+   `t()`, not `data-i18n` (the slide is JS-rendered, like the project modal). **No photo column**
+   — briefly had a `#serviceVisual` placeholder box, but the user decided text-only reads fine and
+   had it removed the same day; `.services-slide` is a 2-column grid now (`140px 1fr` — number
+   column + info column). The empty `images/services/<key>/` folders (`retouching`,
+   `photography`, `creative_direction`, `ecommerce`) are still there in case photos come back
+   later — see the comment at the top of the `services` `<script>` block (right after the
+   coverflow one) for how to restore the 3-column layout + `<img>` if so. The section head's copy
+   was also fixed from "Two things we do really well" to "Four things" — there have always been 4
+   cards. Also: `#heroContent`'s padding is now `clamp(20px,3vh,36px)` on *both* top and bottom
+   (was top-only) — the bottom half used to stack with `#work`'s own top padding and leave a large
+   empty gap below the brand marquee.
 6. **About** (`#about`) — dark section, studio bio + 3 stats, B&W behind-the-scenes photo
 7. **Team Builder** (`#team-builder`) — interactive: click role chips (Photographer, Stylist,
    MUA, Casting, Producer, Retoucher, Motion/Video, Set Design) to build a live "team" string.
