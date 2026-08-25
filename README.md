@@ -132,6 +132,13 @@ and Services came first.
 - Subtle dot/line grid background on `body`
 - No CSS framework — hand-written, mobile breakpoints at 900px / 620px / 700px depending on
   section
+- `button, input, select, textarea{font:inherit; color:inherit;}` (added 2026-08-25, right after
+  the universal `*{}` reset) — form controls don't inherit page font/color by default in every
+  browser; iOS Safari in particular renders an unstyled `<button>`'s text in its own default blue
+  instead of the surrounding text color. Found via a real phone screenshot (`.role-chip` text was
+  blue on iOS, correctly dark in every desktop browser tested). If a future button looks
+  differently-colored than intended on a real device even though it looks right in desktop
+  Chrome, check this reset is still in place before assuming the component's own CSS is wrong.
 
 ## Bilingual (EN/ES) system — how it works
 - Every translatable static text element has `data-i18n="key"` (or `data-i18n-html="hero.h1"`

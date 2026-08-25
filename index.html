@@ -20,6 +20,10 @@
   }
 
   *{box-sizing:border-box; margin:0; padding:0;}
+  /* form controls don't inherit font/color from the page by default in every browser (iOS Safari
+     in particular renders unstyled buttons in its own default blue) — reset them explicitly so
+     every button/input on the site uses the design system's colors unless a rule overrides it */
+  button, input, select, textarea{font:inherit; color:inherit;}
   html{scroll-behavior:smooth;}
   @media (prefers-reduced-motion: reduce){
     *{animation-duration:0.001ms !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
