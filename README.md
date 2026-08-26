@@ -413,6 +413,16 @@ Ricks method**: one clamp on the root, everything else a plain `rem` value.
   (15px → 20px), no horizontal overflow beyond the marquee ticker/coverflow side-peek/honeypot
   input that were already there and already clipped by `body{overflow-x:hidden}`, nothing wraps or
   overlaps at either extreme.
+- **Bumped ~12% same day, bold/display text only** — after seeing the recalibrated sizes live,
+  user said they actually preferred it bigger and asked to bump "all the bold letters" a few
+  notches. Increased just the bold *display* tokens (hero `h1`, `.section-head h2`, `.about h2`,
+  `.stat-num`, `.service-bignum`/`.campaign-bignum`, `.service-info h3`/`.campaign-info h3`,
+  `.project-modal-head h2`, `.contact h2`, `.whatsapp-cta-number`, `#team-list`,
+  `.coverflow-caption .title`) by roughly 12% each — deliberately left the small uppercase
+  UI chrome alone (eyebrows, buttons, counters, form labels, nav) since those weren't what the
+  user was pointing at and bumping them too would throw off the size hierarchy. Re-verified at
+  375px specifically (the width that broke during the first max-value attempt above) before
+  committing — hero `h1` lands at 46.5px there, still wraps cleanly to 4 lines, no regression.
 
 ## Bilingual (EN/ES) system — how it works
 - Every translatable static text element has `data-i18n="key"` (or `data-i18n-html="hero.h1"`

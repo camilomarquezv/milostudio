@@ -101,7 +101,7 @@
   #heroContent{padding:1.5rem 0; background:var(--paper);} /* override both top AND bottom of the generic section{padding} rule — top so the headline sits close under the logo, bottom so the marquee (already a strong dark full-width band) doesn't leave a huge gap before the next section, which adds its own top padding on top of this one. Solid background (no grid) through the headline and marquee — the dot grid resumes right after, at Campaigns */
   .hero-content{text-align:center;}
   .hero-content h1{
-    font-size:2.8rem; font-weight:800; line-height:1.05; margin-top:0.8rem;
+    font-size:3.1rem; font-weight:800; line-height:1.05; margin-top:0.8rem;
   }
   .hero-content h1 em{font-style:italic; font-weight:500; color:var(--slate);}
   .hero-content p{font-size:1rem; line-height:1.55; color:var(--slate); max-width:44ch; margin:1.1rem auto 0;}
@@ -143,7 +143,7 @@
   /* ===== SECTION SHELL ===== */
   section{padding:5rem 0;}
   .section-head{display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; margin-bottom:2.8rem; flex-wrap:wrap;}
-  .section-head h2{font-size:2.25rem; font-weight:800;}
+  .section-head h2{font-size:2.5rem; font-weight:800;}
   .section-head .desc{max-width:32ch; font-size:0.95rem; line-height:1.5; color:var(--slate);}
 
   .reveal{opacity:0; transform:translateY(20px); transition:opacity 0.6s ease, transform 0.6s ease;}
@@ -153,11 +153,11 @@
   .about{background:var(--ink); color:var(--paper); border-radius:4px;}
   .about-grid{display:grid; grid-template-columns:0.75fr 1.25fr; gap:3rem; align-items:center;}
   .about img{width:100%; border-radius:4px; filter:grayscale(1) contrast(1.05);}
-  .about h2{font-size:1.6rem; font-weight:800; color:var(--paper); line-height:1.25;}
+  .about h2{font-size:1.8rem; font-weight:800; color:var(--paper); line-height:1.25;}
   .about-copy p{font-size:1rem; line-height:1.6; opacity:0.82; margin-top:1.1rem; max-width:50ch;}
   .stat-row{display:flex; gap:2.2rem; margin-top:1.8rem; flex-wrap:wrap;}
   .stat-row div{border-top:1px solid rgba(242,244,245,0.24); padding-top:0.7rem; min-width:110px;}
-  .stat-num{font-size:1.9rem; font-weight:800; display:block;}
+  .stat-num{font-size:2.1rem; font-weight:800; display:block;}
   .stat-label{font-size:0.72rem; opacity:0.68; text-transform:uppercase; letter-spacing:0.05em;}
 
   @media (max-width:860px){.about-grid{grid-template-columns:1fr;}}
@@ -176,7 +176,7 @@
      load, so a taller image-slide appearing later would otherwise desync the scroll math. */
   .services-slide{display:grid; grid-template-columns:140px auto 1fr; gap:2.25rem; align-items:center; padding:2.8rem 0; min-height:min(46vh,380px);}
   .service-num-col{display:flex; flex-direction:column; gap:1.6rem;}
-  .service-bignum{font-size:3.9rem; font-weight:800; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums;}
+  .service-bignum{font-size:4.4rem; font-weight:800; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums;}
   .services-dots{display:flex; flex-direction:column; gap:10px;}
   .services-dots .sdot{width:8px; height:8px; border-radius:50%; background:var(--mist); border:none; cursor:pointer; padding:0; transition:background .25s ease, transform .25s ease;}
   .services-dots .sdot.is-active{background:var(--ink); transform:scale(1.3);}
@@ -196,7 +196,7 @@
   .compare-label.before{left:10px;}
   .compare-label.after{right:10px;}
   .service-counter{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; color:var(--steel); margin-bottom:0.8rem;}
-  .service-info h3{font-size:1.9rem; font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
+  .service-info h3{font-size:2.1rem; font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
   .service-info p{font-size:1rem; line-height:1.65; color:var(--slate); max-width:52ch;}
   @media (max-width:860px){
     .services-slide{grid-template-columns:1fr; text-align:left; min-height:0;}
@@ -214,7 +214,7 @@
   .role-chip:hover{background:rgba(22,27,34,0.06);}
   .role-chip.active{background:var(--ink); color:var(--paper);}
   .builder-output{border:1.5px dashed var(--steel); border-radius:4px; padding:1.8rem; min-height:200px; display:flex; flex-direction:column; justify-content:space-between; background:var(--paper);}
-  #team-list{font-size:1.35rem; font-weight:700; line-height:1.35; margin:0.9rem 0;}
+  #team-list{font-size:1.5rem; font-weight:700; line-height:1.35; margin:0.9rem 0;}
   #team-list .empty{opacity:0.45; font-style:italic; font-weight:400; font-size:1rem;}
   .team-tag{display:inline-block; text-decoration:underline; text-decoration-color:var(--steel); text-underline-offset:4px; margin-right:0.15em;}
   .builder-note{font-size:0.82rem; color:var(--slate); line-height:1.5;}
@@ -260,7 +260,7 @@
   .coverflow-dot.is-active{background:var(--ink);transform:scale(1.3);}
 
   .coverflow-caption{text-align:center;margin-top:1.4rem;}
-  .coverflow-caption .title{font-size:1.5rem;font-weight:800;}
+  .coverflow-caption .title{font-size:1.7rem;font-weight:800;}
   .coverflow-caption .sub{font-size:.85rem;color:var(--slate);margin-top:.3rem;}
   .coverflow-caption .hint{font-size:.72rem;color:var(--steel);margin-top:.6rem;letter-spacing:.06em;text-transform:uppercase;}
 
@@ -295,7 +295,7 @@
      whole composition (numbers + photo) read as pushed to the left. */
   .campaigns-slide{display:grid; grid-template-columns:140px auto minmax(200px,300px); justify-content:center; gap:2.25rem; align-items:center; padding:2.8rem 0;}
   .campaign-num-col{display:flex; flex-direction:column; gap:1.6rem;}
-  .campaign-bignum{font-size:3.9rem; font-weight:800; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums;}
+  .campaign-bignum{font-size:4.4rem; font-weight:800; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums;}
   .campaigns-dots{display:flex; flex-direction:column; gap:10px;}
   .campaigns-dots .cdot{width:8px; height:8px; border-radius:50%; background:var(--mist); border:none; cursor:pointer; padding:0; transition:background .25s ease, transform .25s ease;}
   .campaigns-dots .cdot.is-active{background:var(--ink); transform:scale(1.3);}
@@ -313,7 +313,7 @@
   .campaign-stage:hover .tile-hover-gif{opacity:1;}
   .campaign-info{max-width:46ch;}
   .campaign-counter{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; color:var(--steel); margin-bottom:0.8rem;}
-  .campaign-info h3{font-size:1.9rem; font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
+  .campaign-info h3{font-size:2.1rem; font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
   .campaign-info p{font-size:1rem; line-height:1.65; color:var(--slate);}
   @media (max-width:860px){
     .campaigns-slide{grid-template-columns:1fr; text-align:left;}
@@ -329,7 +329,7 @@
   .project-modal-card{width:min(760px,96vw);max-height:92vh;overflow:auto;background:var(--paper);color:var(--ink);border-radius:4px;box-shadow:0 30px 90px rgba(0,0,0,.35);}
   .project-modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:2rem;padding:28px 30px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(242,244,245,.96);backdrop-filter:blur(8px);z-index:2;}
   .project-modal-head .eyebrow{margin-bottom:.5rem;}
-  .project-modal-head h2{font-size:2.25rem;font-weight:800;}
+  .project-modal-head h2{font-size:2.5rem;font-weight:800;}
   .project-modal-head p{color:var(--slate);font-size:.88rem;margin-top:.45rem;}
   .modal-close{width:42px;height:42px;border:1px solid var(--line);background:transparent;font-size:1.25rem;cursor:pointer;border-radius:2px;flex:0 0 auto;}
   .modal-close:hover{background:var(--ink);color:var(--paper);}
@@ -364,12 +364,12 @@
   /* ===== CONTACT ===== */
   .contact{background:var(--ink); color:var(--paper); border-radius:4px;}
   .contact-grid{display:grid; grid-template-columns:1fr 1fr; gap:3rem;}
-  .contact h2{font-size:2.6rem; font-weight:800; color:var(--paper);}
+  .contact h2{font-size:2.9rem; font-weight:800; color:var(--paper);}
   .contact-copy p{font-size:1rem; line-height:1.5; margin-top:1rem; max-width:38ch; opacity:0.8;}
   .contact-direct{display:flex; flex-direction:column; justify-content:center; height:100%;}
   .whatsapp-cta{margin-top:1rem; display:inline-flex; align-items:center; gap:0.65rem; background:var(--paper); color:var(--ink); padding:16px 26px; border-radius:100px; width:fit-content; transition:transform 0.15s ease, background 0.2s ease; box-shadow:0 8px 24px rgba(0,0,0,0.18);}
   .whatsapp-cta:hover{background:var(--mist); transform:translateY(-1px);}
-  .whatsapp-cta-number{font-size:1.45rem; font-weight:800; letter-spacing:-0.01em;}
+  .whatsapp-cta-number{font-size:1.6rem; font-weight:800; letter-spacing:-0.01em;}
   .contact-direct-note{font-size:0.85rem; color:var(--paper); opacity:0.7; margin-top:1.1rem; max-width:34ch; line-height:1.5;}
   @media (max-width:800px){.contact-grid{grid-template-columns:1fr;}}
 
