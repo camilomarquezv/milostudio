@@ -284,7 +284,24 @@ markup doesn't matter to them).
    refactor — see "Fluid type/spacing scale" below) so the
    hover background bleeds full-width to `.process-list`'s own edge instead of stopping at the
    row's normal content width.
-6. **About** (`#about`) — dark section, studio bio + 3 stats, B&W behind-the-scenes photo.
+6. **About** (`#about`) — dark section, studio bio + 3 stats, B&W behind-the-scenes visual.
+   **Photo replaced with a looping video (2026-08-25):** `.about-grid`'s first child is now
+   `<video src="images/site/about-bts.mp4" poster="images/site/about-bts.jpg" autoplay muted loop
+   playsinline>` instead of a plain `<img>` — same BTS moment, but a 4.5s studio clip instead of a
+   still. `.about img{...}` became `.about img, .about video{...}` so the same `width:100%;
+   border-radius:4px; filter:grayscale(1) contrast(1.05)` styling covers both (the filter matters
+   here even though the source is already B&W — it's what gives it the higher-contrast look
+   matching the rest of the section). `about-bts.jpg` is kept on disk and wired up as the video's
+   `poster`, so there's still a real B&W frame showing before the video buffers in, instead of a
+   blank box. Source was `studio.mov` (HEVC, 1440×1920) — converted with `avconvert` (no ffmpeg on
+   this machine) at `Preset960x540`, landing at 720×960/3.7MB; chose this over the smaller
+   `PresetMediumQuality` output (360×480/430KB) because this element renders considerably larger
+   in the layout than a hover-preview card would, and looked visibly soft at the smaller size.
+   **User supplied this file in a follow-up round** after an initial `studio.mov` in `Downloads`
+   hit a macOS permission wall (`Operation not permitted` on `cp`/`head`, even with normal-looking
+   `-rw-r--r--` perms — likely a Sensitive-Content/data-protection flag from how the file arrived
+   on the Mac) that widened to blocking all of `~/Downloads` shortly after; resolved by the user
+   re-saving the file under `~/Documents/branding/` instead, which this tool could already read.
    **Stats count up on scroll (added 2026-08-25):** `#statRow`'s three `.stat-num` spans
    (`data-target="10+"`, `"20+"`, `"2"`) start at `"00"` in the HTML and animate up via
    `requestAnimationFrame` (ease-out cubic) the first time `#statRow` scrolls into view — a

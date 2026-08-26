@@ -153,7 +153,7 @@
   /* ===== ABOUT ===== */
   .about{background:var(--ink); color:var(--paper); border-radius:4px;}
   .about-grid{display:grid; grid-template-columns:0.75fr 1.25fr; gap:3rem; align-items:center;}
-  .about img{width:100%; border-radius:4px; filter:grayscale(1) contrast(1.05);}
+  .about img, .about video{width:100%; display:block; border-radius:4px; filter:grayscale(1) contrast(1.05);}
   .about h2{font-size:1.8rem; font-weight:800; color:var(--paper); line-height:1.25;}
   .about-copy p{font-size:1rem; line-height:1.6; opacity:0.82; margin-top:1.1rem; max-width:50ch;}
   .stat-row{display:flex; gap:2.2rem; margin-top:1.8rem; flex-wrap:wrap;}
@@ -609,7 +609,7 @@
   <div class="wrap">
     <div class="about reveal" style="padding:2.8rem;">
       <div class="about-grid">
-        <img src="images/site/about-bts.jpg" alt="MILO Studio behind the scenes">
+        <video src="images/site/about-bts.mp4" poster="images/site/about-bts.jpg" autoplay muted loop playsinline aria-label="MILO Studio behind the scenes"></video>
         <div>
           <span class="eyebrow" style="color:var(--mist);" data-i18n="about.eyebrow">The Studio</span>
           <h2 style="margin-top:0.8rem;" data-i18n="about.h2">One decade. One point of contact. A full crew behind it.</h2>
