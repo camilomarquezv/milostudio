@@ -25,12 +25,13 @@
      every button/input on the site uses the design system's colors unless a rule overrides it */
   button, input, select, textarea{font:inherit; color:inherit;}
   /* Fluid type/spacing scale (Timothy Ricks method, added 2026-08-25): a single clamp on the
-     root font-size — 15px at ~375px viewports up to 20px at ~2560px, passing near the usual
-     16px default around 1280-1440px so desktop doesn't feel like it jumped. Every font-size,
-     padding, gap, and container max-width elsewhere in this file is a plain rem value (no
-     per-property clamp/vw of its own) specifically so it rides this one curve instead of
-     stacking its own — a token with its own clamp() AND a scaling root would double-grow. */
-  html{scroll-behavior:smooth; font-size:clamp(15px, 14.14px + 0.2288vw, 20px);}
+     root font-size drives every rem value in the file (font-size, padding, gap, container
+     max-width) so the whole site scales off one curve instead of each token following its own.
+     Range bumped same day (16px→24px, was 15px→20px) after the initial pass still read as too
+     small — pushed the *max* end harder than the min specifically so desktop/wide screens grow
+     noticeably more without also pushing mobile headlines back into the wrapping problem the
+     very first attempt at this hit (see README's "Fluid type/spacing scale" section). */
+  html{scroll-behavior:smooth; font-size:clamp(16px, 14.63px + 0.3661vw, 24px);}
   @media (prefers-reduced-motion: reduce){
     *{animation-duration:0.001ms !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
   }
@@ -104,7 +105,7 @@
     font-size:3.1rem; font-weight:800; line-height:1.05; margin-top:0.8rem;
   }
   .hero-content h1 em{font-style:italic; font-weight:500; color:var(--slate);}
-  .hero-content p{font-size:1rem; line-height:1.55; color:var(--slate); max-width:44ch; margin:1.1rem auto 0;}
+  .hero-content p{font-size:1.08rem; line-height:1.55; color:var(--slate); max-width:44ch; margin:1.1rem auto 0;}
   .hero-cta-row{display:flex; gap:0.8rem; margin-top:1.6rem; justify-content:center; flex-wrap:wrap;}
   .btn{display:inline-flex; align-items:center; gap:0.5em; padding:13px 24px; font-size:0.85rem; font-weight:700; border-radius:2px; border:1.5px solid var(--ink); transition:all 0.2s ease;}
   .btn-solid{background:var(--ink); color:var(--paper);}
@@ -144,7 +145,7 @@
   section{padding:5rem 0;}
   .section-head{display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; margin-bottom:2.8rem; flex-wrap:wrap;}
   .section-head h2{font-size:2.5rem; font-weight:800;}
-  .section-head .desc{max-width:32ch; font-size:0.95rem; line-height:1.5; color:var(--slate);}
+  .section-head .desc{max-width:32ch; font-size:1.03rem; line-height:1.5; color:var(--slate);}
 
   .reveal{opacity:0; transform:translateY(20px); transition:opacity 0.6s ease, transform 0.6s ease;}
   .reveal.in{opacity:1; transform:translateY(0);}
@@ -197,7 +198,7 @@
   .compare-label.after{right:10px;}
   .service-counter{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; color:var(--steel); margin-bottom:0.8rem;}
   .service-info h3{font-size:2.1rem; font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
-  .service-info p{font-size:1rem; line-height:1.65; color:var(--slate); max-width:52ch;}
+  .service-info p{font-size:1.08rem; line-height:1.65; color:var(--slate); max-width:52ch;}
   @media (max-width:860px){
     .services-slide{grid-template-columns:1fr; text-align:left; min-height:0;}
     .service-num-col{flex-direction:row; align-items:center; justify-content:space-between;}
@@ -240,7 +241,7 @@
 
   /* ===== EDITORIAL / MAGAZINES (3D Coverflow) ===== */
   .editorial-intro{display:grid;grid-template-columns:1.1fr 0.9fr;gap:3rem;align-items:end;}
-  .editorial-intro .lead{font-size:1rem;line-height:1.5;color:var(--slate);max-width:46ch;}
+  .editorial-intro .lead{font-size:1.08rem;line-height:1.5;color:var(--slate);max-width:46ch;}
   .editorial-index{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--steel);line-height:1.7;justify-self:end;text-align:right;}
 
   .coverflow-pin{position:relative;} /* height set in JS (sizeCoverflowPin) to match .coverflow-sticky's content height + a fixed scroll-scrub distance */
@@ -314,7 +315,7 @@
   .campaign-info{max-width:46ch;}
   .campaign-counter{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; color:var(--steel); margin-bottom:0.8rem;}
   .campaign-info h3{font-size:2.1rem; font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
-  .campaign-info p{font-size:1rem; line-height:1.65; color:var(--slate);}
+  .campaign-info p{font-size:1.08rem; line-height:1.65; color:var(--slate);}
   @media (max-width:860px){
     .campaigns-slide{grid-template-columns:1fr; text-align:left;}
     .campaign-num-col{flex-direction:row; align-items:center; justify-content:space-between;}

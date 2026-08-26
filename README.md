@@ -423,6 +423,20 @@ Ricks method**: one clamp on the root, everything else a plain `rem` value.
   user was pointing at and bumping them too would throw off the size hierarchy. Re-verified at
   375px specifically (the width that broke during the first max-value attempt above) before
   committing — hero `h1` lands at 46.5px there, still wraps cleanly to 4 lines, no regression.
+- **Still read as too small — root range widened instead of bumping tokens again (2026-08-25,
+  same day).** Rather than push individual tokens further (risks re-hitting the mobile-wrap
+  ceiling from the very first attempt), widened the root clamp itself: `16px → 24px` (was
+  `15px → 20px`), pushing the *max* end harder than the *min* — `clamp(16px, 14.63px +
+  0.3661vw, 24px)`. This grows every `rem` value on the page proportionally, but weighted toward
+  wide screens: mobile only gained ~7% (hero `h1` 46.5px → 49.6px at 375px, still wraps to 4
+  clean lines) while desktop/wide screens gained ~14-20% (hero `h1` at 1440px: 54px → 61.7px;
+  `.wrap` max-width at 2560px: 1600px → 1920px). Also bumped the handful of plain-`rem` body
+  paragraph tokens that had never been touched (`.hero-content p`, `.section-head .desc`,
+  `.service-info p`/`.campaign-info p`, `.editorial-intro .lead`) from `1rem`/`0.95rem` up to
+  `~1.08rem`/`1.03rem`, since "the text" reads as the whole page, not just headlines.
+  **How to apply:** if size still isn't landing, prefer widening the root range over bumping
+  individual tokens again — one lever, less risk of re-breaking mobile, and it's what the whole
+  point of this refactor was for.
 
 ## Bilingual (EN/ES) system — how it works
 - Every translatable static text element has `data-i18n="key"` (or `data-i18n-html="hero.h1"`
