@@ -31,7 +31,14 @@
      small — pushed the *max* end harder than the min specifically so desktop/wide screens grow
      noticeably more without also pushing mobile headlines back into the wrapping problem the
      very first attempt at this hit (see README's "Fluid type/spacing scale" section). */
-  html{scroll-behavior:smooth; font-size:clamp(16px, 14.63px + 0.3661vw, 24px);}
+  /* Pinch-zoom is meant to be fully disabled site-wide (see the mobile pinch-zoom note further
+     down and README) — the viewport meta tag's maximum-scale/user-scalable=no alone doesn't
+     actually stop it, since iOS Safari has ignored those two attributes since iOS 10 (an
+     Apple-side accessibility decision, not a bug here). touch-action is a separate mechanism
+     Safari still honors: listing only pan-x/pan-y (omitting pinch-zoom) blocks the pinch gesture
+     while leaving normal scroll panning untouched. Backed up by a gesturestart/gesturechange JS
+     block further down for the same reason belt-and-suspenders. */
+  html{scroll-behavior:smooth; font-size:clamp(16px, 14.63px + 0.3661vw, 24px); touch-action:pan-x pan-y;}
   @media (prefers-reduced-motion: reduce){
     *{animation-duration:0.001ms !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
   }
@@ -182,7 +189,7 @@
   .services-dots .sdot{width:8px; height:8px; border-radius:50%; background:var(--mist); border:none; cursor:pointer; padding:0; transition:background .25s ease, transform .25s ease;}
   .services-dots .sdot.is-active{background:var(--ink); transform:scale(1.3);}
   .service-visual{display:none; height:min(46vh,380px); aspect-ratio:3/4; border-radius:6px; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(22,27,34,.08); flex-shrink:0;}
-  .service-visual img{width:100%; height:100%; object-fit:cover; display:block; filter:saturate(1) contrast(1.02);}
+  .service-visual img, .service-visual video{width:100%; height:100%; object-fit:cover; display:block; filter:saturate(1) contrast(1.02);}
   /* Before/after compare (Retouching slide only) — a real drag slider, not the third-party
      Juxtapose embed the user first sent, so the source images can be resized/compressed like
      every other asset on the site instead of loading at whatever resolution the embed serves.
@@ -314,6 +321,7 @@
      for campaigns with neither. */
   .campaign-stage .tile-hover-gif{position:absolute; inset:0; opacity:0; transition:opacity .35s ease;}
   .campaign-stage:hover .tile-hover-gif{opacity:1;}
+  .campaign-stage.show-hover .tile-hover-gif{opacity:1;}
   .campaign-info{max-width:46ch;}
   .campaign-counter{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; color:var(--steel); margin-bottom:0.8rem;}
   .campaign-info h3{font-size:2.1rem; font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
@@ -365,7 +373,7 @@
      cursor trail, so real hover-capable devices (including touchscreen laptops) keep the
      hover-to-reveal interaction untouched. prefers-reduced-motion is handled globally above. */
   @media (hover:none){
-    .project-track .project-hover-compare .hc-hover{animation:hoverCompareLoop 7s ease-in-out infinite;}
+    .project-track .project-hover-compare .hc-hover{animation:hoverCompareLoop 4.5s ease-in-out infinite;}
   }
   @keyframes hoverCompareLoop{
     0%, 18%{opacity:0;}
@@ -432,6 +440,22 @@
 </style>
 </head>
 <body>
+
+<script>
+  // Reinforces the CSS touch-action pinch-zoom block above — Safari's gesturestart/gesturechange
+  // (its own pinch gesture events, fired even when touch-action would otherwise stop it in some
+  // WebKit versions) and a double-tap-zoom guard (blocks a touchend that lands within 300ms of
+  // the previous one, which is what triggers double-tap-to-zoom). Placed first in <body> so it's
+  // listening before any layout/scroll-scrub JS below runs.
+  document.addEventListener('gesturestart', e => e.preventDefault());
+  document.addEventListener('gesturechange', e => e.preventDefault());
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', e => {
+    const now = Date.now();
+    if(now - lastTouchEnd < 300) e.preventDefault();
+    lastTouchEnd = now;
+  }, {passive:false});
+</script>
 
 <header>
   <div class="nav">
@@ -689,6 +713,7 @@
           </div>
           <div class="service-visual" id="serviceVisual">
             <img id="serviceImg" src="" alt="">
+            <video id="serviceVideo" muted loop playsinline preload="none"></video>
           </div>
           <div class="service-compare" id="serviceCompare">
             <img id="compareAfter" class="compare-img" src="" alt="">
@@ -1430,9 +1455,9 @@
   // display:none by default and only shown for slides with an `img` set below.
   const servicesData = [
     {key: 'service1', folder: 'images/services/retouching', compareBefore: 'images/services/retouching/before.jpg', compareAfter: 'images/services/retouching/after.jpg', compareProjectKey: 'retouching'},
-    {key: 'service2', folder: 'images/services/photography'},
-    {key: 'service3', folder: 'images/services/creative_direction'},
-    {key: 'service4', folder: 'images/services/ecommerce', img: 'images/campaigns/fila/01.jpg', projectKey: 'fila'},
+    {key: 'service2', folder: 'images/services/photography', video: 'images/services/photography/production.mp4'},
+    {key: 'service3', folder: 'images/services/creative_direction', video: 'images/services/creative_direction/creative-direction.mp4'},
+    {key: 'service4', folder: 'images/services/ecommerce', video: 'images/services/ecommerce/ecommerce.mp4'},
   ];
   const servicesPin = document.getElementById('servicesPin');
   const servicesSticky = document.querySelector('.services-sticky');
@@ -1445,6 +1470,7 @@
   const compareHandle = document.getElementById('compareHandle');
   const compareExpand = document.getElementById('compareExpand');
   const serviceImg = document.getElementById('serviceImg');
+  const serviceVideo = document.getElementById('serviceVideo');
   const serviceTitleEl = document.getElementById('serviceTitle');
   const serviceDescEl = document.getElementById('serviceDesc');
   const servicesDotsWrap = document.getElementById('servicesDots');
@@ -1471,10 +1497,20 @@
     if(s.img){
       serviceImg.src = s.img;
       serviceImg.alt = t(s.key + '.title');
+      serviceImg.style.display = 'block';
+      serviceVideo.style.display = 'none';
+      serviceVideo.pause();
+      serviceVisual.style.display = 'block';
+    } else if(s.video){
+      serviceVideo.src = s.video;
+      serviceVideo.style.display = 'block';
+      serviceImg.style.display = 'none';
+      serviceVideo.play().catch(() => {}); // ignored: autoplay can be blocked pre-interaction, harmless for a muted BTS loop
       serviceVisual.style.display = 'block';
     } else {
       serviceVisual.style.display = 'none';
     }
+    serviceVisual.style.cursor = s.projectKey ? 'pointer' : 'default';
     if(s.compareBefore){
       compareBeforeImg.src = s.compareBefore;
       compareAfterImg.src = s.compareAfter;
@@ -1598,6 +1634,19 @@
   });
   const campaignDots = Array.from(campaignsDotsWrap.children);
 
+  // Touch devices can't hover, so the hover-gif/video would otherwise never be seen — on
+  // (hover:none) (same feature check the cursor trail and the retouching before/after loop
+  // already use), show the static photo first and reveal the video/gif 2s later instead,
+  // rather than requiring an interaction. Desktop keeps the plain CSS :hover reveal untouched.
+  let campaignRevealTimer = null;
+  function scheduleCampaignHoverReveal(){
+    campaignStage.classList.remove('show-hover');
+    if(campaignRevealTimer) clearTimeout(campaignRevealTimer);
+    // Checked live (not cached at parse time) so it reflects the real device consistently.
+    if(!window.matchMedia('(hover: none)').matches) return;
+    campaignRevealTimer = setTimeout(() => campaignStage.classList.add('show-hover'), 2000);
+  }
+
   function renderCampaignSlide(){
     const c = campaignsData[activeCampaign];
     const proj = projectData[c.key];
@@ -1626,6 +1675,7 @@
       campaignHoverVideo.style.display = 'none';
     }
     campaignDots.forEach((d, i) => d.classList.toggle('is-active', i === activeCampaign));
+    scheduleCampaignHoverReveal();
   }
 
   campaignStage.addEventListener('click', () => {
