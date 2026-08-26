@@ -249,13 +249,9 @@ markup doesn't matter to them).
    edge-arrow`) instead of `.coverflow-stage`, same reasoning as the campaigns slider: `left:0`/
    `right:0` needs a full-viewport-width positioned ancestor to land at the actual page edge, not
    the narrower carousel stage. `.coverflow-stage` keeps `position:relative` regardless — its
-   `::before` ground-shadow pseudo-element still needs it, only the arrows moved out.
-   **Off-center covers desaturate toward grayscale (2026-08-25)** — `layoutCovers()`'s per-cover
-   `filter` used to only dim brightness slightly (still fairly colorful even far from center); now
-   it's `grayscale(min(0.88, 0.32 + abs*0.14)) brightness(...)`, so the centered cover is the only
-   one in full color and the rest fade toward gray the further they are from it. `.mag-cover`'s
-   existing `filter .5s ease` transition (unchanged) is what makes this cross-fade smoothly as
-   `active` changes — the JS only sets the target value.
+   `::before` ground-shadow pseudo-element still needs it, only the arrows moved out. (Briefly
+   tried fading off-center covers to grayscale the same day — user asked to keep them full color
+   instead, so `layoutCovers()`'s filter is still just the original brightness-only dim.)
 5. **Process** (`#process`) — 4-step process (Briefing → Team Assembly → Production → Retouch &
    Deliver). Each `.process-row` inverts on hover (added 2026-08-25) — dark `var(--ink)`
    background, title goes `var(--paper)`, the number goes `var(--accent)`, description goes
@@ -380,6 +376,43 @@ markup doesn't matter to them).
   **Trade-off worth knowing:** this does remove the ability for low-vision visitors to pinch-zoom
   the page to read text — acceptable here since the trigger was a real, reproducible visual bug,
   but flag it if the user ever asks about accessibility compliance later.
+
+## Fluid type/spacing scale (2026-08-25)
+Every font-size, padding, margin, and gap in the stylesheet used to have its own per-property
+`clamp(minPx, Nvw, maxPx)` — dozens of them, each tuned independently. Replaced with the **Timothy
+Ricks method**: one clamp on the root, everything else a plain `rem` value.
+
+- `html{font-size:clamp(15px, 14.14px + 0.2288vw, 20px);}` (in the `html{}` rule near the top of
+  `<style>`, right next to `scroll-behavior:smooth`) — 15px at ~375px viewports up to 20px at
+  ~2560px, passing near the ordinary 16px default around 1280-1440px so typical laptop/desktop
+  doesn't feel like it jumped. Every `rem` value elsewhere in the file is relative to this, so the
+  whole site grows/shrinks together instead of each element following its own independent curve.
+- **Every font-size/padding/margin/gap that used to carry its own `clamp()` is now a single fixed
+  `rem` number** — mixing a per-property clamp with a scaling root double-scales (the token's own
+  `vw` term pushes it up *and* its `rem`-based min/max bounds stretch as the root grows) and looks
+  exaggerated at the wide end. `.wrap`'s `max-width` (was a flat `1280px`) is now `80rem` for the
+  same reason, in reverse — this is what makes containers "feel less boxed in" on huge monitors,
+  per the original ask, since 80rem grows from ~1200px to ~1600px right along with the root.
+- **How the fixed rem numbers were chosen:** not each token's old clamp *maximum* — an early pass
+  using each max blew up badly on narrow phones (e.g. the hero `h1` hit 54px at 375px width,
+  wrapping to one word per line and eating the whole viewport) since the old per-token curves had
+  a much wider swing (some 80-90%) than the new root's gentler 33% (15px→20px) can reproduce on
+  its own. Instead each value is what that token's *original* clamp formula would have rendered at
+  a representative mid-range viewport (~900px width / ~800px height for the `vh`-based ones) —
+  keeps the "typical" desktop look close to before while letting mobile shrink and huge screens
+  grow off that anchor, rather than baking in the old desktop-calibrated maximum as everyone's floor.
+- **Left untouched, deliberately:** anything sizing a *visual/media container* rather than a
+  text/spacing token — `.coverflow-stage{height:clamp(420px,50vw,560px)}`, and the various
+  `min(Nvh,Npx)` heights on `.campaign-stage`/`.service-visual`/`.services-slide` etc. These feed
+  into JS-measured pin heights (`sizeHeroPin()` and friends already measure `offsetHeight` at
+  runtime, so they adapt fine regardless) but they're a different kind of "size" than what this
+  pass was about, and none of them mix `rem` into their own clamp, so they aren't at risk of the
+  double-scaling problem this refactor was solving.
+- Verified by checking `getComputedStyle` values (root font-size, `.wrap` max-width, hero `h1`
+  size) and screenshotting at 375/768/1024/1440/1920/2560px — root font-size interpolates smoothly
+  (15px → 20px), no horizontal overflow beyond the marquee ticker/coverflow side-peek/honeypot
+  input that were already there and already clipped by `body{overflow-x:hidden}`, nothing wraps or
+  overlaps at either extreme.
 
 ## Bilingual (EN/ES) system — how it works
 - Every translatable static text element has `data-i18n="key"` (or `data-i18n-html="hero.h1"`

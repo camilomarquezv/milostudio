@@ -24,7 +24,13 @@
      in particular renders unstyled buttons in its own default blue) — reset them explicitly so
      every button/input on the site uses the design system's colors unless a rule overrides it */
   button, input, select, textarea{font:inherit; color:inherit;}
-  html{scroll-behavior:smooth;}
+  /* Fluid type/spacing scale (Timothy Ricks method, added 2026-08-25): a single clamp on the
+     root font-size — 15px at ~375px viewports up to 20px at ~2560px, passing near the usual
+     16px default around 1280-1440px so desktop doesn't feel like it jumped. Every font-size,
+     padding, gap, and container max-width elsewhere in this file is a plain rem value (no
+     per-property clamp/vw of its own) specifically so it rides this one curve instead of
+     stacking its own — a token with its own clamp() AND a scaling root would double-grow. */
+  html{scroll-behavior:smooth; font-size:clamp(15px, 14.14px + 0.2288vw, 20px);}
   @media (prefers-reduced-motion: reduce){
     *{animation-duration:0.001ms !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
   }
@@ -56,11 +62,11 @@
   .eyebrow::before{content:""; width:6px; height:6px; background:var(--accent); border-radius:50%; display:inline-block;}
 
   a{color:inherit; text-decoration:none;}
-  .wrap{max-width:1280px; margin:0 auto; padding:0 clamp(20px,4vw,56px);}
+  .wrap{max-width:80rem; margin:0 auto; padding:0 2.25rem;}
 
   /* ===== NAV ===== */
   header{position:fixed; top:0; left:0; right:0; z-index:200; background:rgba(242,244,245,0.85); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
-  .nav{display:flex; align-items:center; justify-content:space-between; padding:14px clamp(20px,4vw,56px);}
+  .nav{display:flex; align-items:center; justify-content:space-between; padding:14px 2.25rem;}
   .logo-wrap{display:flex; align-items:center; gap:10px;}
   .logo-wrap img{height:30px; width:auto; display:block; transform:translateY(-3px);}
   .nav-links{display:flex; gap:2.2rem; align-items:center;}
@@ -79,7 +85,7 @@
   .hero-stage{
     position:sticky; top:0; overflow:hidden;
     display:flex; align-items:flex-start; justify-content:center;
-    padding:clamp(64px,9vh,110px) 0 clamp(32px,5vh,56px);
+    padding:4.5rem 0 2.5rem;
     background:var(--paper); /* same exact base tone as the rest of the page — just without the dot grid drawn on top, so there's no seam at the section's own edge */
   }
 
@@ -92,10 +98,10 @@
     mask-image: radial-gradient(ellipse 72% 78% at 50% 50%, #000 68%, transparent 100%);
   }
 
-  #heroContent{padding:clamp(20px,3vh,36px) 0; background:var(--paper);} /* override both top AND bottom of the generic section{padding} rule — top so the headline sits close under the logo, bottom so the marquee (already a strong dark full-width band) doesn't leave a huge gap before the next section, which adds its own top padding on top of this one. Solid background (no grid) through the headline and marquee — the dot grid resumes right after, at Campaigns */
+  #heroContent{padding:1.5rem 0; background:var(--paper);} /* override both top AND bottom of the generic section{padding} rule — top so the headline sits close under the logo, bottom so the marquee (already a strong dark full-width band) doesn't leave a huge gap before the next section, which adds its own top padding on top of this one. Solid background (no grid) through the headline and marquee — the dot grid resumes right after, at Campaigns */
   .hero-content{text-align:center;}
   .hero-content h1{
-    font-size:clamp(2rem, 5vw, 3.6rem); font-weight:800; line-height:1.05; margin-top:0.8rem;
+    font-size:2.8rem; font-weight:800; line-height:1.05; margin-top:0.8rem;
   }
   .hero-content h1 em{font-style:italic; font-weight:500; color:var(--slate);}
   .hero-content p{font-size:1rem; line-height:1.55; color:var(--slate); max-width:44ch; margin:1.1rem auto 0;}
@@ -118,12 +124,12 @@
 
 
 
-  .marquee-band{margin-top:clamp(32px,6vw,60px); background:var(--ink); color:var(--paper); overflow:hidden;}
+  .marquee-band{margin-top:3.375rem; background:var(--ink); color:var(--paper); overflow:hidden;}
   .marquee-track{display:flex; width:max-content; animation:scroll 30s linear infinite; padding:14px 0;}
   @keyframes scroll{from{transform:translateX(0);} to{transform:translateX(-50%);}}
   .marquee-track span{font-size:0.8rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; padding:0 2rem; white-space:nowrap; opacity:0.8;}
   .marquee-track span::after{content:"·"; margin-left:2rem; color:var(--steel);}
-  .hero-marquee{margin-top:clamp(40px,6vw,68px);}
+  .hero-marquee{margin-top:3.375rem;}
   .hero-marquee .marquee-track{padding:12px 0;}
   .hero-marquee .marquee-track span{font-size:0.7rem; padding:0 1.35rem;}
 
@@ -135,9 +141,9 @@
   #cursorTrail{position:fixed; inset:0; width:100vw; height:100vh; pointer-events:none; z-index:9999; mix-blend-mode:difference;}
 
   /* ===== SECTION SHELL ===== */
-  section{padding:clamp(56px,9vw,120px) 0;}
-  .section-head{display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; margin-bottom:clamp(32px,5vw,56px); flex-wrap:wrap;}
-  .section-head h2{font-size:clamp(1.9rem,4vw,3rem); font-weight:800;}
+  section{padding:5rem 0;}
+  .section-head{display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; margin-bottom:2.8rem; flex-wrap:wrap;}
+  .section-head h2{font-size:2.25rem; font-weight:800;}
   .section-head .desc{max-width:32ch; font-size:0.95rem; line-height:1.5; color:var(--slate);}
 
   .reveal{opacity:0; transform:translateY(20px); transition:opacity 0.6s ease, transform 0.6s ease;}
@@ -147,7 +153,7 @@
   .about{background:var(--ink); color:var(--paper); border-radius:4px;}
   .about-grid{display:grid; grid-template-columns:0.75fr 1.25fr; gap:3rem; align-items:center;}
   .about img{width:100%; border-radius:4px; filter:grayscale(1) contrast(1.05);}
-  .about h2{font-size:clamp(1.6rem,2.8vw,2.3rem); font-weight:800; color:var(--paper); line-height:1.25;}
+  .about h2{font-size:1.6rem; font-weight:800; color:var(--paper); line-height:1.25;}
   .about-copy p{font-size:1rem; line-height:1.6; opacity:0.82; margin-top:1.1rem; max-width:50ch;}
   .stat-row{display:flex; gap:2.2rem; margin-top:1.8rem; flex-wrap:wrap;}
   .stat-row div{border-top:1px solid rgba(242,244,245,0.24); padding-top:0.7rem; min-width:110px;}
@@ -168,9 +174,9 @@
   /* min-height matches .service-visual's own height so the sticky content is the same overall
      size whether or not the current slide has an image — sizeServicesPin() only measures once at
      load, so a taller image-slide appearing later would otherwise desync the scroll math. */
-  .services-slide{display:grid; grid-template-columns:140px auto 1fr; gap:clamp(24px,4vw,56px); align-items:center; padding:clamp(32px,5vw,56px) 0; min-height:min(46vh,380px);}
+  .services-slide{display:grid; grid-template-columns:140px auto 1fr; gap:2.25rem; align-items:center; padding:2.8rem 0; min-height:min(46vh,380px);}
   .service-num-col{display:flex; flex-direction:column; gap:1.6rem;}
-  .service-bignum{font-size:clamp(3rem,7vw,5.5rem); font-weight:800; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums;}
+  .service-bignum{font-size:3.9rem; font-weight:800; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums;}
   .services-dots{display:flex; flex-direction:column; gap:10px;}
   .services-dots .sdot{width:8px; height:8px; border-radius:50%; background:var(--mist); border:none; cursor:pointer; padding:0; transition:background .25s ease, transform .25s ease;}
   .services-dots .sdot.is-active{background:var(--ink); transform:scale(1.3);}
@@ -190,7 +196,7 @@
   .compare-label.before{left:10px;}
   .compare-label.after{right:10px;}
   .service-counter{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; color:var(--steel); margin-bottom:0.8rem;}
-  .service-info h3{font-size:clamp(1.8rem,3.4vw,2.8rem); font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
+  .service-info h3{font-size:1.9rem; font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
   .service-info p{font-size:1rem; line-height:1.65; color:var(--slate); max-width:52ch;}
   @media (max-width:860px){
     .services-slide{grid-template-columns:1fr; text-align:left; min-height:0;}
@@ -208,7 +214,7 @@
   .role-chip:hover{background:rgba(22,27,34,0.06);}
   .role-chip.active{background:var(--ink); color:var(--paper);}
   .builder-output{border:1.5px dashed var(--steel); border-radius:4px; padding:1.8rem; min-height:200px; display:flex; flex-direction:column; justify-content:space-between; background:var(--paper);}
-  #team-list{font-size:clamp(1.2rem,2.4vw,1.7rem); font-weight:700; line-height:1.35; margin:0.9rem 0;}
+  #team-list{font-size:1.35rem; font-weight:700; line-height:1.35; margin:0.9rem 0;}
   #team-list .empty{opacity:0.45; font-style:italic; font-weight:400; font-size:1rem;}
   .team-tag{display:inline-block; text-decoration:underline; text-decoration-color:var(--steel); text-underline-offset:4px; margin-right:0.15em;}
   .builder-note{font-size:0.82rem; color:var(--slate); line-height:1.5;}
@@ -217,10 +223,10 @@
   @media (max-width:860px){.builder-inner{grid-template-columns:1fr;}}
 
   /* ===== PROCESS ===== */
-  .process-list{border-top:1px solid var(--line); background:var(--paper); border-radius:4px; padding:0 clamp(20px,3vw,32px);}
+  .process-list{border-top:1px solid var(--line); background:var(--paper); border-radius:4px; padding:0 1.7rem;}
   .process-row{
-    display:grid; grid-template-columns:70px 1fr 1.4fr; gap:2rem; padding:1.7rem clamp(20px,3vw,32px);
-    margin:0 clamp(-20px,-3vw,-32px); border-bottom:1px solid var(--line); align-items:baseline;
+    display:grid; grid-template-columns:70px 1fr 1.4fr; gap:2rem; padding:1.7rem;
+    margin:0 -1.7rem; border-bottom:1px solid var(--line); align-items:baseline;
     border-radius:3px; transition:background .3s ease;
   }
   .process-row .pnum{font-size:1.3rem; font-weight:800; color:var(--steel); transition:color .3s ease;}
@@ -234,11 +240,11 @@
 
   /* ===== EDITORIAL / MAGAZINES (3D Coverflow) ===== */
   .editorial-intro{display:grid;grid-template-columns:1.1fr 0.9fr;gap:3rem;align-items:end;}
-  .editorial-intro .lead{font-size:clamp(1rem,1.8vw,1.25rem);line-height:1.5;color:var(--slate);max-width:46ch;}
+  .editorial-intro .lead{font-size:1rem;line-height:1.5;color:var(--slate);max-width:46ch;}
   .editorial-index{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--steel);line-height:1.7;justify-self:end;text-align:right;}
 
   .coverflow-pin{position:relative;} /* height set in JS (sizeCoverflowPin) to match .coverflow-sticky's content height + a fixed scroll-scrub distance */
-  .coverflow-sticky{position:sticky; top:0; padding-top:clamp(64px,9vh,110px);}
+  .coverflow-sticky{position:sticky; top:0; padding-top:4.5rem;}
   .coverflow-stage{position:relative;height:clamp(420px,50vw,560px);display:flex;align-items:center;justify-content:center;perspective:2200px;margin-top:2.6rem;}
   .coverflow-stage::before{content:"";position:absolute;left:50%;bottom:8%;width:min(72vw,760px);height:56px;transform:translateX(-50%);background:radial-gradient(ellipse, rgba(22,27,34,.24) 0%, rgba(22,27,34,.08) 45%, transparent 72%);filter:blur(10px);pointer-events:none;}
   .coverflow-track{position:relative;width:100%;height:100%;transform-style:preserve-3d;}
@@ -287,9 +293,9 @@
      justify-content:center centers that now-intrinsic-width cluster within the wrap — otherwise
      on wide viewports the short campaign note left a lot of empty space on the right, making the
      whole composition (numbers + photo) read as pushed to the left. */
-  .campaigns-slide{display:grid; grid-template-columns:140px auto minmax(200px,300px); justify-content:center; gap:clamp(24px,4vw,56px); align-items:center; padding:clamp(32px,5vw,56px) 0;}
+  .campaigns-slide{display:grid; grid-template-columns:140px auto minmax(200px,300px); justify-content:center; gap:2.25rem; align-items:center; padding:2.8rem 0;}
   .campaign-num-col{display:flex; flex-direction:column; gap:1.6rem;}
-  .campaign-bignum{font-size:clamp(3rem,7vw,5.5rem); font-weight:800; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums;}
+  .campaign-bignum{font-size:3.9rem; font-weight:800; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums;}
   .campaigns-dots{display:flex; flex-direction:column; gap:10px;}
   .campaigns-dots .cdot{width:8px; height:8px; border-radius:50%; background:var(--mist); border:none; cursor:pointer; padding:0; transition:background .25s ease, transform .25s ease;}
   .campaigns-dots .cdot.is-active{background:var(--ink); transform:scale(1.3);}
@@ -307,7 +313,7 @@
   .campaign-stage:hover .tile-hover-gif{opacity:1;}
   .campaign-info{max-width:46ch;}
   .campaign-counter{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; color:var(--steel); margin-bottom:0.8rem;}
-  .campaign-info h3{font-size:clamp(1.8rem,3.4vw,2.8rem); font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
+  .campaign-info h3{font-size:1.9rem; font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
   .campaign-info p{font-size:1rem; line-height:1.65; color:var(--slate);}
   @media (max-width:860px){
     .campaigns-slide{grid-template-columns:1fr; text-align:left;}
@@ -323,7 +329,7 @@
   .project-modal-card{width:min(760px,96vw);max-height:92vh;overflow:auto;background:var(--paper);color:var(--ink);border-radius:4px;box-shadow:0 30px 90px rgba(0,0,0,.35);}
   .project-modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:2rem;padding:28px 30px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(242,244,245,.96);backdrop-filter:blur(8px);z-index:2;}
   .project-modal-head .eyebrow{margin-bottom:.5rem;}
-  .project-modal-head h2{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;}
+  .project-modal-head h2{font-size:2.25rem;font-weight:800;}
   .project-modal-head p{color:var(--slate);font-size:.88rem;margin-top:.45rem;}
   .modal-close{width:42px;height:42px;border:1px solid var(--line);background:transparent;font-size:1.25rem;cursor:pointer;border-radius:2px;flex:0 0 auto;}
   .modal-close:hover{background:var(--ink);color:var(--paper);}
@@ -358,12 +364,12 @@
   /* ===== CONTACT ===== */
   .contact{background:var(--ink); color:var(--paper); border-radius:4px;}
   .contact-grid{display:grid; grid-template-columns:1fr 1fr; gap:3rem;}
-  .contact h2{font-size:clamp(2rem,4.6vw,3.4rem); font-weight:800; color:var(--paper);}
+  .contact h2{font-size:2.6rem; font-weight:800; color:var(--paper);}
   .contact-copy p{font-size:1rem; line-height:1.5; margin-top:1rem; max-width:38ch; opacity:0.8;}
   .contact-direct{display:flex; flex-direction:column; justify-content:center; height:100%;}
   .whatsapp-cta{margin-top:1rem; display:inline-flex; align-items:center; gap:0.65rem; background:var(--paper); color:var(--ink); padding:16px 26px; border-radius:100px; width:fit-content; transition:transform 0.15s ease, background 0.2s ease; box-shadow:0 8px 24px rgba(0,0,0,0.18);}
   .whatsapp-cta:hover{background:var(--mist); transform:translateY(-1px);}
-  .whatsapp-cta-number{font-size:clamp(1.2rem,2.6vw,1.6rem); font-weight:800; letter-spacing:-0.01em;}
+  .whatsapp-cta-number{font-size:1.45rem; font-weight:800; letter-spacing:-0.01em;}
   .contact-direct-note{font-size:0.85rem; color:var(--paper); opacity:0.7; margin-top:1.1rem; max-width:34ch; line-height:1.5;}
   @media (max-width:800px){.contact-grid{grid-template-columns:1fr;}}
 
@@ -390,7 +396,7 @@
   .footer-links{display:flex; gap:1.4rem; font-size:0.78rem; color:var(--slate);}
 
   @media (max-width:860px){
-    .nav-links{position:fixed; top:60px; left:0; right:0; bottom:0; background:var(--paper); flex-direction:column; align-items:flex-start; padding:2rem clamp(20px,4vw,56px); gap:1.4rem; transform:translateX(100%); transition:transform 0.3s ease; z-index:99;}
+    .nav-links{position:fixed; top:60px; left:0; right:0; bottom:0; background:var(--paper); flex-direction:column; align-items:flex-start; padding:2rem 2.25rem; gap:1.4rem; transform:translateX(100%); transition:transform 0.3s ease; z-index:99;}
     .nav-links.open{transform:translateX(0);}
     .nav-links a{font-size:1.2rem;}
     .burger{display:flex;}
@@ -600,7 +606,7 @@
 <!-- ABOUT -->
 <section id="about">
   <div class="wrap">
-    <div class="about reveal" style="padding:clamp(32px,5vw,56px);">
+    <div class="about reveal" style="padding:2.8rem;">
       <div class="about-grid">
         <img src="images/site/about-bts.jpg" alt="MILO Studio behind the scenes">
         <div>
@@ -689,7 +695,7 @@
 <!-- CONTACT -->
 <section id="contact">
   <div class="wrap">
-    <div class="contact reveal" style="padding:clamp(32px,5vw,56px);">
+    <div class="contact reveal" style="padding:2.8rem;">
       <div class="contact-grid">
         <div>
           <span class="eyebrow" style="color:var(--mist);" data-i18n="contact.eyebrow">Start a Project</span>
@@ -1175,12 +1181,7 @@
       const scale = 1 - Math.min(abs * 0.09, 0.4);
       c.style.transform = `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`;
       c.style.zIndex = 100 - abs;
-      // Off-center covers fade toward grayscale (capped at 88% so they don't go flat black/white)
-      // and the centered one is always full color — makes the "current" cover read clearly as
-      // you scroll, instead of everything staying equally colorful. .mag-cover's own `filter .5s
-      // ease` transition (declared in CSS) is what makes this cross-fade smoothly, not this JS.
-      const grayscale = abs === 0 ? 0 : Math.min(0.88, 0.32 + abs * 0.14);
-      c.style.filter = `grayscale(${grayscale}) brightness(${abs === 0 ? 1 : 1 - abs * 0.04})`;
+      c.style.filter = abs === 0 ? 'brightness(1)' : `brightness(${1 - abs*0.06})`;
       c.classList.toggle('is-active', i === active);
     });
     dots.forEach((d, i) => d.classList.toggle('is-active', i === active));
