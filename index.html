@@ -196,6 +196,8 @@
   .compare-label{position:absolute; bottom:10px; font-size:.68rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--paper); background:rgba(22,27,34,.62); padding:4px 9px; border-radius:2px; pointer-events:none;}
   .compare-label.before{left:10px;}
   .compare-label.after{right:10px;}
+  .compare-expand{position:absolute; top:10px; right:10px; width:32px; height:32px; border:none; border-radius:50%; background:rgba(22,27,34,.62); color:var(--paper); display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:2; transition:background .2s ease;}
+  .compare-expand:hover{background:rgba(22,27,34,.82);}
   .service-counter{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; color:var(--steel); margin-bottom:0.8rem;}
   .service-info h3{font-size:2.1rem; font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
   .service-info p{font-size:1.08rem; line-height:1.65; color:var(--slate); max-width:52ch;}
@@ -325,33 +327,58 @@
   }
 
   /* ===== PROJECT MODAL ===== */
-  .project-modal{position:fixed;inset:0;background:rgba(22,27,34,.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:28px;z-index:500;}
-  .project-modal.open{display:flex;}
-  .project-modal-card{width:min(760px,96vw);max-height:92vh;overflow:auto;background:var(--paper);color:var(--ink);border-radius:4px;box-shadow:0 30px 90px rgba(0,0,0,.35);}
-  .project-modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:2rem;padding:28px 30px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(242,244,245,.96);backdrop-filter:blur(8px);z-index:2;}
-  .project-modal-head .eyebrow{margin-bottom:.5rem;}
-  .project-modal-head h2{font-size:2.5rem;font-weight:800;}
-  .project-modal-head p{color:var(--slate);font-size:.88rem;margin-top:.45rem;}
-  .modal-close{width:42px;height:42px;border:1px solid var(--line);background:transparent;font-size:1.25rem;cursor:pointer;border-radius:2px;flex:0 0 auto;}
-  .modal-close:hover{background:var(--ink);color:var(--paper);}
-  .project-gallery{padding:24px 30px 12px;}
-  .project-slider{position:relative;display:flex;align-items:center;justify-content:center;background:var(--paper-dim);border-radius:2px;overflow:hidden;}
-  .project-slider img{display:block;width:100%;max-height:60vh;object-fit:contain;border-radius:2px;}
-  .slider-arrow{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:100px;border:1px solid rgba(22,27,34,.15);background:rgba(242,244,245,.9);color:var(--ink);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s ease,color 0.2s ease;z-index:2;}
-  .slider-arrow:hover{background:var(--ink);color:var(--paper);}
-  .slider-arrow.prev{left:12px;}
-  .slider-arrow.next{right:12px;}
-  .slider-dots{display:flex;justify-content:center;gap:8px;padding-top:14px;}
-  .slider-dot{width:7px;height:7px;border-radius:100px;background:var(--mist);border:none;cursor:pointer;padding:0;transition:background 0.2s ease,transform 0.2s ease;}
-  .slider-dot.is-active{background:var(--ink);transform:scale(1.3);}
-  .slider-count{position:absolute;bottom:12px;right:14px;font-size:.7rem;font-weight:700;letter-spacing:.04em;color:var(--paper);background:rgba(22,27,34,.55);padding:3px 9px;border-radius:100px;z-index:2;}
-  .project-note{padding:0 30px 28px;color:var(--slate);font-size:.8rem;line-height:1.5;}
-  .project-note strong{color:var(--ink);}
-  .behance-link{display:block; margin-top:0.9rem; font-weight:700; color:var(--ink); border-bottom:1.5px solid var(--ink); width:fit-content; padding-bottom:2px;}
-  .behance-link:hover{color:var(--accent); border-color:var(--accent);}
-  @media (max-width:620px){
-    .project-modal{padding:12px;}.project-modal-card{width:100%;max-height:96vh;}
-    .project-modal-head{padding:20px;}.project-gallery{padding:16px 20px;}.project-note{padding:0 20px 22px;}
+  /* Scroll-driven horizontal filmstrip (redesigned 2026-08-25 v2, ref: gsproductions.co.za) —
+     white background, small clean type, no click-arrows. Vertical scroll/swipe inside the modal
+     drives horizontal translateX of the image row, same math as the site's other scroll-scrubbed
+     sections (coverflow/services/campaigns), just measured off this element's own scrollTop
+     instead of window scroll since the modal isn't part of normal page flow. */
+  .project-modal{position:fixed;inset:0;background:var(--paper);display:none;z-index:500;}
+  .project-modal.open{display:block;}
+  .modal-controls{position:absolute;top:20px;right:24px;z-index:3;display:flex;align-items:center;gap:2px;}
+  .modal-icon-btn{width:36px;height:36px;border:none;background:transparent;color:var(--ink);cursor:pointer;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s ease;}
+  .modal-icon-btn:hover{background:rgba(22,27,34,.08);}
+  .modal-close{font-size:1.3rem;line-height:1;}
+  .project-caption{position:absolute;top:22px;left:24px;z-index:3;pointer-events:none;}
+  .project-caption .eyebrow{font-size:.64rem;}
+  .project-caption h2{font-size:.9rem;font-weight:800;letter-spacing:.02em;margin-top:.3rem;}
+  .project-caption .behance-link{display:inline-block;pointer-events:auto;margin-top:.35rem;font-weight:600;font-size:.6rem;letter-spacing:.02em;color:var(--steel);border-bottom:1px solid var(--line);padding-bottom:1px;}
+  .project-caption .behance-link:hover{color:var(--accent);border-color:var(--accent);}
+  .project-progress{position:absolute;bottom:20px;left:24px;font-size:.68rem;letter-spacing:.04em;color:var(--steel);z-index:3;font-variant-numeric:tabular-nums;}
+  .project-next-btn{position:absolute;bottom:18px;right:24px;z-index:3;display:inline-flex;align-items:center;gap:.4em;padding:9px 16px;font-size:.66rem;font-weight:700;letter-spacing:.03em;border:1.5px solid var(--ink);border-radius:2px;background:transparent;color:var(--ink);cursor:pointer;transition:all .2s ease;}
+  .project-next-btn:hover{background:var(--ink);color:var(--paper);}
+  .project-scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+  .project-track-pin{position:relative;}
+  .project-track-sticky{position:sticky;top:0;height:100vh;display:flex;align-items:center;overflow:hidden;}
+  .project-track{display:flex;align-items:center;gap:min(10vw,120px);will-change:transform;}
+  .project-track img{display:block;height:74vh;width:auto;max-width:none;object-fit:cover;transition:height .25s ease;}
+  .project-modal.zoomed .project-track img{height:92vh;}
+  /* Before/after hover-reveal slide (used by the retouching example) — same "static base,
+     opacity-fade hover layer" technique as the campaigns tile hover-gif (.tile-hover-gif),
+     just swapping a still photo instead of a gif/video. */
+  .project-track .project-hover-compare{position:relative;display:block;height:74vh;transition:height .25s ease;}
+  .project-track .project-hover-compare img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .project-track .project-hover-compare .hc-hover{opacity:0;transition:opacity .35s ease;}
+  .project-track .project-hover-compare:hover .hc-hover{opacity:1;}
+  .project-modal.zoomed .project-track .project-hover-compare{height:92vh;}
+  /* Touch devices can't hover, so the before/after would otherwise just sit frozen on "before" —
+     auto-loop it slowly instead. Scoped to (hover:none), same feature check already used for the
+     cursor trail, so real hover-capable devices (including touchscreen laptops) keep the
+     hover-to-reveal interaction untouched. prefers-reduced-motion is handled globally above. */
+  @media (hover:none){
+    .project-track .project-hover-compare .hc-hover{animation:hoverCompareLoop 7s ease-in-out infinite;}
+  }
+  @keyframes hoverCompareLoop{
+    0%, 18%{opacity:0;}
+    50%, 68%{opacity:1;}
+    100%{opacity:0;}
+  }
+  @media (max-width:700px){
+    .project-track img{height:56vh;}
+    .project-track .project-hover-compare{height:56vh;}
+    .project-modal.zoomed .project-track img{height:80vh;}
+    .project-modal.zoomed .project-track .project-hover-compare{height:80vh;}
+    .project-caption h2{font-size:.85rem;}
+    .project-next-btn{font-size:.6rem;padding:8px 13px;}
   }
 
 
@@ -497,13 +524,28 @@
 
 <!-- PROJECT MODAL -->
 <div class="project-modal" id="projectModal" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle">
-  <div class="project-modal-card">
-    <div class="project-modal-head">
-      <div><span class="eyebrow" id="projectModalEyebrow">Editorial</span><h2 id="projectModalTitle">Project</h2><p id="projectModalSub">Editorial archive</p></div>
-      <button class="modal-close" id="modalClose" type="button" aria-label="Close project">×</button>
+  <div class="modal-controls">
+    <button class="modal-icon-btn" id="modalZoom" type="button" aria-label="Zoom in">
+      <svg id="modalZoomIcon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.3" y1="15.3" x2="21" y2="21"/><line x1="10.5" y1="7.5" x2="10.5" y2="13.5"/><line x1="7.5" y1="10.5" x2="13.5" y2="10.5"/></svg>
+    </button>
+    <button class="modal-icon-btn" id="modalFullscreen" type="button" aria-label="Enter fullscreen">
+      <svg id="modalFullscreenIcon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>
+    </button>
+    <button class="modal-icon-btn modal-close" id="modalClose" type="button" aria-label="Close project">×</button>
+  </div>
+  <div class="project-caption" id="projectCaption">
+    <span class="eyebrow" id="projectModalEyebrow">Editorial</span>
+    <h2 id="projectModalTitle">Project</h2>
+    <span id="projectNote"></span>
+  </div>
+  <span class="project-progress" id="projectProgress">01 / 01</span>
+  <button class="project-next-btn" id="projectNextBtn" type="button" data-i18n="project.next">Next Project →</button>
+  <div class="project-scroll" id="projectScroll">
+    <div class="project-track-pin" id="projectTrackPin">
+      <div class="project-track-sticky">
+        <div class="project-track" id="projectTrack"></div>
+      </div>
     </div>
-    <div class="project-gallery" id="projectGallery"></div>
-    <div class="project-note" id="projectNote"></div>
   </div>
 </div>
 <!-- EDITORIAL PORTFOLIO -->
@@ -654,6 +696,9 @@
             <div class="compare-handle" id="compareHandle"><span class="compare-grip">↔</span></div>
             <span class="compare-label before">Before</span>
             <span class="compare-label after">After</span>
+            <button class="compare-expand" id="compareExpand" type="button" aria-label="Open large view">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>
+            </button>
           </div>
           <div class="service-info">
             <span class="service-counter" id="serviceCounter">01 / 04</span>
@@ -841,6 +886,12 @@
 
     'behance.full': {en:'View full project on Behance ↗', es:'Ver proyecto completo en Behance ↗'},
     'behance.more': {en:'See more work on Behance ↗', es:'Ver más trabajo en Behance ↗'},
+
+    'project.next': {en:'Next Project →', es:'Siguiente Proyecto →'},
+    'project.zoomIn': {en:'Zoom in', es:'Acercar'},
+    'project.zoomOut': {en:'Zoom out', es:'Alejar'},
+    'project.fullscreen': {en:'Enter fullscreen', es:'Pantalla completa'},
+    'project.exitFullscreen': {en:'Exit fullscreen', es:'Salir de pantalla completa'},
   };
 
   const heroH1 = {
@@ -1052,20 +1103,29 @@
 
 <script>
   const projectModal = document.getElementById('projectModal');
-  const projectGallery = document.getElementById('projectGallery');
+  const projectScroll = document.getElementById('projectScroll');
+  const projectTrackPin = document.getElementById('projectTrackPin');
+  const projectTrackSticky = document.querySelector('.project-track-sticky');
+  const projectTrack = document.getElementById('projectTrack');
+  const projectProgress = document.getElementById('projectProgress');
   const projectTitle = document.getElementById('projectModalTitle');
-  const projectSub = document.getElementById('projectModalSub');
   const projectNote = document.getElementById('projectNote');
+  const projectEyebrow = document.getElementById('projectModalEyebrow');
   const modalClose = document.getElementById('modalClose');
+  const modalZoom = document.getElementById('modalZoom');
+  const modalZoomIcon = document.getElementById('modalZoomIcon');
+  const modalFullscreen = document.getElementById('modalFullscreen');
+  const modalFullscreenIcon = document.getElementById('modalFullscreenIcon');
+  const projectNextBtn = document.getElementById('projectNextBtn');
 
   const projectData = {
     penida: { images: ['images/editorial/penida/01.jpg', 'images/editorial/penida/06.webp', 'images/editorial/penida/07.webp', 'images/editorial/penida/08.webp', 'images/editorial/penida/09.webp', 'images/editorial/penida/10.webp', 'images/editorial/penida/11.webp', 'images/editorial/penida/12.webp'], folder: 'images/editorial/penida', title: 'PENIDA', sub: {en:'Penida Magazine — Editorial / Sep 2025', es:'Revista Penida — Editorial / Sep 2025'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/230267081/Venon-Bloom' },
     elegant: { images: ['images/editorial/elegant/01.jpg', 'images/editorial/elegant/02.webp', 'images/editorial/elegant/04.webp', 'images/editorial/elegant/05.webp', 'images/editorial/elegant/06.webp', 'images/editorial/elegant/07.webp', 'images/editorial/elegant/08.webp', 'images/editorial/elegant/09.webp', 'images/editorial/elegant/10.webp', 'images/editorial/elegant/11.webp', 'images/editorial/elegant/12.webp'], folder: 'images/editorial/elegant', title: 'ELEGANT', sub: {en:'Elegant Magazine — Otto by Eriko', es:'Revista Elegant — Otto by Eriko'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/136375879/Otto' },
     imirage: { images: ['images/editorial/imirage/01.jpg', 'images/editorial/imirage/07.webp', 'images/editorial/imirage/08.webp', 'images/editorial/imirage/09.webp', 'images/editorial/imirage/10.webp'], folder: 'images/editorial/imirage', title: 'IMIRAGE', sub: {en:'Imirage Magazine — Beauty Editorial', es:'Revista Imirage — Editorial de Belleza'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/121980999/Red-Muse' },
     shuba: { images: ['images/editorial/shuba/01.jpg', 'images/editorial/shuba/08.webp', 'images/editorial/shuba/09.webp', 'images/editorial/shuba/10.webp'], folder: 'images/editorial/shuba', title: 'SHUBA', sub: {en:'Shuba Magazine — Diversity Makeup, Issue 11', es:'Revista Shuba — Maquillaje Diversidad, Edición 11'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/170986845/Shuba-MAG' },
-    scorpiovin: { images: ['images/editorial/scorpiovin/01.jpg', 'images/editorial/scorpiovin/02.webp', 'images/editorial/scorpiovin/04.webp', 'images/editorial/scorpiovin/05.webp', 'images/editorial/scorpiovin/06.webp', 'images/editorial/scorpiovin/07.webp', 'images/editorial/scorpiovin/08.webp', 'images/editorial/scorpiovin/09.webp', 'images/editorial/scorpiovin/10.webp', 'images/editorial/scorpiovin/11.webp'], folder: 'images/editorial/scorpiovin', title: 'SCORPIO VIN', sub: {en:'Scorpio Vin — Neoscivic Editorial', es:'Scorpio Vin — Editorial Neoscivic'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/237730315/Neoscivic' },
-    mob: { images: ['images/editorial/mob/01.jpg', 'images/editorial/mob/02.webp', 'images/editorial/mob/03.webp', 'images/editorial/mob/04.webp', 'images/editorial/mob/05.webp', 'images/editorial/mob/06.webp', 'images/editorial/mob/07.webp', 'images/editorial/mob/08.webp', 'images/editorial/mob/09.webp'], folder: 'images/editorial/mob', title: 'MOB', sub: {en:'MOB Magazine — Editorial', es:'Revista MOB — Editorial'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/217204699/Muskaria-Mob-Journal' },
-    tag: { images: ['images/editorial/tag/01.jpg', 'images/editorial/tag/02.webp', 'images/editorial/tag/03.webp', 'images/editorial/tag/05.webp', 'images/editorial/tag/06.webp', 'images/editorial/tag/07.webp', 'images/editorial/tag/08.webp', 'images/editorial/tag/09.webp', 'images/editorial/tag/10.webp', 'images/editorial/tag/11.webp', 'images/editorial/tag/12.webp', 'images/editorial/tag/13.webp', 'images/editorial/tag/14.webp', 'images/editorial/tag/15.webp', 'images/editorial/tag/16.webp'], folder: 'images/editorial/tag', title: 'TAG', sub: {en:'Tag Magazine — Editorial', es:'Revista Tag — Editorial'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/249848237/Tag-FILM-Editorial' },
+    scorpiovin: { images: ['images/editorial/scorpiovin/01.jpg', 'images/editorial/scorpiovin/02.webp', 'images/editorial/scorpiovin/04.webp', 'images/editorial/scorpiovin/05.webp', 'images/editorial/scorpiovin/06.webp', 'images/editorial/scorpiovin/07.webp', 'images/editorial/scorpiovin/09.webp', 'images/editorial/scorpiovin/10.webp', 'images/editorial/scorpiovin/11.webp'], folder: 'images/editorial/scorpiovin', title: 'SCORPIO VIN', sub: {en:'Scorpio Vin — Neoscivic Editorial', es:'Scorpio Vin — Editorial Neoscivic'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/237730315/Neoscivic' },
+    mob: { images: ['images/editorial/mob/04.webp', 'images/editorial/mob/02.webp', 'images/editorial/mob/03.webp', 'images/editorial/mob/05.webp', 'images/editorial/mob/06.webp', 'images/editorial/mob/07.webp', 'images/editorial/mob/08.webp', 'images/editorial/mob/09.webp'], folder: 'images/editorial/mob', title: 'MOB', sub: {en:'MOB Magazine — Editorial', es:'Revista MOB — Editorial'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/217204699/Muskaria-Mob-Journal' },
+    tag: { images: ['images/editorial/tag/01-full.jpg', 'images/editorial/tag/02.webp', 'images/editorial/tag/03.webp', 'images/editorial/tag/05.webp', 'images/editorial/tag/06.webp', 'images/editorial/tag/07.webp', 'images/editorial/tag/08.webp', 'images/editorial/tag/09.webp', 'images/editorial/tag/10.webp', 'images/editorial/tag/11.webp', 'images/editorial/tag/12.webp', 'images/editorial/tag/13.webp', 'images/editorial/tag/14.webp', 'images/editorial/tag/15.webp', 'images/editorial/tag/16.webp'], folder: 'images/editorial/tag', title: 'TAG', sub: {en:'Tag Magazine — Editorial', es:'Revista Tag — Editorial'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/249848237/Tag-FILM-Editorial' },
     nike: { images: ['images/campaigns/nike/01.jpg', 'images/campaigns/nike/02.webp'], folder: 'images/campaigns/nike', title: 'NIKE', sub: {en:'Dafiti LATAM Campaign', es:'Campaña Dafiti LATAM'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'}, behance: 'https://www.behance.net/gallery/190502323/Nike-Dafiti-Colombia' },
     adidas: { images: ['images/campaigns/adidas/01.jpg', 'images/campaigns/adidas/02.jpg', 'images/campaigns/adidas/03.jpg', 'images/campaigns/adidas/04.jpg'], folder: 'images/campaigns/adidas', title: 'ADIDAS', sub: {en:'Dafiti LATAM Campaign', es:'Campaña Dafiti LATAM'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'}, behance: 'https://www.behance.net/gallery/252052449/Adidas-Retouch-HH-Global' },
     zegna: { images: ['images/campaigns/zegna/01.jpg', 'images/campaigns/zegna/02.webp', 'images/campaigns/zegna/04.webp', 'images/campaigns/zegna/05.webp', 'images/campaigns/zegna/07.webp', 'images/campaigns/zegna/08.webp', 'images/campaigns/zegna/11.webp', 'images/campaigns/zegna/14.webp', 'images/campaigns/zegna/15.webp'], folder: 'images/campaigns/zegna', title: 'ZEGNA', sub: {en:'Le Collezioni Campaign', es:'Campaña Le Collezioni'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'}, behance: 'https://www.behance.net/gallery/174653847/Zegna-2023' },
@@ -1075,79 +1135,181 @@
     lci: { images: ['images/campaigns/lci/01.jpg', 'images/campaigns/lci/02.jpg', 'images/campaigns/lci/03.jpg', 'images/campaigns/lci/04.jpg', 'images/campaigns/lci/05.jpg', 'images/campaigns/lci/06.jpg'], folder: 'images/campaigns/lci', title: 'LCI', sub: {en:'LCI Education Campaign', es:'Campaña LCI Education'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'} },
     rayban: { images: ['images/campaigns/rayban/01.jpg', 'images/campaigns/rayban/02.jpg', 'images/campaigns/rayban/03.jpg'], folder: 'images/campaigns/rayban', title: 'RAY-BAN', sub: {en:'Ray-Ban Meta "Masters" Project', es:'Proyecto Ray-Ban Meta "Masters"'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'} },
     fila: { images: ['images/campaigns/fila/01.jpg'], folder: 'images/campaigns/fila', title: 'FILA', sub: {en:'Campaign', es:'Campaña'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'} },
+    retouching: { pairs: [
+      {before: 'images/services/retouching/before.jpg', after: 'images/services/retouching/after.jpg', ratio: 2},
+      {before: 'images/services/retouching/before-02.jpg', after: 'images/services/retouching/after-02.jpg', ratio: 0.6678},
+      {before: 'images/services/retouching/before-03.jpg', after: 'images/services/retouching/after-03.jpg', ratio: 1.3333},
+      {before: 'images/services/retouching/before-04.jpg', after: 'images/services/retouching/after-04.jpg', ratio: 0.7517},
+      {before: 'images/services/retouching/before-05.jpg', after: 'images/services/retouching/after-05.jpg', ratio: 0.6667},
+      {before: 'images/services/retouching/before-06.jpg', after: 'images/services/retouching/after-06.jpg', ratio: 0.6672},
+    ], folder: 'images/services/retouching', title: 'RETOUCHING & POST-PRODUCTION', sub: {en:'Retouching & Post-Production', es:'Retoque y Postproducción'}, note: {en:'Hover each photo to see the after — retouching examples from the MILO Studio archive.', es:'Pasa el mouse por cada foto para ver el después — ejemplos de retoque del archivo de MILO Studio.'} },
   };
 
-  let currentProjectKey = null, currentProjectImg = null, currentSlide = 0;
+  let currentProjectKey = null, currentProjectImg = null, projectMaxTranslate = 0;
 
-  function renderSlide(){
-    const project = projectData[currentProjectKey];
-    if(!project) return;
-    const images = project.images && project.images.length ? project.images : (currentProjectImg ? [currentProjectImg] : []);
-    currentSlide = ((currentSlide % images.length) + images.length) % images.length;
-    const img = projectGallery.querySelector('.project-slider img');
-    if(img) img.src = images[currentSlide];
-    const dots = projectGallery.querySelectorAll('.slider-dot');
-    dots.forEach((d, i) => d.classList.toggle('is-active', i === currentSlide));
-    const count = projectGallery.querySelector('.slider-count');
-    if(count) count.textContent = `${currentSlide + 1} / ${images.length}`;
+  // Vertical scroll/swipe inside .project-scroll drives horizontal translateX of .project-track
+  // — same scroll-progress math as the site's other pinned sliders (coverflow/services/
+  // campaigns), just measured off this element's own scrollTop since the modal is an overlay,
+  // not part of normal page flow, so there's no window-scroll position to read.
+  function sizeProjectTrack(){
+    const imgs = projectTrack.querySelectorAll('img');
+    if(!imgs.length) return;
+    const viewportWidth = projectScroll.clientWidth;
+    // Pad each end of the track with however much space is needed to center that end's image in
+    // the viewport, so the first photo starts centered at scrollTop 0 (not flush against the
+    // edge) and the last one ends up centered too, at the very end of the scroll range — same
+    // "peek the neighbor" feel as the campaigns/coverflow sliders, just for a full filmstrip
+    // instead of one active item.
+    const firstW = imgs[0].getBoundingClientRect().width;
+    const lastW = imgs[imgs.length - 1].getBoundingClientRect().width;
+    projectTrack.style.paddingLeft = Math.max(24, (viewportWidth - firstW) / 2) + 'px';
+    projectTrack.style.paddingRight = Math.max(24, (viewportWidth - lastW) / 2) + 'px';
+    projectMaxTranslate = Math.max(0, projectTrack.scrollWidth - viewportWidth);
+    projectTrackPin.style.height = (projectScroll.clientHeight + projectMaxTranslate) + 'px';
+    updateProjectScroll();
   }
-  function goToSlide(i){ currentSlide = i; renderSlide(); }
-  function nextSlide(){ currentSlide++; renderSlide(); }
-  function prevSlide(){ currentSlide--; renderSlide(); }
+  function updateProjectScroll(){
+    const total = projectScroll.scrollHeight - projectScroll.clientHeight;
+    const progress = total > 0 ? clamp(projectScroll.scrollTop / total, 0, 1) : 0;
+    projectTrack.style.transform = `translateX(${-progress * projectMaxTranslate}px)`;
+    const project = projectData[currentProjectKey];
+    const n = project ? ((project.pairs ? project.pairs.length : project.images.length) || 1) : 1;
+    const shown = Math.min(n, Math.max(1, Math.round(progress * (n - 1)) + 1));
+    projectProgress.textContent = `${String(shown).padStart(2,'0')} / ${String(n).padStart(2,'0')}`;
+  }
+  let projectScrollTicking = false;
+  projectScroll.addEventListener('scroll', () => {
+    if(!projectScrollTicking){
+      requestAnimationFrame(() => { updateProjectScroll(); projectScrollTicking = false; });
+      projectScrollTicking = true;
+    }
+  });
+  window.addEventListener('resize', () => { if(projectModal.classList.contains('open')) sizeProjectTrack(); });
 
   function openProjectModal(key, imgSrc){
     const project = projectData[key];
     if(!project) return;
-    currentProjectKey = key; currentProjectImg = imgSrc; currentSlide = 0;
+    currentProjectKey = key; currentProjectImg = imgSrc;
+    projectEyebrow.textContent = project.folder.includes('/editorial/') ? t('editorial.eyebrow')
+      : project.folder.includes('/services/') ? t('services.eyebrow')
+      : t('campaigns.eyebrow');
     projectTitle.textContent = project.title;
-    projectSub.textContent = project.sub[currentLang];
     const behanceUrl = project.behance || 'https://www.behance.net/marquezvillegas';
     const linkLabel = project.behance ? t('behance.full') : t('behance.more');
-    projectNote.innerHTML = `${project.note[currentLang]} <a href="${behanceUrl}" target="_blank" rel="noopener" class="behance-link">${linkLabel}</a>`;
+    projectNote.innerHTML = `<a href="${behanceUrl}" target="_blank" rel="noopener" class="behance-link">${linkLabel}</a>`;
 
-    const images = project.images && project.images.length ? project.images : (imgSrc ? [imgSrc] : []);
-    const hasMultiple = images.length > 1;
-    projectGallery.innerHTML = images.length ? `
-      <div class="project-slider">
-        ${hasMultiple ? `<button class="slider-arrow prev" type="button" aria-label="Previous photo">‹</button>` : ''}
-        <img src="${images[0]}" alt="${project.title}">
-        ${hasMultiple ? `<button class="slider-arrow next" type="button" aria-label="Next photo">›</button>` : ''}
-        ${hasMultiple ? `<span class="slider-count"></span>` : ''}
-      </div>
-      ${hasMultiple ? `<div class="slider-dots">${images.map((_, i) => `<button class="slider-dot" type="button" aria-label="Go to photo ${i+1}"></button>`).join('')}</div>` : ''}
-    ` : '';
-
-    if(hasMultiple){
-      projectGallery.querySelector('.slider-arrow.prev').addEventListener('click', prevSlide);
-      projectGallery.querySelector('.slider-arrow.next').addEventListener('click', nextSlide);
-      projectGallery.querySelectorAll('.slider-dot').forEach((d, i) => d.addEventListener('click', () => goToSlide(i)));
-      const slider = projectGallery.querySelector('.project-slider');
-      let touchStartX = null;
-      slider.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].clientX; }, {passive:true});
-      slider.addEventListener('touchend', e => {
-        if(touchStartX === null) return;
-        const dx = e.changedTouches[0].clientX - touchStartX;
-        if(Math.abs(dx) > 40){ dx < 0 ? nextSlide() : prevSlide(); }
-        touchStartX = null;
-      }, {passive:true});
+    // Deliberately NOT loading="lazy" — this is a scroll-scrubbed gallery, not a normal page
+    // scroll, so every image's rendered width has to be known up front to map scroll progress to
+    // translateX correctly. Lazy-loading would leave the pin sized wrong until each image happens
+    // to load, causing jumps/jank mid-scroll instead of a stable range from the start.
+    if(project.pairs){
+      // Each slide is a before/after hover-reveal (same "static base, opacity-fade hover layer"
+      // technique as the campaigns tile hover-gif) instead of a single flat photo. The wrapper's
+      // aspect-ratio is baked into projectData per pair (all sizes were fixed at export time), so
+      // no measurement/load-wait is needed to size it, unlike a plain <img>'s natural width.
+      projectTrack.innerHTML = project.pairs.map(p =>
+        `<div class="project-hover-compare" style="aspect-ratio:${p.ratio}"><img src="${p.before}" alt="${project.title} — before" class="hc-base"><img src="${p.after}" alt="${project.title} — after" class="hc-hover"></div>`
+      ).join('');
+    } else {
+      const images = project.images && project.images.length ? project.images : (imgSrc ? [imgSrc] : []);
+      projectTrack.innerHTML = images.map(src => `<img src="${src}" alt="${project.title}">`).join('');
     }
-    renderSlide();
 
     projectModal.classList.add('open');
+    projectModal.classList.remove('zoomed');
+    updateZoomIcon();
     document.body.style.overflow = 'hidden';
+    projectScroll.scrollTop = 0;
+
+    // Each image is height:74vh; width:auto, so its rendered width depends on its own intrinsic
+    // aspect ratio — resize the pin as each one finishes loading (not just once at the end) so
+    // the gallery is usable almost immediately and just settles into its final size.
+    sizeProjectTrack();
+    projectTrack.querySelectorAll('img').forEach(img => {
+      if(img.complete) return;
+      img.addEventListener('load', sizeProjectTrack, {once:true});
+      img.addEventListener('error', sizeProjectTrack, {once:true});
+    });
   }
   function closeProject(){
-    projectModal.classList.remove('open');
+    projectModal.classList.remove('open', 'zoomed');
     document.body.style.overflow = '';
     currentProjectKey = null;
+    if(isModalFullscreen()) exitModalFullscreen();
   }
   modalClose.addEventListener('click', closeProject);
-  projectModal.addEventListener('click', e => { if(e.target === projectModal) closeProject(); });
+
+  // ===== Zoom toggle — grows the images in-place, re-measuring the track so the
+  // currently-visible photo stays centered (same "keep the current fraction of scroll
+  // progress" trick used when the language changes and captions re-render). =====
+  const ZOOM_IN_ICON = '<circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.3" y1="15.3" x2="21" y2="21"/><line x1="10.5" y1="7.5" x2="10.5" y2="13.5"/><line x1="7.5" y1="10.5" x2="13.5" y2="10.5"/>';
+  const ZOOM_OUT_ICON = '<circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.3" y1="15.3" x2="21" y2="21"/><line x1="7.5" y1="10.5" x2="13.5" y2="10.5"/>';
+  function updateZoomIcon(){
+    const zoomed = projectModal.classList.contains('zoomed');
+    modalZoomIcon.innerHTML = zoomed ? ZOOM_OUT_ICON : ZOOM_IN_ICON;
+    modalZoom.setAttribute('aria-label', t(zoomed ? 'project.zoomOut' : 'project.zoomIn'));
+  }
+  function setProjectZoom(zoomed){
+    const total = projectScroll.scrollHeight - projectScroll.clientHeight;
+    const progress = total > 0 ? clamp(projectScroll.scrollTop / total, 0, 1) : 0;
+    projectModal.classList.toggle('zoomed', zoomed);
+    updateZoomIcon();
+    sizeProjectTrack();
+    const newTotal = projectScroll.scrollHeight - projectScroll.clientHeight;
+    projectScroll.scrollTop = progress * newTotal;
+  }
+  modalZoom.addEventListener('click', () => setProjectZoom(!projectModal.classList.contains('zoomed')));
+
+  // ===== Fullscreen toggle — Safari only exposes the webkit-prefixed API. =====
+  function isModalFullscreen(){ return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+  function exitModalFullscreen(){ (document.exitFullscreen || document.webkitExitFullscreen).call(document); }
+  function updateFullscreenIcon(){
+    const fs = isModalFullscreen();
+    modalFullscreenIcon.innerHTML = fs
+      ? '<path d="M9 4v5H4"/><path d="M15 4v5h5"/><path d="M9 20v-5H4"/><path d="M15 20v-5h5"/>'
+      : '<path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/>';
+    modalFullscreen.setAttribute('aria-label', t(fs ? 'project.exitFullscreen' : 'project.fullscreen'));
+  }
+  modalFullscreen.addEventListener('click', () => {
+    if(isModalFullscreen()){
+      exitModalFullscreen();
+    } else {
+      const req = projectModal.requestFullscreen || projectModal.webkitRequestFullscreen;
+      Promise.resolve(req.call(projectModal)).catch(() => {});
+    }
+  });
+  document.addEventListener('fullscreenchange', updateFullscreenIcon);
+  document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+
+  // ===== Next Project — cycles through the editorial covers, then the campaigns, so
+  // one button walks the entire portfolio regardless of which grid it was opened from.
+  // Reads coverOrder/campaignsData lazily (only at click time) since campaignsData is
+  // declared in a later <script> block that hasn't run yet when this one is parsed. =====
+  function getProjectOrder(){
+    return [...coverOrder, ...campaignsData.map(c => c.key), 'fila'];
+  }
+  function goToNextProject(){
+    if(!currentProjectKey) return;
+    const order = getProjectOrder();
+    const idx = order.indexOf(currentProjectKey);
+    const nextKey = order[idx === -1 ? 0 : (idx + 1) % order.length];
+    const nextProject = projectData[nextKey];
+    if(!nextProject) return;
+    openProjectModal(nextKey, nextProject.images[0]);
+  }
+  projectNextBtn.addEventListener('click', goToNextProject);
+  // Clicking anywhere that isn't a photo closes the modal — the only things that can eat a click
+  // are the images themselves (flex items) and the caption/close button (explicit listeners of
+  // their own); everything else — the scroll container, the pin, the sticky stage, gaps between
+  // images in the track — is "background," so matching e.target against all of those covers it.
+  projectModal.addEventListener('click', e => {
+    if(e.target === projectModal || e.target === projectScroll || e.target === projectTrackSticky || e.target === projectTrack) closeProject();
+  });
   document.addEventListener('keydown', e => {
     if(!projectModal.classList.contains('open')) return;
     if(e.key === 'Escape') closeProject();
-    else if(e.key === 'ArrowRight') nextSlide();
-    else if(e.key === 'ArrowLeft') prevSlide();
+    else if(e.key === 'ArrowRight') projectScroll.scrollBy({top: projectScroll.clientHeight * 0.6, behavior:'smooth'});
+    else if(e.key === 'ArrowLeft') projectScroll.scrollBy({top: -projectScroll.clientHeight * 0.6, behavior:'smooth'});
   });
 
 
@@ -1249,9 +1411,11 @@
     layoutCovers();
     renderTeam();
     if(currentProjectKey && projectModal.classList.contains('open')){
-      const savedSlide = currentSlide;
+      const savedScrollTop = projectScroll.scrollTop;
+      const wasZoomed = projectModal.classList.contains('zoomed');
       openProjectModal(currentProjectKey, currentProjectImg);
-      goToSlide(savedSlide);
+      if(wasZoomed) setProjectZoom(true);
+      projectScroll.scrollTop = savedScrollTop;
     }
     if(typeof renderServiceSlide === 'function') renderServiceSlide();
     if(typeof renderCampaignSlide === 'function') renderCampaignSlide();
@@ -1265,7 +1429,7 @@
   // here since it's a catalog/e-commerce shoot, not a brand campaign. .service-visual is
   // display:none by default and only shown for slides with an `img` set below.
   const servicesData = [
-    {key: 'service1', folder: 'images/services/retouching', compareBefore: 'images/services/retouching/before.jpg', compareAfter: 'images/services/retouching/after.jpg'},
+    {key: 'service1', folder: 'images/services/retouching', compareBefore: 'images/services/retouching/before.jpg', compareAfter: 'images/services/retouching/after.jpg', compareProjectKey: 'retouching'},
     {key: 'service2', folder: 'images/services/photography'},
     {key: 'service3', folder: 'images/services/creative_direction'},
     {key: 'service4', folder: 'images/services/ecommerce', img: 'images/campaigns/fila/01.jpg', projectKey: 'fila'},
@@ -1279,6 +1443,7 @@
   const compareBeforeImg = document.getElementById('compareBefore');
   const compareAfterImg = document.getElementById('compareAfter');
   const compareHandle = document.getElementById('compareHandle');
+  const compareExpand = document.getElementById('compareExpand');
   const serviceImg = document.getElementById('serviceImg');
   const serviceTitleEl = document.getElementById('serviceTitle');
   const serviceDescEl = document.getElementById('serviceDesc');
@@ -1351,6 +1516,16 @@
   });
   serviceCompare.addEventListener('pointerup', () => { compareDragging = false; });
   serviceCompare.addEventListener('pointercancel', () => { compareDragging = false; });
+
+  // Expand button — stopPropagation on pointerdown so it doesn't also register as a
+  // compare-slider drag (serviceCompare's own pointerdown listener would otherwise fire too,
+  // since pointer events bubble, and jump the before/after divider right as the modal opens).
+  compareExpand.addEventListener('pointerdown', e => e.stopPropagation());
+  compareExpand.addEventListener('click', e => {
+    e.stopPropagation();
+    const s = servicesData[activeService];
+    if(s.compareProjectKey) openProjectModal(s.compareProjectKey, compareBeforeImg.src);
+  });
 
   function sizeServicesPin(){
     servicesPin.style.height = (servicesSticky.offsetHeight + SERVICES_SCROLL_ROOM) + 'px';
