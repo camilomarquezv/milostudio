@@ -440,7 +440,11 @@ Ricks method**: one clamp on the root, everything else a plain `rem` value.
 
 ## Bilingual (EN/ES) system — how it works
 - Every translatable static text element has `data-i18n="key"` (or `data-i18n-html="hero.h1"`
-  for the one element with embedded `<em>` markup).
+  for the one element with embedded `<em>` markup). `heroH1`'s EN/ES strings (near the top of the
+  hero-pin `<script>` block) carry a manual `<br>` before the last word ("retouching"/"integral")
+  — added 2026-08-25, user wanted that word to always start its own line rather than wrapping
+  naturally, which at some widths put it on the same line as the words before it. The static
+  fallback markup on the `<h1>` itself (before JS runs) was updated to match.
 - A single `translations` object (in the first `<script>` block, right before the hero-pin
   script) maps `key → {en, es}`.
 - `currentLang` (`'en'` | `'es'`) is a module-level JS variable, default `'en'`.
