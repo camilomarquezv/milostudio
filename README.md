@@ -276,6 +276,21 @@ markup doesn't matter to them).
    correct new file the whole time. **How to apply:** if a replaced image file seems to not be
    taking effect in this dev-preview tool, verify via a cache-busted fetch/`Image()` before
    assuming the file swap or deploy failed — the on-disk/server state may already be correct.
+   **More cover/thumbnail fixes, 2026-08-26:** Nike and Adidas campaign covers
+   (`images/campaigns/nike|adidas/01.jpg`) and Tag's opening editorial shot were flagged as
+   pixelated (900×600 / 800×1066, much lower-res than their siblings) — replaced with
+   higher-res sources the user supplied, resized/re-compressed to match the site's usual weight
+   (Adidas 900×600→1800×1200, Nike similar, Tag 800×1066→1400×1750). **Tag is split into two
+   files on purpose:** the user wanted the small coverflow thumbnail to keep the original
+   logo'd/branded cover, but the *modal's* opening photo to be the higher-res unbranded version —
+   `images/editorial/tag/01.jpg` (logo, used only by the `<img>` in `#coverTrack`) is untouched
+   from its original commit, while the new unbranded photo is a separate file, `01-full.jpg`,
+   referenced only in `projectData.tag.images[0]`. Don't collapse these back into one file. Also:
+   MOB and Scorpio Vin's project-modal filmstrips each had an accidental duplicate frame (a
+   low-res `01.jpg` that was the same shot as a later higher-res image in the same set, and a
+   cropped duplicate of another frame missing its magazine logo/page number respectively) —
+   removed from `projectData[key].images`; the now-orphaned `mob/01.jpg` file is left on disk
+   unused rather than deleted.
 5. **Process** (`#process`) — 4-step process (Briefing → Team Assembly → Production → Retouch &
    Deliver). Each `.process-row` inverts on hover (added 2026-08-25) — dark `var(--ink)`
    background, title goes `var(--paper)`, the number goes `var(--accent)`, description goes
@@ -370,7 +385,39 @@ markup doesn't matter to them).
    `pointerup`) directly and checking `#compareHandle`'s resulting position, then a screenshot
    showing the handle visually at the expected spot — see
    [[feedback_browser_preview_heavy_page]] for other cases of this same tool's `computer`-action
-   unreliability. The other 2 folders (`images/services/photography|creative_direction/`) are
+   unreliability. **Expand button + project-modal integration, 2026-08-26:** a small circular
+   `#compareExpand` button (top-right corner of `#serviceCompare`, `.compare-expand`) opens the
+   same big project modal used everywhere else — `pointerdown` on the button calls
+   `e.stopPropagation()` before the click reaches `#serviceCompare`'s own `pointerdown` listener,
+   otherwise the drag-to-compare handler would also fire and jump the divider right as the modal
+   opens. `servicesData[0].compareProjectKey` (`'retouching'`) points at a new `projectData`
+   entry, mirroring how the plain-photo case (`service4`/Fila) already uses `.projectKey` —
+   `openProjectModal('retouching', ...)` on click. Inside the modal, `projectData.retouching` is
+   no longer a flat `images` array — it's `pairs: [{before, after, ratio}, ...]`, and
+   `openProjectModal()` branches on `project.pairs` to build one `.project-hover-compare` div per
+   pair instead of plain `<img>`s (both photos absolutely stacked inside, `object-fit:cover`,
+   `.hc-hover` opacity 0→1 on `:hover` — same cross-fade technique as the campaigns tile
+   hover-gif). `ratio` is baked into `projectData` per pair (not measured at runtime) since every
+   photo's final size was fixed at export time, so the wrapper gets an inline
+   `style="aspect-ratio:${p.ratio}"` and needs no load-wait to size correctly — unlike a plain
+   `<img>` (`width:auto`), which does. `sizeProjectTrack()`/`updateProjectScroll()` needed no
+   change beyond reading `project.pairs.length` instead of `project.images.length` for the
+   counter — they already just query `.querySelectorAll('img')` for width/centering math, and
+   that still finds both stacked images per pair correctly since each is `width:100%` of its
+   wrapper. Expanded from the original 1 pair to 6: user supplied 5 more before/after sets
+   (`~/Desktop/before and after/1..5/`), each 9–42MB (up to 7760×10328) — resized to a 1800px
+   long edge + JPEG q85 optimize/progressive, landing at 130–430KB each
+   (`images/services/retouching/before-02..06.jpg` / `after-02..06.jpg`; the original pair keeps
+   its `before.jpg`/`after.jpg` names, unrenamed). **Mobile auto-loop, 2026-08-26:** touch
+   devices can't hover, so the after layer would otherwise just sit frozen invisible — under
+   `@media (hover:none)` (same feature check the cursor trail already uses, see below) `.hc-hover`
+   instead gets `animation: hoverCompareLoop 7s ease-in-out infinite` (hold before → fade to after
+   → hold after → fade back), skipped automatically by the sitewide
+   `prefers-reduced-motion: reduce` override at the top of `<style>` (forces
+   `animation-duration:0.001ms` on everything) rather than needing its own check. `getProjectOrder()`
+   (the "Next Project" button's cycle, see item 9) does **not** include `'retouching'` — it's a
+   service illustration, not a portfolio piece, so it's reachable only via the expand button, not
+   the cross-portfolio next/prev flow. The other 2 folders (`images/services/photography|creative_direction/`) are
    still empty, ready the same way if photos show up for those too. The section head's copy was
    also fixed from "Two things we
    do really well" to "Four things" — there have always been 4
@@ -384,9 +431,46 @@ markup doesn't matter to them).
    (`#cfMessage`) with the selected roles (translated, via `team.quoteMessage`), smooth-scrolls to
    `#contact`, and focuses the name field. Hidden again (`.builder-cta` without `.show`) when
    nothing's selected, so it never shows an empty quote request.
-9. **Project Modal** (`#projectModal`) — shared lightbox for both editorial covers and campaign
-   tiles; pulls from the `projectData` JS object; includes a Behance deep-link when we have the
-   real project URL, otherwise links to the profile
+9. **Project Modal** (`#projectModal`) — shared lightbox for editorial covers, campaign tiles, and
+   the retouching example (item 7); pulls from the `projectData` JS object; includes a Behance
+   deep-link when we have the real project URL, otherwise links to the profile.
+   **Redesigned 2026-08-26, three rounds of feedback in one sitting:** originally a full-screen
+   *dark* single-image view with prev/next arrows (styled after an
+   `openstudios.com.co`-style reference the user sent) — first round replaced the old smaller
+   in-page gallery/slider with this, closing on outside-click or a subtle `×` top-right. Called
+   "static" on review; **second round** rebuilt it as the current **white, scroll-driven
+   horizontal filmstrip** (reference: `gsproductions.co.za`) — vertical scroll/swipe inside
+   `#projectScroll` (an internally-scrollable `overflow-y:auto` container, since the modal is an
+   overlay outside normal page flow — reads its own `scrollTop`, not `window.scrollY`) drives
+   `translateX` on `#projectTrack`, same pinned-scroll-scrub math as the hero logo/coverflow/
+   campaigns/services sliders elsewhere on the site. **Third round** (same day): first and last
+   photo now start/end centered rather than flush against the edge — `sizeProjectTrack()`
+   computes `padding-left`/`padding-right` from each end photo's own rendered width so it's
+   centered at `scrollTop` 0 and at the end of the scroll range, the same "peek the neighbor"
+   feel as the coverflow; gaps between photos widened (`gap:min(10vw,120px)`, was `20px`); the
+   Behance link shrunk and muted (`.6rem`/`var(--steel)`, was `.72rem`/`var(--ink)` — it was
+   overlapping photos at the old size); the subtitle line under the title was removed entirely
+   (from both the HTML and `openProjectModal()`) for less on-screen text.
+   **Added the same day, after the redesign landed:** a `.modal-controls` row (top-right, next to
+   the existing `×`) with **zoom** (`#modalZoom` — toggles `.project-modal.zoomed`, which grows
+   `.project-track img`/`.project-hover-compare` from `74vh`→`92vh`; `setProjectZoom()` captures
+   the current scroll-progress fraction before resizing and re-applies it after, so the photo you
+   were looking at stays roughly centered instead of jumping) and **fullscreen** (`#modalFullscreen`
+   — standard `requestFullscreen()`/`exitFullscreen()`, `webkit`-prefixed fallback for Safari,
+   wrapped in `Promise.resolve(...).catch(()=>{})` since it rejects with a console warning if not
+   triggered by a real trusted user gesture — harmless but silenced). A **"Next Project →" button**
+   (`#projectNextBtn`, bottom-right) cycles through every editorial cover, then every campaign,
+   then Fila, wrapping at the end — `getProjectOrder()` builds this list *lazily at click time*
+   (not once at load) specifically because `campaignsData` is declared in a later `<script>`
+   block than the modal's own script; reading it only when the button is actually clicked (well
+   after every script has run) sidesteps the ordering problem entirely. Does not include
+   `'retouching'` (see item 7) since that's a service illustration, not a portfolio project.
+   **Verification note:** this page's heavy weight makes the browser-preview tool's screenshots
+   render full-screen `position:fixed` overlays incorrectly and intermittently (an element
+   genuinely spanning the full viewport per `getBoundingClientRect()`/`elementFromPoint()` at all
+   four corners shows in a screenshot as covering only part of it, with page content bleeding
+   through) — treat DOM measurement as ground truth over a screenshot on this specific page; see
+   [[feedback_browser_preview_heavy_page]].
 10. **Contact** (`#contact`) — dark panel, email + WhatsApp, no form (previously had a form but
     it wasn't wired to anything, so it was replaced with direct contact info)
 11. **Footer** — nav links + Behance + tagline. `background:var(--paper-dim)` (added 2026-08-25,
