@@ -246,10 +246,10 @@
 
   .coverflow-pin{position:relative;} /* height set in JS (sizeCoverflowPin) to match .coverflow-sticky's content height + a fixed scroll-scrub distance */
   .coverflow-sticky{position:sticky; top:0; padding-top:4.5rem;}
-  .coverflow-stage{position:relative;height:clamp(420px,50vw,560px);display:flex;align-items:center;justify-content:center;perspective:2200px;margin-top:2.6rem;}
+  .coverflow-stage{position:relative;height:clamp(460px,52vw,620px);display:flex;align-items:center;justify-content:center;perspective:2200px;margin-top:2.6rem;}
   .coverflow-stage::before{content:"";position:absolute;left:50%;bottom:8%;width:min(72vw,760px);height:56px;transform:translateX(-50%);background:radial-gradient(ellipse, rgba(22,27,34,.24) 0%, rgba(22,27,34,.08) 45%, transparent 72%);filter:blur(10px);pointer-events:none;}
   .coverflow-track{position:relative;width:100%;height:100%;transform-style:preserve-3d;}
-  .mag-cover{position:absolute;top:50%;left:50%;width:224px;height:316px;margin:-158px 0 0 -112px;background:none;border:none;padding:0;cursor:pointer;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.22,.9,.24,1), filter .5s ease;}
+  .mag-cover{position:absolute;top:50%;left:50%;width:320px;height:427px;margin:-213.5px 0 0 -160px;background:none;border:none;padding:0;cursor:pointer;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.22,.9,.24,1), filter .5s ease;}
   .mag-cover-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;border-radius:2px;box-shadow:0 26px 52px rgba(22,27,34,.34);}
   .mag-cover img{width:100%;height:100%;object-fit:cover;display:block;border-radius:2px;backface-visibility:hidden;}
   .mag-spine{position:absolute;top:0;bottom:0;left:0;width:16px;background:linear-gradient(to right, rgba(0,0,0,.55), rgba(0,0,0,.05));transform:rotateY(90deg) translateZ(-8px);transform-origin:left center;}
@@ -277,7 +277,7 @@
 
   @media (max-width:900px){
     .editorial-intro{grid-template-columns:1fr;}.editorial-index{justify-self:start;text-align:left;}
-    .mag-cover{width:150px;height:212px;margin:-106px 0 0 -75px;}
+    .mag-cover{width:190px;height:253px;margin:-126.5px 0 0 -95px;}
   }
 
   /* ===== CAMPAIGNS SLIDER ===== */

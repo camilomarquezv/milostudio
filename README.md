@@ -252,6 +252,26 @@ markup doesn't matter to them).
    `::before` ground-shadow pseudo-element still needs it, only the arrows moved out. (Briefly
    tried fading off-center covers to grayscale the same day — user asked to keep them full color
    instead, so `layoutCovers()`'s filter is still just the original brightness-only dim.)
+   **Covers enlarged + re-sourced in high-res (2026-08-25):** `01.jpg` for all 7
+   `images/editorial/<key>/` folders was replaced — the originals were only 315×420 (fine at the
+   old smaller display size, but the user wanted the covers themselves bigger, which would have
+   started upscaling/pixelating those). User supplied full-res exports (2476×3300,
+   `~/Documents/branding/portadas/principal_000N_...jpg`, generic Photoshop export names with no
+   indication of which cover was which — matched each to its `editorial/<key>/` slot by opening
+   and reading the actual cover art/title on each one); resized to 800px wide (`Pillow`, quality
+   85) since that's plenty for both the coverflow display and the project-modal's larger view
+   (`width:min(760px,96vw)`), landing at 130-250KB each. `.mag-cover` went `224×316` → `320×427`
+   (mobile: `150×212` → `190×253`), `.coverflow-stage`'s height clamp widened
+   `clamp(420px,50vw,560px)` → `clamp(460px,52vw,620px)` to keep the taller covers from crowding
+   the stage's top/bottom edge. **Verification gotcha hit here:** the dev server's `<img>` tags
+   kept showing the *old* 315×420 dimensions in `naturalWidth`/`naturalHeight` checks even across
+   a fresh tab and a `Cmd+Shift+R` hard-refresh keystroke (the latter doesn't reach the actual
+   browser chrome in this tool, it just goes to the page) — turned out to be pure browser
+   HTTP-cache staleness for that exact URL, not a real bug: `fetch(url, {cache:'no-store'})` and a
+   `new Image()` with a `?v=` cache-busting query both confirmed the server was serving the
+   correct new file the whole time. **How to apply:** if a replaced image file seems to not be
+   taking effect in this dev-preview tool, verify via a cache-busted fetch/`Image()` before
+   assuming the file swap or deploy failed — the on-disk/server state may already be correct.
 5. **Process** (`#process`) — 4-step process (Briefing → Team Assembly → Production → Retouch &
    Deliver). Each `.process-row` inverts on hover (added 2026-08-25) — dark `var(--ink)`
    background, title goes `var(--paper)`, the number goes `var(--accent)`, description goes
