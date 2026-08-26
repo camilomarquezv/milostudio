@@ -233,6 +233,17 @@ markup doesn't matter to them).
    `Preset640x480` if `PresetMediumQuality`'s ~480px-tall output looks soft for the source's own
    resolution), copy to `images/campaigns/<key>/hover.mp4`, and add `<key>: 'images/campaigns/<key>/hover.mp4'`
    to the `campaignHoverVideos` map instead of `campaignHoverKeys`.
+   **Mobile fallback, 2026-08-26:** touch devices can't hover, so the gif/video would otherwise
+   never be seen — under `(hover:none)` (checked live inside `scheduleCampaignHoverReveal()`, not
+   cached at parse time, so it reflects the real device rather than whatever the media condition
+   happened to read at load), the static photo shows first and a 2s `setTimeout` then adds a
+   `.show-hover` class (`.campaign-stage.show-hover .tile-hover-gif{opacity:1}`, alongside the
+   existing `:hover` rule) to cross-fade in the gif/video automatically. The timer resets on every
+   `renderCampaignSlide()` call (scroll, dot click, arrow click, lang change) so switching slides
+   before the 2s elapses doesn't leave a stale reveal from the previous one. Desktop keeps the
+   plain CSS `:hover` behavior untouched. Same `(hover:none)` check the retouching before/after's
+   own mobile auto-loop uses (item 7) and the cursor trail uses (below) — this is now the site's
+   established way to handle hover-only content on touch.
 4. **Editorial** (`#work`) — 3D "coverflow" carousel (CSS `rotateY`/`translateZ`, no library) of
    7 magazine covers (Penida, Elegant, Imirage, Shuba, Scorpio Vin, MOB, Tag). Click a side cover
    to center it; click the centered one to open the project modal. The section head only has the
@@ -411,19 +422,62 @@ markup doesn't matter to them).
    its `before.jpg`/`after.jpg` names, unrenamed). **Mobile auto-loop, 2026-08-26:** touch
    devices can't hover, so the after layer would otherwise just sit frozen invisible — under
    `@media (hover:none)` (same feature check the cursor trail already uses, see below) `.hc-hover`
-   instead gets `animation: hoverCompareLoop 7s ease-in-out infinite` (hold before → fade to after
+   instead gets `animation: hoverCompareLoop 4.5s ease-in-out infinite` (originally 7s, sped up the
+   same day per feedback) (hold before → fade to after
    → hold after → fade back), skipped automatically by the sitewide
    `prefers-reduced-motion: reduce` override at the top of `<style>` (forces
    `animation-duration:0.001ms` on everything) rather than needing its own check. `getProjectOrder()`
    (the "Next Project" button's cycle, see item 9) does **not** include `'retouching'` — it's a
    service illustration, not a portfolio piece, so it's reachable only via the expand button, not
-   the cross-portfolio next/prev flow. The other 2 folders (`images/services/photography|creative_direction/`) are
-   still empty, ready the same way if photos show up for those too. The section head's copy was
+   the cross-portfolio next/prev flow. The section head's copy was
    also fixed from "Two things we
    do really well" to "Four things" — there have always been 4
    cards. Also: `#heroContent`'s padding is now `clamp(20px,3vh,36px)` on *both* top and bottom
    (was top-only) — the bottom half used to stack with `#work`'s own top padding and leave a large
    empty gap below the brand marquee.
+   **All 4 slides have real visuals now, 2026-08-26:** `#serviceVisual` gained a second element,
+   `#serviceVideo` (`<video muted loop playsinline preload="none">`, sharing the same
+   `.service-visual img, video{width:100%;height:100%;object-fit:cover;...}` sizing rule as the
+   about-section video), toggled by a new `servicesData[i].video` field alongside the existing
+   `.img` — `renderServiceSlide()` shows/hides+plays/pauses whichever one the active slide sets, or
+   hides `#serviceVisual` entirely if neither is set. `serviceVisual.style.cursor` is now set
+   explicitly per slide (`pointer` only if `.projectKey` is set, `default` otherwise) — added when
+   this stopped being a safe assumption, since a video slide gives no click affordance. Photography
+   & Creative Direction (previously the two empty "ready if photos show up" folders) and E-Commerce
+   (previously reused `images/campaigns/fila/01.jpg`, per item 3's Fila-move note — now replaced,
+   not reused; Fila's `projectData` entry is untouched and still reachable via the project modal's
+   Next Project cycle, just no longer has a direct click-through anywhere) each got a real looping
+   BTS clip:
+   - **Photography** (`images/services/photography/production.mp4`, 720×960/~2MB): two source
+     clips concatenated into one (a studio lighting-setup shot + a retouch-monitor session) — no
+     tool on this machine can concat video directly (`avconvert` transcodes one clip at a time,
+     no multi-input support), so it's done with `PyAV` (`pip install av` — its wheel bundles
+     libx264, no system ffmpeg needed): decode both sources frame-by-frame with a shared
+     `av.open(..., mode='w')` output container, mux every frame into one continuous stream. **Both
+     source clips were landscape-encoded with a 90°-rotation display-matrix flag** (iPhone videos
+     recorded in portrait store the raw sensor frame as landscape + a "please rotate on playback"
+     flag) — `mdls`'s `kMDItemPixelHeight/Width` reports the *display* (rotated) size, PyAV's raw
+     `frame.to_image()` reports the *encoded* (unrotated) size; confirmed which was which by
+     decoding one frame and eyeballing it (sideways = still needs rotating), then
+     `Image.rotate(-90, expand=True)` (90° clockwise) on every decoded frame before muxing. **How
+     to apply:** if `mdls` and a PyAV/ffprobe-style tool disagree on a video's width/height for
+     an iPhone-sourced clip, that mismatch itself is the tell — trust `mdls` (or any player) as
+     the real displayed orientation and rotate raw decoded frames to match, don't assume one tool
+     is simply wrong.
+   - **Creative Direction** (`images/services/creative_direction/creative-direction.mp4`,
+     576×1024/1.6MB): single clip, already correctly oriented on decode (no rotation flag this
+     time) — just re-muxed through `avconvert --preset PresetHighestQuality` for a consistent
+     faststart-enabled file, no PyAV frame-copy needed since there's nothing to concatenate.
+   - **E-Commerce & Catalog** (`images/services/ecommerce/ecommerce.mp4`, 540×960/4.5MB): source
+     was a single 4K HEVC clip (3840×2160 encoded, 20MB/8.2s) with the same landscape+rotation-flag
+     situation as the Photography clips — but since this one didn't need concatenation, it went
+     straight through `avconvert --preset Preset960x540` instead of PyAV. **`avconvert`
+     (AVFoundation) reads the rotation display-matrix correctly and bakes it into the output
+     automatically** — confirmed the *output* file's encoded dimensions came out already-portrait
+     (540×960, not 960×540) with no manual rotation step needed. **How to apply:** the manual
+     PyAV frame-rotation trick above is only necessary when hand-decoding/re-muxing frame-by-frame
+     (i.e. for a concat, which PyAV must do manually); a straight single-file `avconvert` pass
+     never needs it, since AVFoundation already respects the metadata.
 8. **Team Builder** (`#team-builder`) — interactive: click role chips (Photographer, Stylist,
    MUA, Casting, Producer, Retoucher, Motion/Video, Set Design) to build a live "team" string.
    A **"Get a Quote"/"Cotizar" button** (`#quoteBtn`, added 2026-08-25) appears in the output box
@@ -504,6 +558,19 @@ markup doesn't matter to them).
   **Trade-off worth knowing:** this does remove the ability for low-vision visitors to pinch-zoom
   the page to read text — acceptable here since the trigger was a real, reproducible visual bug,
   but flag it if the user ever asks about accessibility compliance later.
+  **The meta-tag block alone stopped actually working, fixed 2026-08-26:** user hit the exact same
+  broken-layout-when-zoomed bug again on a real phone. Root cause: **iOS Safari has ignored
+  `maximum-scale`/`user-scalable=no` since iOS 10** (a deliberate Apple accessibility decision, not
+  a regression here) — the meta tag was never really blocking zoom on current iOS, it just
+  happened not to get tested with an actual pinch gesture until now. Reinforced with two things
+  Safari *does* still honor: `html{touch-action:pan-x pan-y}` (CSS — allows normal scroll panning,
+  omits `pinch-zoom` from the allowed gesture list so the browser won't zoom on that gesture) and a
+  small `<script>` first thing in `<body>` blocking `gesturestart`/`gesturechange` (Safari's own
+  pinch-gesture events) plus a double-tap-zoom guard (`preventDefault()` on a `touchend` landing
+  within 300ms of the previous one). **How to apply:** don't trust the viewport-meta
+  `user-scalable=no`/`maximum-scale` attributes alone to block zoom on iOS going forward — verify
+  with `getComputedStyle(document.documentElement).touchAction` instead, and always pair the meta
+  tag with the `touch-action` CSS property for any future zoom-blocking need on this site.
 
 ## Fluid type/spacing scale (2026-08-25)
 Every font-size, padding, margin, and gap in the stylesheet used to have its own per-property
