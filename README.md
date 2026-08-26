@@ -84,9 +84,13 @@ markup doesn't matter to them).
      pixelated at real size once live, so it's back to the original text ticker. The GIF file is
      still in `images/site/` (unused) in case a higher-res version shows up later; nothing
      references it now.
-3. **Campaigns** (`#campaigns`) — 10 brand campaigns (Nike, Adidas, Zegna, Valentino, Iceberg,
-   Payless, Calvin Klein, Desigual, LCI, Ray-Ban — Fila moved out to Services' E-Commerce slide,
-   see item 7). **LCI and Ray-Ban added 2026-08-25:** LCI is a set of 6 finished ad posters for
+3. **Campaigns** (`#campaigns`) — 8 brand campaigns (Nike, Adidas, Zegna, Valentino, Iceberg,
+   Payless, LCI, Ray-Ban — Fila moved out to Services' E-Commerce slide, see item 7). **Calvin
+   Klein and Desigual removed 2026-08-25** per user request — dropped from `campaignsData`, their
+   `projectData` entries deleted, and `images/campaigns/calvin_k/`+`desigual/` removed entirely
+   (nothing else referenced them; the hero marquee's "Calvin Klein" text is a separate decorative
+   brand-name ticker, untouched, not tied to an actual case-study project). **LCI and Ray-Ban
+   added 2026-08-25:** LCI is a set of 6 finished ad posters for
    an education program (`images/campaigns/lci/`, cover = the brand-wide "Your Creativity, Your
    Rules." shot rather than any single program poster, since it's the least tied to one specific
    course); Ray-Ban is a 3-photo Ray-Ban × Meta smart-glasses shoot (`images/campaigns/rayban/`)
@@ -276,18 +280,21 @@ markup doesn't matter to them).
    Deliver). Each `.process-row` inverts on hover (added 2026-08-25) — dark `var(--ink)`
    background, title goes `var(--paper)`, the number goes `var(--accent)`, description goes
    `var(--mist)`. The row uses a negative-margin/matching-padding trick
-   (`margin:0 clamp(-20px,-3vw,-32px)` cancelling `padding:1.7rem clamp(20px,3vw,32px)`) so the
+   (`margin:0 -1.7rem` cancelling `padding:1.7rem`, both flat values since the fluid-scaling
+   refactor — see "Fluid type/spacing scale" below) so the
    hover background bleeds full-width to `.process-list`'s own edge instead of stopping at the
    row's normal content width.
 6. **About** (`#about`) — dark section, studio bio + 3 stats, B&W behind-the-scenes photo.
    **Stats count up on scroll (added 2026-08-25):** `#statRow`'s three `.stat-num` spans
    (`data-target="10+"`, `"20+"`, `"2"`) start at `"00"` in the HTML and animate up via
-   `requestAnimationFrame` (ease-out cubic, 900ms) the first time `#statRow` scrolls into view — a
+   `requestAnimationFrame` (ease-out cubic) the first time `#statRow` scrolls into view — a
    dedicated `IntersectionObserver` (threshold 0.12, same as the site's generic `.reveal` one, but
    separate since this one runs a counting animation instead of toggling a class). The three are
-   staggered 250ms apart (`setTimeout(() => animateCount(el, 900), i * 250)`) rather than starting
-   together, so they land in sequence — 10+ first, then 20+, then 2 — instead of all finishing at
-   once. Numbers pad to 2 digits mid-count (`"07"`, not `"7"`) and snap to the exact original text
+   staggered rather than starting together, so they land in sequence — 10+ first, then 20+, then 2
+   — instead of all finishing at once. **Slowed down same day** — user said the original pace
+   (900ms count, 250ms stagger) felt too fast: `setTimeout(() => animateCount(el, 3000), i * 400)`
+   now, so each count takes 3s and the next one starts 400ms after the previous. Numbers pad to 2
+   digits mid-count (`"07"`, not `"7"`) and snap to the exact original text
    (`"10+"`, with the `+`) on the final frame rather than relying on the animated math to land
    precisely on it. Skips straight to the final values under `prefers-reduced-motion: reduce`.
    **Gotcha hit while testing:** `requestAnimationFrame` doesn't advance in a backgrounded/
@@ -489,8 +496,9 @@ images/
   editorial/<key>/ — 01.jpg, 02.jpg, ... per magazine cover (penida, elegant, imirage, shuba,
                       scorpiovin, mob, tag)
   campaigns/<key>/ — 01.jpg, 02.jpg, ... per brand (nike, adidas, zegna, valentino, iceberg,
-                      payless, calvin_k, desigual, lci, rayban, fila) — fila's 01.jpg is now used
-                      by the Services E-Commerce slide instead of the campaigns slider, see below
+                      payless, lci, rayban, fila) — fila's 01.jpg is now used by the Services
+                      E-Commerce slide instead of the campaigns slider, see below. calvin_k and
+                      desigual were removed 2026-08-25 (folders deleted, not just unlinked)
 ```
 
 Clicking an editorial cover or a campaign tile opens `#projectModal`, which now renders a
