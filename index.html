@@ -89,7 +89,7 @@
   .burger span{width:22px; height:2px; background:var(--ink);}
 
   /* ===== SCROLL-PINNED HERO ===== */
-  .hero-pin{position:relative; padding:0;} /* height set in JS to match .hero-stage's natural (content-fit) height plus a fixed scroll-scrub distance — see sizeHeroPin() */
+  .hero-pin{position:relative; padding:0; background:var(--paper);} /* height set in JS to match .hero-stage's natural (content-fit) height plus a scroll-scrub distance — see sizeHeroPin(). background matches .hero-stage's own so the body's dot-grid doesn't show through the scroll-room gap below the sticky stage — that gap is real (needed for the frame-scrub distance) but looked like an unstyled rendering gap without this, especially on mobile where the whole pin can fit within one screen at scrollY 0 */
   .hero-stage{
     position:sticky; top:0; overflow:hidden;
     display:flex; align-items:flex-start; justify-content:center;
@@ -113,12 +113,12 @@
   }
   .hero-content h1 em{font-style:italic; font-weight:500; color:var(--slate);}
   .hero-content p{font-size:1.08rem; line-height:1.55; color:var(--slate); max-width:44ch; margin:1.1rem auto 0;}
-  .hero-cta-row{display:flex; gap:0.8rem; margin-top:1.6rem; justify-content:center; flex-wrap:wrap;}
   .btn{display:inline-flex; align-items:center; gap:0.5em; padding:13px 24px; font-size:0.85rem; font-weight:700; border-radius:2px; border:1.5px solid var(--ink); transition:all 0.2s ease;}
   .btn-solid{background:var(--ink); color:var(--paper);}
   .btn-solid:hover{background:var(--accent); border-color:var(--accent);}
   .btn-outline{background:transparent; color:var(--ink);}
   .btn-outline:hover{background:var(--ink); color:var(--paper);}
+  .hero-cta-row{display:flex; gap:0.8rem; margin-top:1.6rem; justify-content:center; flex-wrap:wrap;}
 
   .scroll-cue{
     position:absolute; bottom:32px; left:50%; transform:translateX(-50%);
@@ -493,15 +493,15 @@
       <h1 data-i18n-html="hero.h1">Full-service <em>fashion</em> production &amp;<br>retouching.</h1>
       <p data-i18n="hero.p">MILO Studio assembles the stylists, casting, and retouchers your campaign needs — one brief, one accountable team.</p>
       <div class="hero-cta-row">
-        <a href="#work" class="btn btn-solid" data-i18n="hero.cta1">See the Work</a>
-        <a href="#contact" class="btn btn-outline" data-i18n="hero.cta2">Start a Project</a>
+        <a href="#campaigns" class="btn btn-solid" data-i18n="hero.cta1">See the Work</a>
+        <a href="#team-builder" class="btn btn-outline" data-i18n="nav.buildTeam">Build a Team</a>
       </div>
     </div>
   </div>
   <div class="marquee-band hero-marquee">
     <div class="marquee-track">
-      <span>Nike</span><span>Adidas</span><span>Zegna</span><span>Valentino</span><span>Ferragamo</span><span>Calvin Klein</span><span>Kenzo</span><span>Sisley</span><span>Ray-Ban</span><span>Dafiti</span><span>Hawkers</span><span>Iceberg</span>
-      <span>Nike</span><span>Adidas</span><span>Zegna</span><span>Valentino</span><span>Ferragamo</span><span>Calvin Klein</span><span>Kenzo</span><span>Sisley</span><span>Ray-Ban</span><span>Dafiti</span><span>Hawkers</span><span>Iceberg</span>
+      <span>Nike</span><span>Adidas</span><span>Zegna</span><span>Valentino</span><span>Ferragamo</span><span>Calvin Klein</span><span>Sisley</span><span>Ray-Ban</span><span>Dafiti</span><span>Hawkers</span><span>Iceberg</span><span>HH Global</span><span>Google</span><span>Le Collezioni</span>
+      <span>Nike</span><span>Adidas</span><span>Zegna</span><span>Valentino</span><span>Ferragamo</span><span>Calvin Klein</span><span>Sisley</span><span>Ray-Ban</span><span>Dafiti</span><span>Hawkers</span><span>Iceberg</span><span>HH Global</span><span>Google</span><span>Le Collezioni</span>
     </div>
   </div>
 </section>
@@ -675,7 +675,7 @@
   <div class="wrap">
     <div class="about reveal" style="padding:2.8rem;">
       <div class="about-grid">
-        <video src="images/site/about-bts.mp4" poster="images/site/about-bts.jpg" autoplay muted loop playsinline aria-label="MILO Studio behind the scenes"></video>
+        <img src="images/site/about-bts.gif" alt="MILO Studio behind the scenes">
         <div>
           <span class="eyebrow" style="color:var(--mist);" data-i18n="about.eyebrow">The Studio</span>
           <h2 style="margin-top:0.8rem;" data-i18n="about.h2">One decade. One point of contact. A full crew behind it.</h2>
@@ -832,7 +832,6 @@
     'hero.p': {en:'MILO Studio assembles the stylists, casting, and retouchers your campaign needs — one brief, one accountable team.', es:'MILO Studio reúne a los estilistas, el casting y los retocadores que tu campaña necesita — un solo brief, un equipo responsable.'},
     'hero.scroll': {en:'Scroll', es:'Desplázate'},
     'hero.cta1': {en:'See the Work', es:'Ver el Trabajo'},
-    'hero.cta2': {en:'Start a Project', es:'Inicia un Proyecto'},
 
     'about.eyebrow': {en:'The Studio', es:'El Estudio'},
     'about.h2': {en:'One decade. One point of contact. A full crew behind it.', es:'Una década. Un solo punto de contacto. Todo un equipo detrás.'},
@@ -969,7 +968,6 @@
   // wordmark). Preloaded once so swapping .src during scroll is instant, no flicker. The logo
   // stays put once assembled — no blur/fade-out; the headline reveals in the section below it.
   const HERO_FRAME_COUNT = 20;
-  const HERO_SCROLL_ROOM = 420; // px of scroll dedicated to the frame-scrub, independent of viewport size
   const heroFrames = [];
   for(let i = 1; i <= HERO_FRAME_COUNT; i++){
     const img = new Image();
@@ -977,12 +975,21 @@
     heroFrames.push(img);
   }
 
+  // Scroll room dedicated to the frame-scrub, as a fraction of viewport height instead of a flat
+  // px value (was a flat 420px, independent of viewport size) — that read fine on desktop but
+  // left a long stretch of pinned empty space after the logo finished assembling on short mobile
+  // viewports, since 420px eats a much bigger share of a phone screen's height than a laptop's.
+  // Recomputed on every resize (sizeHeroPin() already re-runs there).
+  function heroScrollRoom(){
+    return clamp(window.innerHeight * 0.22, 90, 340);
+  }
+
   // .hero-stage is sized by its own content (padding + the logo's natural aspect ratio), not a
   // fixed 100vh, so there's no dead space below a logo that's shorter than the viewport. .hero-pin
-  // just needs to be exactly that height plus HERO_SCROLL_ROOM for the sticky release timing (and
+  // just needs to be exactly that height plus heroScrollRoom() for the sticky release timing (and
   // this update()'s progress math) to line up.
   function sizeHeroPin(){
-    heroPin.style.height = (heroStage.offsetHeight + HERO_SCROLL_ROOM) + 'px';
+    heroPin.style.height = (heroStage.offsetHeight + heroScrollRoom()) + 'px';
   }
 
   // Plays once on load so a visitor who never scrolls still sees the logo assemble instead of a
@@ -1455,7 +1462,7 @@
   // display:none by default and only shown for slides with an `img` set below.
   const servicesData = [
     {key: 'service1', folder: 'images/services/retouching', compareBefore: 'images/services/retouching/before.jpg', compareAfter: 'images/services/retouching/after.jpg', compareProjectKey: 'retouching'},
-    {key: 'service2', folder: 'images/services/photography', video: 'images/services/photography/production.mp4'},
+    {key: 'service2', folder: 'images/services/photography', img: 'images/services/photography/production.gif'},
     {key: 'service3', folder: 'images/services/creative_direction', video: 'images/services/creative_direction/creative-direction.mp4'},
     {key: 'service4', folder: 'images/services/ecommerce', video: 'images/services/ecommerce/ecommerce.mp4'},
   ];
