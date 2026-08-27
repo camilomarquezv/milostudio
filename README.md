@@ -40,9 +40,17 @@ markup doesn't matter to them).
      `padding-bottom` + the logo's natural rendered height from its `width:min(78vw,980px)`), not
      a flat `100vh`, specifically so there's no dead space below a short logo on tall viewports.
      Because of that, `.hero-pin`'s height is set in JS (`sizeHeroPin()`, in the hero-pin
-     `<script>` block) to `.hero-stage`'s measured height + a fixed `HERO_SCROLL_ROOM` (420px) of
-     scroll-scrub distance, re-run on resize and on the logo image's `load` event — **don't** put
-     a height back on `.hero-pin` or `.hero-stage` in CSS, it'll fight this. `.hero-stage` also has
+     `<script>` block) to `.hero-stage`'s measured height + `heroScrollRoom()` of scroll-scrub
+     distance, re-run on resize and on the logo image's `load` event — **don't** put
+     a height back on `.hero-pin` or `.hero-stage` in CSS, it'll fight this.
+     **`heroScrollRoom()` is viewport-relative, fixed 2026-08-26** (was a flat 420px) —
+     `clamp(innerHeight*0.22, 90px, 340px)` — the flat value read fine on desktop but on a short
+     phone screen left a long stretch of pinned empty space below the logo before the headline
+     appeared, since 420px eats a much bigger share of a phone's viewport height than a laptop's.
+     Same commit also gave `.hero-pin` itself `background:var(--paper)` (previously only
+     `.hero-stage` had it) — the scroll-room gap sits *outside* `.hero-stage`'s own box, so the
+     body's dot-grid was bleeding through specifically in that gap, which read as an unstyled
+     rendering glitch rather than intentional space. `.hero-stage` also has
      `background:var(--paper)` — the **same** flat color as the body's own base tone — specifically
      to override the generic `section{padding:...}` rule (every `<section>` gets padding, including
      this one, which used to leave a gap between the fixed header and the sticky stage where the
@@ -83,7 +91,19 @@ markup doesn't matter to them).
      (`images/site/brand-marquee.gif`, added then reverted same day, 2026-08-25) — looked too
      pixelated at real size once live, so it's back to the original text ticker. The GIF file is
      still in `images/site/` (unused) in case a higher-res version shows up later; nothing
-     references it now.
+     references it now. **Brand list updated 2026-08-26:** removed Kenzo, added HH Global, Google,
+     Le Collezioni (both duplicated `<span>` rows, for the seamless loop — keep them in sync if
+     the list changes again).
+     **CTA row removed then restored, 2026-08-26 (same day, two rounds):** first removed both
+     hero buttons entirely per feedback. Put back later the same day with different targets than
+     before — `hero.cta1`("See the Work") now points at `#campaigns` instead of `#work`
+     (lands on Nike, since it's index 0 in `campaignsData`, no extra JS needed), and the second
+     button dropped its own `hero.cta2` key entirely in favor of reusing `nav.buildTeam`'s text
+     verbatim (`data-i18n="nav.buildTeam"`), pointing at `#team-builder` instead of `#contact` — if
+     that section's translation copy ever changes, this button's label follows automatically since
+     they share one key. Briefly tried a pill shape (`border-radius:100px`, matching
+     `.lang-toggle`/`.whatsapp-cta`) per request, reverted to the standard squared `.btn` corners
+     in the same sitting.
 3. **Campaigns** (`#campaigns`) — 8 brand campaigns (Nike, Adidas, Zegna, Valentino, Iceberg,
    Payless, LCI, Ray-Ban — Fila moved out to Services' E-Commerce slide, see item 7). **Calvin
    Klein and Desigual removed 2026-08-25** per user request — dropped from `campaignsData`, their
@@ -328,6 +348,12 @@ markup doesn't matter to them).
    `-rw-r--r--` perms — likely a Sensitive-Content/data-protection flag from how the file arrived
    on the Mac) that widened to blocking all of `~/Downloads` shortly after; resolved by the user
    re-saving the file under `~/Documents/branding/` instead, which this tool could already read.
+   **Swapped for a GIF, 2026-08-26:** `.about-grid`'s child is now
+   `<img src="images/site/about-bts.gif" alt="...">` — same "static base, grainy quantized" look
+   the campaign tile hover-gifs already use (260px wide, 64-color palette, no dither, ~10fps),
+   built straight from `about-bts.mp4` via PyAV+Pillow. `about-bts.mp4`/`.jpg` are both unused now
+   but left on disk. The `.about img, .about video{...}` shared rule from the video swap above
+   still applies fine to the `<img>` alone — no CSS change needed.
    **Stats count up on scroll (added 2026-08-25):** `#statRow`'s three `.stat-num` spans
    (`data-target="10+"`, `"20+"`, `"2"`) start at `"00"` in the HTML and animate up via
    `requestAnimationFrame` (ease-out cubic) the first time `#statRow` scrolls into view — a
@@ -463,7 +489,9 @@ markup doesn't matter to them).
      to apply:** if `mdls` and a PyAV/ffprobe-style tool disagree on a video's width/height for
      an iPhone-sourced clip, that mismatch itself is the tell — trust `mdls` (or any player) as
      the real displayed orientation and rotate raw decoded frames to match, don't assume one tool
-     is simply wrong.
+     is simply wrong. **Swapped for a GIF the next day (2026-08-26)** — same B&W hover-gif look as
+     the About video and campaign tiles: `production.gif` (built from `production.mp4`), and
+     `servicesData[1]` now sets `.img` instead of `.video`. The `.mp4` is unused but left on disk.
    - **Creative Direction** (`images/services/creative_direction/creative-direction.mp4`,
      576×1024/1.6MB): single clip, already correctly oriented on decode (no rotation flag this
      time) — just re-muxed through `avconvert --preset PresetHighestQuality` for a consistent
@@ -478,6 +506,16 @@ markup doesn't matter to them).
      PyAV frame-rotation trick above is only necessary when hand-decoding/re-muxing frame-by-frame
      (i.e. for a concat, which PyAV must do manually); a straight single-file `avconvert` pass
      never needs it, since AVFoundation already respects the metadata.
+   **All videos on this site are silent by design** (every `<video>` element is `muted`) — but
+   several source files still carried an unused audio track from the original phone recording.
+   Stripped 2026-08-26 (`about-bts.mp4`, `campaigns/rayban/hover.mp4`, `ecommerce.mp4`,
+   `creative-direction.mp4`) via a PyAV stream-copy remux — demux the video packets only and mux
+   them into a fresh container with no audio stream, no decode/re-encode of the video itself, so
+   quality and file size are effectively untouched (just minus the audio track's own weight).
+   `add_stream_from_template()` is the PyAV call for this — plain `add_stream(codec_name)` won't
+   copy an existing stream's codec params for you. **How to apply:** if a future video for this
+   site arrives with audio, strip it the same way before it ever gets wired in — there's no reason
+   for any video here to carry a track that will never play.
 8. **Team Builder** (`#team-builder`) — interactive: click role chips (Photographer, Stylist,
    MUA, Casting, Producer, Retoucher, Motion/Video, Set Design) to build a live "team" string.
    A **"Get a Quote"/"Cotizar" button** (`#quoteBtn`, added 2026-08-25) appears in the output box
