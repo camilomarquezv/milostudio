@@ -27,6 +27,20 @@ markup doesn't matter to them).
 1. **Header/Nav** — logo, links (Services, Build a Team, Editorial, Studio, Start a Project),
    language toggle button (`#langToggle`). Nav link order was NOT changed in the reorder — it's
    still Services → Build a Team → Editorial → Studio, which no longer matches page order below.
+   **Mobile menu (`#navLinks`, `@media max-width:860px`) had a real sizing bug, fixed 2026-08-26:**
+   sized via `top:60px; bottom:0` with no explicit `height` — computed to a ~64px box instead of
+   filling the screen below the header (confirmed via `getBoundingClientRect()`, reproducible on
+   a fresh load, not a preview-tool artifact — isolated by bisecting properties on a synthetic
+   clone until only the real element still showed it, root cause never fully pinned down beyond
+   "this browser doesn't reliably auto-size top+bottom on this exact element"). Since the panel
+   was too short, page content behind/below it showed through and visually overlapped the nav
+   links — looked unreadable, which is what got reported, not a transparency issue. Fixed with an
+   explicit `height:calc(100vh - 60px)` instead of relying on `top`+`bottom` alone. **How to
+   apply:** don't trust implicit top+bottom-implies-height sizing on a `position:fixed` element in
+   this codebase without spot-checking `getBoundingClientRect()` — set an explicit `height` if
+   anything looks short. Also swapped the flat `var(--paper)` fill for a frosted-glass look
+   (`rgba(242,244,245,0.92)` + `backdrop-filter:blur(18px)`, same recipe as `header{}`'s own glass
+   effect) plus a drop shadow on the panel edge, per a direct request for that look.
 2. **Hero, split into two sections** (redesigned 2026-08-24 — used to be one pinned section with
    a blur/fade transition into a floating glass-panel headline; that's gone):
    - **Logo header** (`#heroPin` → `.hero-stage`, `position:sticky`): scroll-scrubs through
@@ -264,6 +278,13 @@ markup doesn't matter to them).
    plain CSS `:hover` behavior untouched. Same `(hover:none)` check the retouching before/after's
    own mobile auto-loop uses (item 7) and the cursor trail uses (below) — this is now the site's
    established way to handle hover-only content on touch.
+   **`.section-head .desc` moved under the heading instead of floating far-right, 2026-08-26:**
+   user found the full-size paragraph sitting on the opposite side of the row from the `h2`
+   distracting ("me molesta"). Moved the `<p class="desc">` into the h2's own `<div>` (right after
+   it) and added a `.campaigns-desc` class (`max-width:38ch; font-size:0.85rem; margin-top:0.7rem`)
+   scoped to just this instance — `.section-head .desc`'s shared rule (`1.03rem`, no margin) is
+   untouched since Services and Team Builder still use the original side-by-side `.section-head`
+   layout and weren't part of the complaint.
 4. **Editorial** (`#work`) — 3D "coverflow" carousel (CSS `rotateY`/`translateZ`, no library) of
    7 magazine covers (Penida, Elegant, Imirage, Shuba, Scorpio Vin, MOB, Tag). Click a side cover
    to center it; click the centered one to open the project modal. The section head only has the
@@ -322,6 +343,13 @@ markup doesn't matter to them).
    cropped duplicate of another frame missing its magazine logo/page number respectively) —
    removed from `projectData[key].images`; the now-orphaned `mob/01.jpg` file is left on disk
    unused rather than deleted.
+   **`.editorial-intro .lead` was sitting well below the heading, fixed 2026-08-26:**
+   `.editorial-intro{align-items:end}` bottom-aligned its two grid columns (`.lead` and the
+   7-line numbered `.editorial-index` list) — since the index list runs longer than `.lead`'s 3
+   lines, bottom-aligning pushed `.lead`'s *top* edge down to match, well below the `h2` instead
+   of starting right under it. Switched to `align-items:start`. **How to apply:** a
+   `align-items:end`/bottom-aligned CSS grid with unevenly-tall columns will always do this —
+   default to `start` unless bottom-alignment is specifically the intent.
 5. **Process** (`#process`) — 4-step process (Briefing → Team Assembly → Production → Retouch &
    Deliver). Each `.process-row` inverts on hover (added 2026-08-25) — dark `var(--ink)`
    background, title goes `var(--paper)`, the number goes `var(--accent)`, description goes
@@ -564,11 +592,29 @@ markup doesn't matter to them).
    through) — treat DOM measurement as ground truth over a screenshot on this specific page; see
    [[feedback_browser_preview_heavy_page]].
 10. **Contact** (`#contact`) — dark panel, email + WhatsApp, no form (previously had a form but
-    it wasn't wired to anything, so it was replaced with direct contact info)
+    it wasn't wired to anything, so it was replaced with direct contact info).
+    **Horizontal overflow on mobile in Spanish, fixed 2026-08-26:** `contact.h2`'s ES copy
+    ("Cuéntanos qué estás construyendo.") runs a longer unbroken word than the EN copy
+    ("construyendo" vs "building") — CSS grid items default to `min-width:auto`, so that one long
+    word (or the WhatsApp pill's own `width:fit-content`) forced `.contact-grid`, and with it the
+    whole card and page, wider than the viewport instead of wrapping; language-specific because
+    the EN copy never happened to hit that threshold. Fixed with `.contact-grid > div{min-width:0}`
+    (lets grid items shrink below their content's intrinsic width, so wrapping/breaking takes over
+    instead of forcing the track wider) plus `overflow-wrap:break-word` on `.contact h2` as a
+    backstop. Also moved `.contact`'s padding out of an inline `style=""` into the CSS class so it
+    could get a `@media(max-width:800px)` override (`2.8rem`→`1.8rem`, `h2` `2.9rem`→`2.1rem`,
+    `.whatsapp-cta`/`.whatsapp-cta-number` sized down too) — was already tight on mobile even
+    without the overflow bug. **How to apply:** `min-width:0` on grid/flex items is the general fix
+    whenever a CSS Grid or flexbox track won't shrink below some child's content — reach for it
+    before trying to trim copy length or guess at font-size, since it fixes the *class* of bug
+    regardless of exactly how long a future translation string turns out to be.
 11. **Footer** — nav links + Behance + tagline. `background:var(--paper-dim)` (added 2026-08-25,
     user wanted it "a bit darker, no grid") — an explicit opaque background paints over the
     body's dot-grid pattern that otherwise shows through every section without its own
     background-color. Reuses the same token `#team-builder` already uses, rather than a new color.
+    **Behance "↗" arrow removed everywhere, 2026-08-26** (footer link, and the modal's
+    `behance.full`/`behance.more` translation strings) — user said it read as an emoji, not a
+    typographic arrow, and didn't like it "en todas partes." Plain "Behance" text now.
 
 ## Design system
 - Palette (CSS vars near top of `<style>`): `--ink:#161B22 --slate:#3C4A57 --steel:#6E7F8D
