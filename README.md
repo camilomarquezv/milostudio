@@ -24,10 +24,33 @@ longer matches page order. The physical `<section>` blocks were reshuffled direc
 `index.html`; none of the `<script>` blocks needed to move since all of them already live after
 every section, at the bottom of `<body>` (they look up elements by ID, so section order in the
 markup doesn't matter to them).
-1. **Header/Nav** — logo, links (Services, Build a Team, Editorial, Studio, Start a Project),
-   language toggle button (`#langToggle`). Nav link order was NOT changed in the reorder — it's
-   still Services → Build a Team → Editorial → Studio, which no longer matches page order below.
-   **Mobile menu (`#navLinks`, `@media max-width:860px`) had a real sizing bug, fixed 2026-08-26:**
+1. **Header/Nav** — logo, links, language toggle button (`#langToggle`). **Rebuilt 2026-08-27**
+   ("corrigue el headder y la hamburguesa ya que ahora hay mas elementos que navegar") — the old
+   4-link set (Services → Build a Team → Editorial → Studio) predated Campaigns and E-Commerce
+   existing as their own sections and never got a link either, so 3 of the page's 5
+   project-browsing destinations were unreachable from the nav (Campaigns had never had one at
+   all; E-Commerce didn't exist as a separate section yet when the nav was last touched). Also
+   fixed the "no longer matches page order" problem the previous entry here flagged as a known gap
+   — links now follow page order: **Campaigns → Retouching → E-Commerce → Editorial → Studio →
+   Build a Team → Start a Project**. "Services" (`nav.services`) was retired as a key, not just
+   relabeled — it pointed at `#retouching` alone, which stopped being accurate once E-Commerce
+   split out as its own section; replaced by `nav.retouching` + new `nav.ecommerce`/`nav.campaigns`
+   keys. The footer's link list had the identical staleness (still said "Services", had no
+   E-Commerce link either, though it *did* already have Campaigns — the header and footer had
+   silently drifted out of sync with each other) — updated to match: Campaigns → Retouching →
+   E-Commerce → Editorial → Contact → Behance.
+   **7 links + CTA overflowed the header between 861–950px viewport width** — the mobile breakpoint
+   (`@media max-width:860px`, where `.nav-links` becomes the slide-out drawer and `.burger`
+   appears) was tuned for the old 4-link set; measured the new content's natural width
+   (`.nav.scrollWidth` with the burger hidden) at ~950px, so anything narrower than that but still
+   above 860px had nowhere for the extra links to go — confirmed by testing at 900px (overflowed)
+   before touching anything. Raised to `max-width:1040px` (content width + buffer) — a dedicated,
+   nav-only media query block (not shared with the page's other unrelated `max-width:860px` rules
+   for `.about-grid`/`.builder-inner`), so raising it doesn't affect anything else's layout.
+   Re-verified after: 900px now correctly shows the burger with no overflow, 1280px shows the full
+   row with no overflow or wrapping, and the drawer opens with all 7 links + CTA + language toggle
+   readable at the larger mobile font size.
+   **Mobile menu (`#navLinks`, now `@media max-width:1040px`) had a real sizing bug, fixed 2026-08-26:**
    sized via `top:60px; bottom:0` with no explicit `height` — computed to a ~64px box instead of
    filling the screen below the header (confirmed via `getBoundingClientRect()`, reproducible on
    a fresh load, not a preview-tool artifact — isolated by bisecting properties on a synthetic
@@ -399,131 +422,447 @@ markup doesn't matter to them).
    row into view but doesn't front the tab will see the counters stuck at `"00"` even though the
    code is correct; front the tab (or check `document.hidden`) before concluding a counting
    animation isn't firing.
-7. **Services** (`#services`) — redesigned 2026-08-25 from a static 4-card grid into a
-   scroll-scrubbed slider (same pin pattern as the hero logo and editorial coverflow —
-   `#servicesPin` → `.services-sticky`, height computed in JS via `sizeServicesPin()` as the
-   sticky content's height + a fixed 700px `SERVICES_SCROLL_ROOM`). Scrolling advances through the
-   4 services in order (Retouching → Photography → Creative Direction → E-Commerce), each showing
-   a big number, a counter (`01 / 04`), title, description, and dot nav (click a dot to jump).
-   Text content comes straight from the existing `service1..4.title/.desc` translation keys via
-   `t()`, not `data-i18n` (the slide is JS-rendered, like the project modal). **Mostly text-only,
-   one photo (added 2026-08-25):** briefly had a `#serviceVisual` placeholder box for all 4 slides,
-   removed the same day since the user decided text-only reads fine — but the E-Commerce & Catalog
-   slide (`service4`) got a real photo back when Fila moved out of the Campaigns slider into here
-   (per user feedback — Fila's shoot reads as catalog/e-commerce work, not a brand campaign;
-   reuses the same `images/campaigns/fila/01.jpg` file, no new image asset needed). `.services-slide`
-   is a 3-column grid (`140px auto 1fr`) where the middle `#serviceVisual` column is `display:none`
-   by default and collapses to ~0 width on its own — `servicesData[i].img` (only set for
-   `service4`) toggles it to `display:block` and points `#serviceImg`'s `src` at it in
-   `renderServiceSlide()`. Clicking it opens the project modal via `servicesData[i].projectKey`
-   (`'fila'`), same `openProjectModal()` used everywhere else. **Height gotcha:** `.services-slide`
-   carries an explicit `min-height:min(46vh,380px)` matching `.service-visual`'s own height, so the
-   sticky content is the *same total height* whether or not the current slide has a photo —
-   `sizeServicesPin()` only measures once at load/resize, not per slide, so without this a taller
-   image-slide appearing later would desync the scroll math (verified: `.services-sticky`'s
-   `offsetHeight` is identical — 964px at 1280×800 — across all 4 slides).
-   **Before/after drag slider on Retouching (`service1`, added 2026-08-25):** user first sent a
-   Knight Lab Juxtapose `<iframe>` embed and wanted it "at a lower resolution so it loads fast" —
-   pointed out that's not actually possible with a third-party embed (no control over what
-   resolution Knight Lab serves), so built a native equivalent instead:
-   `#serviceCompare`/`#compareBefore`/`#compareAfter`/`#compareHandle`, same show/hide pattern as
-   `#serviceVisual` (`display:none` by default, `servicesData[0].compareBefore`/`.compareAfter`
-   toggle it). Both images are full-bleed and stacked (`position:absolute; inset:0`, both
-   `object-fit:cover`); only `#compareBefore`'s `clip-path: inset(0 <100-pct>% 0 0)` changes as
-   the handle moves — deliberately *not* the more common technique (a width-`%`-clipped wrapper
-   around a *fixed-pixel-width* inner image sized to match the full container), which needs a
-   resize listener to keep the inner image's pixel width in sync with the container or the two
-   photos drift out of alignment. `pointerdown`/`pointermove`/`pointerup` (unified mouse+touch,
-   `setPointerCapture` so drags keep tracking even if the pointer leaves the element) compute the
-   pointer's `%` position across `#serviceCompare`'s own `getBoundingClientRect()` and call
-   `setComparePosition(pct)`, which is also just called directly with `50` on every
-   `renderServiceSlide()` so the handle always starts centered. Landscape box
-   (`aspect-ratio:2/1`, `height:min(300px,38vw)`) rather than the portrait 3:4 used elsewhere,
-   since the source photos are 2:1 landscape and forcing them into a portrait crop would lose most
-   of the frame. Source photos (`DSG_Vikram_260403_Adidas_335_Hos before/after.jpg`, 3000×1500,
-   2.6–3.9MB each) resized to 1100px wide + JPEG q82 → `images/services/retouching/before.jpg` /
-   `after.jpg`, 100–148KB, in line with the rest of the site's image sizes. **Verification note:**
-   the browser preview tool's `computer` click/drag actions timed out repeatedly against this
-   element (a `computer`-tool-level issue, not a page freeze — `document.title` and other JS
-   still responded fine via `javascript_exec` immediately after each timeout); confirmed the drag
-   mechanic instead by dispatching real `PointerEvent`s (`pointerdown` → `pointermove` →
-   `pointerup`) directly and checking `#compareHandle`'s resulting position, then a screenshot
-   showing the handle visually at the expected spot — see
-   [[feedback_browser_preview_heavy_page]] for other cases of this same tool's `computer`-action
-   unreliability. **Expand button + project-modal integration, 2026-08-26:** a small circular
-   `#compareExpand` button (top-right corner of `#serviceCompare`, `.compare-expand`) opens the
-   same big project modal used everywhere else — `pointerdown` on the button calls
-   `e.stopPropagation()` before the click reaches `#serviceCompare`'s own `pointerdown` listener,
-   otherwise the drag-to-compare handler would also fire and jump the divider right as the modal
-   opens. `servicesData[0].compareProjectKey` (`'retouching'`) points at a new `projectData`
-   entry, mirroring how the plain-photo case (`service4`/Fila) already uses `.projectKey` —
-   `openProjectModal('retouching', ...)` on click. Inside the modal, `projectData.retouching` is
-   no longer a flat `images` array — it's `pairs: [{before, after, ratio}, ...]`, and
-   `openProjectModal()` branches on `project.pairs` to build one `.project-hover-compare` div per
-   pair instead of plain `<img>`s (both photos absolutely stacked inside, `object-fit:cover`,
-   `.hc-hover` opacity 0→1 on `:hover` — same cross-fade technique as the campaigns tile
-   hover-gif). `ratio` is baked into `projectData` per pair (not measured at runtime) since every
-   photo's final size was fixed at export time, so the wrapper gets an inline
-   `style="aspect-ratio:${p.ratio}"` and needs no load-wait to size correctly — unlike a plain
-   `<img>` (`width:auto`), which does. `sizeProjectTrack()`/`updateProjectScroll()` needed no
-   change beyond reading `project.pairs.length` instead of `project.images.length` for the
-   counter — they already just query `.querySelectorAll('img')` for width/centering math, and
-   that still finds both stacked images per pair correctly since each is `width:100%` of its
-   wrapper. Expanded from the original 1 pair to 6: user supplied 5 more before/after sets
-   (`~/Desktop/before and after/1..5/`), each 9–42MB (up to 7760×10328) — resized to a 1800px
-   long edge + JPEG q85 optimize/progressive, landing at 130–430KB each
-   (`images/services/retouching/before-02..06.jpg` / `after-02..06.jpg`; the original pair keeps
-   its `before.jpg`/`after.jpg` names, unrenamed). **Mobile auto-loop, 2026-08-26:** touch
-   devices can't hover, so the after layer would otherwise just sit frozen invisible — under
-   `@media (hover:none)` (same feature check the cursor trail already uses, see below) `.hc-hover`
-   instead gets `animation: hoverCompareLoop 4.5s ease-in-out infinite` (originally 7s, sped up the
-   same day per feedback) (hold before → fade to after
-   → hold after → fade back), skipped automatically by the sitewide
-   `prefers-reduced-motion: reduce` override at the top of `<style>` (forces
-   `animation-duration:0.001ms` on everything) rather than needing its own check. `getProjectOrder()`
-   (the "Next Project" button's cycle, see item 9) does **not** include `'retouching'` — it's a
-   service illustration, not a portfolio piece, so it's reachable only via the expand button, not
-   the cross-portfolio next/prev flow. The section head's copy was
-   also fixed from "Two things we
-   do really well" to "Four things" — there have always been 4
-   cards. Also: `#heroContent`'s padding is now `clamp(20px,3vh,36px)` on *both* top and bottom
-   (was top-only) — the bottom half used to stack with `#work`'s own top padding and leave a large
-   empty gap below the brand marquee.
-   **All 4 slides have real visuals now, 2026-08-26:** `#serviceVisual` gained a second element,
-   `#serviceVideo` (`<video muted loop playsinline preload="none">`, sharing the same
-   `.service-visual img, video{width:100%;height:100%;object-fit:cover;...}` sizing rule as the
-   about-section video), toggled by a new `servicesData[i].video` field alongside the existing
-   `.img` — `renderServiceSlide()` shows/hides+plays/pauses whichever one the active slide sets, or
-   hides `#serviceVisual` entirely if neither is set. `serviceVisual.style.cursor` is now set
-   explicitly per slide (`pointer` only if `.projectKey` is set, `default` otherwise) — added when
-   this stopped being a safe assumption, since a video slide gives no click affordance. Photography
-   & Creative Direction (previously the two empty "ready if photos show up" folders) and E-Commerce
-   (previously reused `images/campaigns/fila/01.jpg`, per item 3's Fila-move note — now replaced,
-   not reused; Fila's `projectData` entry is untouched and still reachable via the project modal's
-   Next Project cycle, just no longer has a direct click-through anywhere) each got a real looping
-   BTS clip:
-   - **Photography** (`images/services/photography/production.mp4`, 720×960/~2MB): two source
-     clips concatenated into one (a studio lighting-setup shot + a retouch-monitor session) — no
-     tool on this machine can concat video directly (`avconvert` transcodes one clip at a time,
-     no multi-input support), so it's done with `PyAV` (`pip install av` — its wheel bundles
-     libx264, no system ffmpeg needed): decode both sources frame-by-frame with a shared
-     `av.open(..., mode='w')` output container, mux every frame into one continuous stream. **Both
-     source clips were landscape-encoded with a 90°-rotation display-matrix flag** (iPhone videos
-     recorded in portrait store the raw sensor frame as landscape + a "please rotate on playback"
-     flag) — `mdls`'s `kMDItemPixelHeight/Width` reports the *display* (rotated) size, PyAV's raw
-     `frame.to_image()` reports the *encoded* (unrotated) size; confirmed which was which by
-     decoding one frame and eyeballing it (sideways = still needs rotating), then
-     `Image.rotate(-90, expand=True)` (90° clockwise) on every decoded frame before muxing. **How
-     to apply:** if `mdls` and a PyAV/ffprobe-style tool disagree on a video's width/height for
-     an iPhone-sourced clip, that mismatch itself is the tell — trust `mdls` (or any player) as
-     the real displayed orientation and rotate raw decoded frames to match, don't assume one tool
-     is simply wrong. **Swapped for a GIF the next day (2026-08-26)** — same B&W hover-gif look as
-     the About video and campaign tiles: `production.gif` (built from `production.mp4`), and
-     `servicesData[1]` now sets `.img` instead of `.video`. The `.mp4` is unused but left on disk.
-   - **Creative Direction** (`images/services/creative_direction/creative-direction.mp4`,
-     576×1024/1.6MB): single clip, already correctly oriented on decode (no rotation flag this
-     time) — just re-muxed through `avconvert --preset PresetHighestQuality` for a consistent
-     faststart-enabled file, no PyAV frame-copy needed since there's nothing to concatenate.
+   **Studio slider, added 2026-08-26, promoted to the main visual the same day** (`.studio-slider`)
+   — Photography & Production and Creative Direction moved here from the old Services carousel
+   (see item 7), shown as a click-to-toggle slider (`#studioPrevBtn`/`#studioNextBtn`, no
+   scroll-pin — still just 2 items, not a full browsable project set like Retouching/E-Commerce
+   get) instead of getting their own dedicated sections. `#studioSlideImg`/`#studioSlideVideo`
+   swap per click. **First landed as a small ~230px box below the stats; moved into `.about-grid`'s
+   first column the same day instead** (`aspect-ratio` `4/5`→`3/4` to better match that column's
+   proportions), replacing the static `about-bts.gif` photo that used to live there — per direct
+   feedback pointing at the small box and asking for it in the big spot instead.
+   `images/site/about-bts.gif`/`.mp4`/`.jpg` are now all unused but left on disk.
+   **Gotcha:** `.about img, .about video{filter:grayscale(1) contrast(1.05)}` (from the original
+   BTS-video swap, further up this item) is a descendant selector that would also grayscale
+   anything dropped in here, including Creative Direction's clip which is in color on purpose —
+   `.studio-slider-stage img, .studio-slider-stage video{filter:none}` overrides it back
+   (equal specificity, wins on being declared later in the stylesheet) — this still applies
+   regardless of where in the DOM `.studio-slider` itself sits, so the move didn't need a second
+   look at this rule.
+7. **Retouching** (`#retouching`) and **E-Commerce** (`#ecommerce`) — dedicated project-browsing
+   sections, split out of a 4-slide "Services" carousel that used to live here (2026-08-26,
+   direct request: "quiero dividir toda esa parte... dejemos retouching y ecommerce como un
+   contenedor de proyectos"). The old carousel's other two slides (Photography & Production,
+   Creative Direction) moved into The Studio instead — see item 6. `nav.services`/the footer's
+   Services link now point at `#retouching`, since `#services` no longer exists.
+   Both new sections **reuse the Campaigns slider's classes wholesale** —
+   `.campaigns-pin`/`.campaigns-sticky`/`.campaigns-slide`/`.campaign-num-col`/`.campaign-bignum`/
+   `.campaigns-dots`/`.campaign-stage-wrap`/`.campaign-stage`/`.campaign-info` — as a second and
+   third instance of that exact pinned single-project-at-a-time pattern (own IDs/JS per section:
+   `retouchingPin`/`ecommercePin` etc.), so no new CSS was needed for the layout itself.
+   **Watch out:** the *original* Campaigns script's `document.querySelector('.campaigns-sticky')`
+   (unscoped) still resolves correctly since it's the first such element in DOM order, but any
+   *new* code reusing these classes must scope its own queries (e.g.
+   `#retouchingPin .campaigns-sticky`) or it'll silently grab Campaigns' element instead.
+   - **Retouching** shows one *project* at a time (`retouchingProjectsData`, a plain array of
+     `{key}` pointing at `projectData` entries), each stage previewing that project's first pair.
+     **Grouped by client/category, not one flat set of 6 pairs (2026-08-26, later the same week
+     the pairs were added):** turned out the 6 before/afters were actually 3 separate shoots —
+     `retouching_adidas` (7 pairs: the original 3 plus 4 more sourced later, see below),
+     `retouching_google` (2 pairs, a Pixel product shot plus an Android plushie background
+     cleanup), `retouching_beauty` (4 pairs) — identified by re-inspecting each photo rather than
+     trusting the original folder-numbered naming, since the user's ask ("junta todo lo de adidas
+     en el primero, deja google solo, beauty solo") only makes sense once you know which photo
+     belongs to which client. The plushie pair (`before-07.jpg`/`after-07.jpg`) was sourced later
+     (2026-08-27, "busca lo mejor de google aca... https://www.behance.net/gallery/238589509/") by
+     browsing the user's own "Retouch Google Global" Behance case study: most of its images are
+     finished single shots with no raw "before," but two used an embedded JuxtaposeJS before/after
+     slider (a Google Store bag+dog product shot, and the plushie). The bag pair turned out to be
+     an exact-pixel duplicate of the already-imported `before-03`/`after-03`, so only the plushie
+     was new — pulled from the slider's underlying full-res Dropbox URLs (found via the iframe's
+     `<img>` tags, since Behance embeds JuxtaposeJS in a sandboxed `cdn.knightlab.com` iframe that
+     doesn't show up in the parent page's own `<img>` list) and resized the same way as the rest
+     (1800px long edge, JPEG q85). Two more pairs (`before-08.jpg`/`after-08.jpg`,
+     `before-09.jpg`/`after-09.jpg`) came the same way from the user's "Beauty Retouch" Behance
+     case study (2026-08-27, a bare gallery URL with no further instruction — same "find the best
+     and add it" ask as the Google one). That gallery had three JuxtaposeJS sliders; one (a
+     red-lips close-up) was again an exact-pixel duplicate of an already-imported pair
+     (`before-04`/`after-04`), so only the other two — both smoky-eye portrait crops of the same
+     shoot, frames `DSC1716`/`DSC1726` — were new. Duplicate-checking by full-resolution MD5 only
+     works when Behance re-serves the identical file; the red-lips one did, but it's not
+     guaranteed — a re-export or re-crop of an existing photo would need a visual check instead
+     (which is what caught it here, MD5 matched anyway). Four more pairs
+     (`before-10.jpg`/`after-10.jpg` through `before-13.jpg`/`after-13.jpg`) came the same way
+     from the user's "Adidas Retouch HH Global" Behance case study (2026-08-27, "has lo mismo con
+     este ignora los que ya estan"). That gallery had 7 JuxtaposeJS sliders; a contact sheet of the
+     3 already-imported pairs (built with PIL, laid out with labels) made it fast to spot 3 more
+     exact-image duplicates by eye — MD5 doesn't help here since Behance re-exports at different
+     resolutions each time a slider is embedded, so only a visual compare catches them. The 4 new
+     ones are two Nikon Z9 CMYK action shots (`H24625_SS26` — a player against black, and a
+     stadium/motion-blur composite) plus a shoe-colorway swap and a walking-woman fashion shot.
+     **CMYK gotcha:** the two Nikon shots are Adobe-CMYK JPEGs (`im.info['adobe_transform'] == 2`,
+     PIL mode `"CMYK"`) — Photoshop-exported CMYK JPEGs are conventionally described as
+     "inverted," but a naive `.convert("RGB")` on these came out correctly on inspection (a
+     photo-negative-looking cyan double-exposure only appeared when *deliberately* inverting
+     first), so no extra inversion step was needed; always eyeball a thumbnail before trusting
+     either way; the CMYK check is `im.mode == 'CMYK'` before calling `.convert('RGB')`, not just
+     always converting since RGB source images don't have that mode to begin with. Each project entry keeps its
+     own `pairs` array read directly off `projectData`, no separate parallel array, so this
+     section and the project modal's own filmstrip (see item 9) can never drift out of sync — and
+     clicking a project's stage now opens *that project's own* modal (`openProjectModal(rp.key,
+     ...)`), not one shared filmstrip of all 6. More photos per category are coming; add them to
+     the relevant `projectData.retouching_<category>.pairs` array, not a new top-level project,
+     unless it's genuinely a new client. Each stage is a plain "before" `<img>` with a stacked
+     `.tile-hover-gif`-class "after" image on top — the *exact* same class the campaign tiles'
+     hover-gif/video already uses, complete with its `(hover:none)` 2s-delay mobile fallback
+     (`scheduleRetouchingReveal()`, copy-pasted from the campaigns one rather than abstracted —
+     this codebase doesn't share sliders across sections, so a 3rd near-identical copy was the
+     consistent choice over introducing the first shared abstraction). See item 9 for the
+     source-photo rotation/compression history of these photos.
+   - **E-Commerce** started with 1 project (`ecommerceProjectsData`, the catalog BTS video) but is
+     built to take more the same way `campaignsData` does — push a `{title, video}` or
+     `{title, img}` object and it just shows up as another dot/slide. A second project,
+     `{title:'Ferragamo — Le Collezioni', img:'images/ecommerce/ferragamo/01.jpg',
+     projectKey:'ferragamo'}`, was added 2026-08-27 ("saca las imagenes de fondo blanco y ponlas
+     en un proyecto que se llame ferragamo le collezioni en e-commerce
+     https://www.behance.net/gallery/117541195/Salvatore-Ferragamo"). That gallery is a long page
+     (38 images, ~39,000px tall) mixing red-background campaign shots with plain isolated
+     product photography — since scrolling and eyeballing 38 images one at a time doesn't scale,
+     every image URL was pulled from the DOM at once and downloaded, then classified
+     programmatically by sampling each corner pixel's RGB with PIL (`all(v > 235 for v in avg)` =
+     white background); this cleanly separated the 14 white-background catalog shots (shoes, bags,
+     belt-buckle details, all 1200×1200 — Behance's own max resolution for these, confirmed by
+     probing the `fs_webp`/`source` CDN tiers, so no upscaling) from the red-background campaign
+     images and 2 website-mockup screenshots (grid layouts with pricing overlays — skipped, not
+     standalone photography). This is the first `projectData` entry using the plain `images:`
+     array (the Campaigns/Editorial pattern — see item 9) from *inside* the E-Commerce section
+     rather than Campaigns; `ecommerceStage`'s click handler already supported `projectKey` from
+     day one, so opening this as a full filmstrip modal needed zero JS changes, only the data.
+     `sub:'E-Commerce Product Photography'` is the first use of the E-Commerce slide's optional
+     `sub` line (`ecommerceSubEl`), previously always empty since Catalog Production never set one.
+   - Both size their scroll-scrub room *proportionally* (`Math.max(300, (n-1)*150)`) instead of a
+     flat px constant, so E-Commerce's early 1-item pin didn't reserve a big empty scroll zone while
+     Retouching's larger sets still get room to scrub smoothly — same instinct as the hero logo's
+     `heroScrollRoom()` fix (see item 2).
+   - **Grid layout for high-volume projects** (`projectData[key].layout === 'grid'`, added
+     2026-08-27), a general capability of the *shared* project modal (used by Campaigns,
+     Retouching, and E-Commerce alike), built for the user's "Vogue Retouch L'Oréal Colombia"
+     Behance gallery ("lo mismo con este proyecto... puedes hacer grids dentro de la pagina del
+     proyecto para que se vea igual a behance donde muchas fotos estan pequeñas acopladas") — 55
+     finished beauty/cosmetic product photos (nail polish, mascara, concealer, model beauty shots
+     for a "Vogue" nail-gel line), no before/after pairs at all. Getting the full image count
+     needed a second DOM read after the first — Behance's React app only attaches `src` to `<img>`
+     tags already scrolled near, so an immediate `querySelectorAll('img')` right after navigating
+     caught just 16 of the 55; the same query a few seconds later (page height was already
+     25,881px at first read, so nothing had to be scrolled — just re-queried) caught all of them.
+     Since the project modal's filmstrip (`.project-track`, scroll-driven `translateX`,
+     `position:sticky` pin) is built around showing one image centered at a time, 55 photos in
+     that view would be 55 screens of scrolling — the opposite of Behance's own dense, clustered
+     layout the user pointed at. So the modal now branches on `project.layout === 'grid'`:
+     `.project-modal.grid-mode` overrides `.project-track-sticky` from `position:sticky` back to
+     static block flow and `.project-track` from `display:flex` to `display:grid` with
+     `repeat(auto-fill,minmax(200px,1fr))` (`minmax(120px,1fr)` under 700px), letting the browser's
+     native grid wrap and the modal scroll vertically like a normal page instead of translateX
+     scrubbing; `sizeProjectTrack()`/`updateProjectScroll()` (the translateX-sizing/scroll-progress
+     functions) both early-return in grid mode since there's nothing left for them to size or
+     scrub. The pinch/fullscreen zoom button (`modalZoom`) is hidden in grid mode too — a
+     single-image zoom doesn't apply to a thumbnail grid — and the progress counter shows a flat
+     `"55 photos"` (new `project.photos` i18n key) instead of the scroll-driven `"03 / 55"`.
+     **Bug caught in mobile testing, now fixed:** `sizeProjectTrack()`'s early return meant it never
+     cleared the inline `paddingLeft`/`paddingRight`/`transform`/pin-`height` a *previous*
+     filmstrip-mode project left on those same shared elements — opening a normal project (desktop
+     width) then a grid project (mobile width) right after left stale desktop-sized inline padding
+     squashing the grid into one column with a horizontal scrollbar. Fixed by explicitly resetting
+     those four inline styles whenever `openProjectModal` enters grid mode, regardless of what the
+     previous project left behind.
+     **Round-tripped between sections the same session, settled back in Retouching:** added first
+     as a 4th retouching category (`retouching_loreal`), moved to E-Commerce ("solo que ese
+     proyecto va en catalogo e-commerce abajo de le collezioni" — renamed to plain `loreal`, folder
+     moved to `images/ecommerce/loreal/`, pushed onto `ecommerceProjectsData` after Ferragamo), then
+     moved *back* to Retouching in the same conversation once the user reviewed the actual grid and
+     annotated it with X's over the images to cut ("saca esas imagenes tachadas de ese proyecto...
+     vuelvelo a dejar en retoque pero que diga vogue loreal") — so it's `retouching_loreal` again,
+     `images/services/retouching/loreal/` again, appended to `retouchingProjectsData` again, with
+     `renderRetouchingSlide()`/`retouchingStage`'s plain-`images`-fallback branch (added, then
+     reverted as dead code, then re-added) back in place since this is once more the only
+     retouching category without `pairs`. Both moves needed zero changes to the grid CSS/JS itself
+     — it's a property of the shared project modal, not of either section — only which `*ProjectsData`
+     array references the key and what `folder` its images live under.
+     **Curated down from 55 to 23 photos** per the user's annotated screenshots: X's (or, on the
+     first two rows, one continuous circling scribble) marked the 5 stylized "product emerging from
+     fruit/balloon" concept shots, the 5 hand-holding-nail-polish shots, and everything from the
+     concealer/foundation face-application shots through the mascara/eyelash close-ups and macro
+     texture shots at the very end (images 34–55) for removal — keeping only the clean
+     product-only bottle/tube shots (nail polish bottles and gel-tip applicators, concealer tubes).
+     Mapping annotated *pixel regions* in a screenshot back to specific array indices isn't
+     something to eyeball directly — the fix was building a labeled contact sheet (PIL, 8 columns
+     to match the live grid's column count at that viewport width, a yellow index tag baked into
+     each tile) from the actual local files and cross-referencing that against the screenshots,
+     rather than trying to count grid cells in the annotated image alone. **The 32 cut photos were
+     *not* deleted** ("no las borres") — only pulled from `projectData.retouching_loreal.images`;
+     all 55 files are still sitting in `images/services/retouching/loreal/`, so the array now
+     references a non-contiguous subset (`06.jpg`–`08.jpg`, `14.jpg`–`33.jpg`) with real gaps where
+     cut photos' numbers used to be, rather than the files being renumbered to close them up.
+     Title changed from `"L'ORÉAL"` to `"VOGUE L'ORÉAL"` per "que diga vogue loreal" — Vogue is the
+     nail-gel product line actually being shot, L'Oréal the parent client, and the user wants both
+     named on the tile itself, not just in the `sub` line underneath it.
+     `images/services/retouching/loreal/` uses plain `01.jpg`–`55.jpg` naming (the Campaigns-folder
+     convention, not the flat `before-NN`/`after-NN` pairs), resized to a 1100px long edge (smaller
+     than the usual 1800px — grid tiles render small, and 55 of them at full res would bloat page
+     weight for no visible benefit) — including format-normalizing a handful of PNGs and one
+     animated GIF frame (Behance served the same gallery in a WebP/JPEG/PNG/GIF mix depending on
+     when each module was uploaded) down to consistent JPEGs.
+     **Then replaced outright the same day** ("borra esas fotos de loreal vogue y pon estas con
+     hover", pointing at a local `~/Desktop/rt/` folder with 3 subfolders of 2 images each) — this
+     time a genuine delete, not a curation: `images/services/retouching/loreal/` (all 55 files, the
+     23 kept + the 32 already-unreferenced ones) was removed with `rm -rf`, unlike the "no las
+     borres" curation earlier in the session. The 3 new pairs came in as raw camera exports
+     (5792×8688 down to 3777×4401) with inconsistent before/after naming per folder — one pair
+     explicit (`... before.jpg`/`... after.jpg`), one explicit but Spanish (`... after.jpg`/`...
+     copia.jpg`, "copia" = "copy," trusted as the before since "after" was the one unambiguous
+     label), and one with no labels at all (`mascara 1.jpg`/`mascara 2.jpg` — ordered by matching
+     the *visual* pattern of the labeled pairs: the flatter, cooler-gray-background shot is
+     consistently "before," the warmer pure-white one "after"). Resized/renamed into the flat
+     `before-14.jpg`–`after-16.jpg` sequence (continuing straight on from Adidas's `before-13`) —
+     back to the shared `images/services/retouching/` folder, not a per-project subfolder, since
+     `pairs` projects don't use one. `projectData.retouching_loreal` dropped `images`/`layout` and
+     gained `pairs`/`ratio` per pair, becoming structurally identical to Adidas/Google/Beauty again;
+     `renderRetouchingSlide()`/`retouchingStage`'s plain-`images` branch (added, reverted, re-added
+     for the round trip above) was reverted a second time and should very likely stay gone now — all
+     4 retouching categories have `pairs` again. **The grid-mode CSS/JS itself was left in place**
+     even though no project currently uses it: the user asked to swap out L'Oréal's *photos*, not
+     to remove the grid capability, and it's inert/harmless when unreferenced (see item 7's original
+     grid entry above for what it does) — worth knowing if a future high-volume project needs it
+     again, this is proven, tested code, not a stub.
+   - **"Scroll right to see more" hint** (`#projectScrollHint`, added 2026-08-27, "pon algo que
+     diga scroll a la derecha para ver en todos los proyectos") — the project modal's filmstrip is
+     driven by *vertical* scroll/swipe (same input as everywhere else on the site) but moves the
+     images *sideways*, which isn't obvious walking in cold. Sits just above `#projectProgress`
+     (bottom-left), fades out the same way the hero's own `.scroll-cue` does — `opacity` toggled
+     off once `updateProjectScroll()`'s progress crosses 0.05 — and resets to visible every time
+     `openProjectModal()` runs, since a fresh project always starts at `scrollTop 0` (which,
+     already being 0 for a same-position reopen, wouldn't otherwise fire a native `scroll` event to
+     reset it on its own — set explicitly instead of relying on that). Hidden entirely in
+     `.grid-mode` projects (`display:none`): grid-layout projects (see above) scroll normally,
+     vertically, so "scroll right" would be actively wrong there, not just unnecessary — the
+     `n` `photos` counter already covers "there's more" for that layout. New `project.scrollHint`
+     i18n key.
+   - **Hover direction reversed sitewide** (2026-08-27, "en todo quiero que sea al reves Hover to
+     see the before para que no se vea toda la pagina") — every before/after hover-reveal (the
+     project modal's `.project-hover-compare` `.hc-base`/`.hc-hover` pair, *and* the Retouching
+     section's own stage preview, `#retouchingImg`/`#retouchingHoverImg`) now shows the **after**
+     by default and reveals the **before** on hover, the opposite of how it shipped originally.
+     Rationale given: with "before" as the resting state, the page read as a gallery of unfinished
+     photos at a glance (`toda la pagina` — the whole page) unless every tile happened to be
+     hovered; "after" resting means the page always reads as polished, and hovering to see the
+     rough input is the intentional reveal/surprise instead of an unwanted default. Purely a data
+     swap in both places (`p.before`/`p.after` → `p.after`/`p.before` when building
+     `.hc-base`/`.hc-hover`, same swap in `renderRetouchingSlide()` and the two images' static-HTML
+     `src`/`alt` defaults) plus copy (`retouching.hint` and all 4 categories' `note` field, "Hover
+     to see the after" → "Hover to see the before", EN+ES) — none of the actual CSS/JS mechanics
+     changed (`.hc-hover{opacity:0} :hover .hc-hover{opacity:1}`, the `(hover:none)` mobile
+     auto-loop, `scheduleRetouchingReveal()`'s 2s delayed reveal), since those only care about
+     *which layer* is on top, not what it depicts — they didn't need to know direction reversed.
+     Deliberately scoped to retouching's before/after pairs only, not the *different*
+     `.tile-hover-gif` mechanic campaign tiles use (static photo → motion on hover, no "before"
+     concept there to reverse).
+   - **5th retouching category, `retouching_falabella`** (2026-08-27, "pon este proyecto de
+     falabella" + a bare Behance URL — by now an established shorthand in this session for "browse
+     this gallery, pull its before/after pairs, add them as a new client category"), from the
+     user's "Retouch Falabella Sybilla" gallery — 4 JuxtaposeJS sliders, all genuinely new (no
+     duplicate-checking needed against existing pairs this time; Falabella/Sybilla hadn't been
+     sourced from before). Two are background color-grade swaps (storefront shutters recolored,
+     a weathered door recolored) and two are the same fashion-editorial pair retouched (skin/
+     lighting), continuing the established `before-NN`/`after-NN` flat-file numbering
+     (`before-17.jpg` through `after-20.jpg`, picking up right after Adidas's `before-13`/
+     L'Oréal's `before-16`) rather than a per-project subfolder, since it's `pairs`-based like
+     every other category except the (currently unused) grid layout. `sub` follows the established
+     "Retouching — `<Client>`" pattern; `note` reuses the sitewide "Hover each photo to see the
+     before" copy set two exchanges ago, applied consistently to the new category from the start
+     rather than needing a follow-up correction like the earlier ones did.
+   - **One more Google pair, one new client (Tissot), both from local files** (2026-08-27,
+     `@"/Users/test/Desktop/rt/4/"` + `@"/Users/test/Desktop/rt/5/"` — the first local-file source
+     in this session that wasn't a Behance URL, using Claude Code's `@path` file-reference syntax
+     instead). `/rt/4/` was one more Google pair (a Pixel Watch/Buds lifestyle shot, explicit
+     `_before.jpg`/`_ after.jpg` suffixes — note the stray leading space before "after" in the
+     actual filename, harmless once read into a Python string but worth knowing if hand-typing that
+     path again) — appended as `retouching_google`'s 3rd pair (`before-21.jpg`/`after-21.jpg`).
+     `/rt/5/` arrived as a follow-up message *mid-turn*, addressed inline rather than deferred to a
+     separate reply: "este en un proyecto nuevo tissot" — a genuinely new 6th client category,
+     `retouching_tissot`, its first pair (`before-22.jpg`/`after-22.jpg`) a watch product shot.
+     Filenames here were Spanish (`antes`/`copia` — "before"/"copy") rather than the usual
+     `before`/`after` English pair seen elsewhere; `antes` mapped straightforwardly to `before`,
+     and `copia` (visually the fully retouched ad composite, Tissot logo added, color-graded) to
+     `after` — same "copia/copy means the *other* one, not literally 'a duplicate'" reading used
+     for the L'Oréal Behance sourcing earlier, now confirmed twice as the right call rather than a
+     one-off guess.
+   - **Process/BTS video slides in the project modal** (new `projectData[key].videos` array, added
+     2026-08-27 for Tissot's ~103s "speed retouch" screen recording — a Photoshop timelapse of the
+     same watch photo being retouched, `@"/Users/test/Desktop/rtvideo/"`, "como puedo poner este
+     video largo en tissot"). Asked as a genuine question, not a direct instruction — answered with
+     a short recommendation (append it to the modal's existing filmstrip, after the before/after
+     pairs, since neither the Retouching section's own stage nor the E-Commerce-style
+     `{title,video}` slide pattern fit a *multi-item-within-one-project* video) before implementing,
+     matching the "exploratory question → recommend, don't just build" instinct — confirmed
+     ("si bien dale") before any code changed.
+     **The file itself needed real work first:** the source was 486MB (1920×1080 h264, ~60fps,
+     ~37 Mbps — a raw, uncompressed-feeling screen-recording export) with no `ffmpeg` CLI on this
+     machine, only the `av` (PyAV) library already used elsewhere in this project's history for
+     audio-stripping. Re-encoding through PyAV directly (not shelling out) hit a real gotcha:
+     muxing packets in raw demux order with the source's odd fractional frame rate
+     (`14280/239 ≈ 59.75fps`) made libx264 reject packets outright (`Invalid argument`, PyAV error
+     22) partway through encoding — not an audio/video interleaving problem as the error's *timing*
+     first suggested, confirmed by isolating a video-only re-encode and watching it fail identically.
+     Fixed by re-timestamping every kept frame with an explicit, clean `Fraction(1,30)` time base
+     and sequential integer `pts`, dropping every other decoded frame (~60fps → true 30fps, not just
+     relabeled) rather than trying to preserve the source's irregular rate. Audio was re-attached via
+     stream copy (`add_stream_from_template` + re-tagging demuxed packets' `.stream`), not
+     re-encoded — sidesteps the *separate* class of resampler/format-matching failures re-encoding
+     AAC through PyAV can hit, and audio was already reasonably compressed in the source anyway.
+     Result: 27.6MB, verified by fully decoding all 3,088 output frames before trusting it. Slides
+     render as `<video controls playsinline preload="metadata">` (real controls, not the muted
+     auto-loop `.tile-hover-gif` campaign tiles use — this has actual runtime and audio worth
+     letting someone deliberately play through) appended to `projectTrack.innerHTML` after any
+     `pairs`/`images` content. `sizeProjectTrack()`'s width-measurement query became
+     `'img, video'` (the trailing video naturally becomes the *last* element measured, which is all
+     that query ever needed); a parallel `loadedmetadata`/`error` listener loop was added alongside
+     the existing per-`<img>` `load`/`error` one, since `<video>` has no `.complete`/`load` — it's
+     `readyState`/`loadedmetadata` instead. New shared `projectSlideCount(project)` helper
+     (pairs-or-images count *plus* any videos) replaces two near-duplicate inline expressions that
+     previously didn't know about videos at all — used by both the scroll-driven progress counter
+     and the grid-mode static counter. **Real bug caught before it shipped:** `closeProject()`
+     didn't stop playback — since `openProjectModal()` only *overwrites* `projectTrack.innerHTML`
+     on the *next* open, a playing video's audio would have kept going in the background after
+     the user closed the modal in between. Fixed with an explicit
+     `.querySelectorAll('video').forEach(v => v.pause())` in `closeProject()`.
+   - **7th retouching category, `retouching_voguecover`** (2026-08-27,
+     `@"/Users/test/Desktop/rt/6/"`, "pon este 6 de portada de vogue" — "6" continuing the running
+     count of local-file pairs handed over this session, "portada de vogue" = "Vogue cover"). A
+     single pair (`before-23.jpg`/`after-23.jpg`, background color-grade on the same "Boom Bastic"
+     lip-gloss-in-balloons product shot style seen in the L'Oréal grid earlier) — kept as its own
+     client category rather than folded into `retouching_loreal`, since the user named it for a
+     specific placement (a Vogue *cover*) rather than the general Vogue-product retouching work the
+     `VOGUE L'ORÉAL` category already covers; `title: 'VOGUE COVER'` reads distinctly on the stage
+     from `"VOGUE L'ORÉAL"` even though both start with "Vogue." Filenames again used the
+     `copia`/`copiabefore` pattern (not `before`/`after`) — same reading as before: the one with an
+     explicit "before" in its name is `before`, the bare `copia` is `after`.
+   - **Tissot's `before-22.jpg` swapped for a cleaner shot** (2026-08-27, same
+     `@"/Users/test/Desktop/rt/5/"` folder re-visited with an updated `antes.jpg` — file size and
+     MD5 both differed from what was already saved, confirming it was a genuine re-export, not the
+     same file re-requested — "actualiza la foto del antes del tissot"): the original before had a
+     visible photography rig rod through the frame; the replacement is a clean floating product
+     shot with no rig visible. Only the file changed, not `after-22.jpg` or the pair's `ratio`
+     (kept at the *after* image's `0.7144`, deliberately not recalculated to the new before photo's
+     own `0.6672` — the pair's `ratio` sizes the shared `.project-hover-compare` wrapper both
+     `hc-base`/`hc-hover` sit inside via `object-fit:cover`, so a same-crop-box mismatch between the
+     two is just a slightly different crop on hover, not a broken layout; changing it to match the
+     new before would have shifted the *after* image's framing instead, which wasn't asked for).
+   - **`retouching_voguecover` merged back into `retouching_loreal`** (2026-08-27) — looking at the
+     two categories side by side on the live Retouching stage (screenshots of both, "07/07" and
+     "04/07"), the user judged them "un mismo proyecto" (one and the same project) and asked to
+     keep the Vogue Cover photo as the lead: "deja esta foto de portada como principal." Its pair
+     (`before-23.jpg`/`after-23.jpg`) was spliced into `retouching_loreal.pairs` at index 0 (ahead
+     of `before-14`/`15`/`16`), and the standalone `retouching_voguecover` entry — both the
+     `projectData` object and its `retouchingProjectsData` slide — removed outright, back to 6
+     categories. Undoes the split from two exchanges ago: creating it as a *separate* category then
+     was a reasonable default (no signal yet that it belonged with L'Oréal specifically — see that
+     entry above), but once the user actually saw both stages next to each other, the call was
+     "these are the same thing," not "these are different." No image files touched, no code
+     changed — purely a `projectData`/`retouchingProjectsData` edit reordering existing entries.
+   - **`before-23.jpg`/`after-23.jpg` had their content swapped** (2026-08-27, another screenshot
+     of this same cover pair, "el hover de la foto colorida de loreal esta al reves la editada es
+     esta") — the source Behance filenames (`copiabefore`/`copia`) had been trusted at face value
+     when this pair was first sourced (see the Vogue Cover entry above), but the user, looking at
+     the actual live site, identified the *brighter magenta-background* version as the true
+     retouched "after" — the opposite of what the filenames implied and what had been saved. Fixed
+     by swapping the two files' actual bytes on disk (`mv before-23.jpg tmp; mv after-23.jpg
+     before-23.jpg; mv tmp after-23.jpg`) rather than touching `projectData` — the pair's `before`/
+     `after` fields still point at the same two filenames, so no JS/data edit was needed once the
+     files underneath were corrected. **Verification gotcha:** the live preview's own screenshot
+     tool kept showing the *old* (pre-swap) colors immediately afterward even though a
+     `fetch(..., {cache:'no-store'})` and a direct on-disk byte-size check both confirmed the swap
+     had taken (matching sizes, correct content on read) — a stale render in the preview browser
+     itself, consistent with this page's documented heavy-page screenshot flakiness, not a real bug;
+     trusted the file-level and network-level checks over the visibly-stale screenshot rather than
+     re-swapping based on a wrong reading of a known-unreliable signal.
+   - **3rd E-Commerce project, `dolcegabbana`** (2026-08-27,
+     `https://www.behance.net/gallery/127539565/Dolce-Gabbana`, "pon estas fotos en catalog" —
+     "catalog" mapped to E-Commerce specifically, not a generic "add somewhere" instruction, since
+     the gallery's own description self-identifies as `"Ad and E-Commerce Le Collezioni The Luxury
+     Multibrand"`; same Le Collezioni client as Ferragamo, `zegna`, `valentino`, `iceberg` in
+     Campaigns — matching `sub` reused from the Ferragamo entry accordingly). 15 images in the
+     gallery, 2 excluded (website-mockup screenshots showing multiple thumbnails + captions in a
+     grid, same category of thing skipped from Ferragamo's gallery) — 13 kept, all clean e-commerce
+     model/product photography, following the exact Ferragamo template: `images/ecommerce/
+     dolcegabbana/01.jpg`–`13.jpg`, `projectData.dolcegabbana` with a plain `images:` array (no
+     `pairs`, no `layout`), a 3rd `ecommerceProjectsData` slide with `projectKey: 'dolcegabbana'`.
+     No code changes needed at all — the `img`/`projectKey` slide pattern and the plain-`images`
+     modal branch were both already built generically enough to take a brand-new brand/gallery as
+     pure data, same as Ferragamo before it.
+   - **Dolce & Gabbana's E-Commerce `sub` line dropped "Product"** (same session, "quita la palabra
+     product de dolche and gabana") — `'E-Commerce Product Photography'` → `'E-Commerce
+     Photography'` (ES: `'Fotografía de Producto E-Commerce'` → `'Fotografía E-Commerce'`).
+     Scoped to just the Dolce & Gabbana slide, not Ferragamo's identical-looking sub line right
+     above it in the same array — the user named this one brand specifically.
+   - **9th Campaigns tile, `dafiti`** (2026-08-27, a Behance *editor* URL —
+     `.../portfolio/editor?project_id=197307639` — which redirects to a sign-in wall when visited
+     directly, since it's the owner's private editing view, not the public gallery; the fix was
+     guessing the public URL shape instead, `behance.net/gallery/197307639/x` — Behance resolves a
+     gallery by numeric ID alone and redirects to the real slug, so the placeholder slug text
+     doesn't matter). Landed on "Dafiti Look de vacaciones," confirmed as the same owner. "Pon este
+     proyecto dafiti" didn't say which section — resolved from context: `nike` and `adidas` in
+     Campaigns already carry `sub:'Dafiti LATAM Campaign'`, meaning Dafiti is an established
+     Campaigns client here (the campaign owner commissioning product-brand shoots), not a new one;
+     this gallery isn't tied to a specific product brand the way those two are, so it became its
+     own tile — `title:'DAFITI'`, `sub:'Vacation Look Campaign'` (matching the gallery's own name)
+     rather than reusing "Dafiti LATAM Campaign" verbatim, which would have named the same client
+     twice on one tile. All 20 images kept (clean model/product shots throughout, no mockups to
+     filter this time) at their native 1400×2100 — `images/campaigns/dafiti/01.jpg`–`20.jpg`,
+     `projectData.dafiti`, appended to `campaignsData`. Left out of `campaignHoverKeys` (no
+     `hover.gif` asset made for it) — confirmed this just falls back to a plain static tile with no
+     hover reveal, the same graceful default `fila` already relies on, not a broken state.
+   - **`dafiti` moved from Campaigns to E-Commerce, same session** ("esta es la foto de portada y
+     se me olvido decir que es de catalogo" — pointing at image 17, the CK-shirt jumping-pose shot,
+     as the cover, and correcting the section placement in the same breath). Two changes: (1) that
+     photo became the *lead* image — rather than just reordering the existing `images` array in
+     place, the whole set was recopied into a fresh `images/ecommerce/dafiti/` folder with image 17
+     renumbered to `01.jpg` and the rest shifted after it (`[17,1,2,...16,18,19,20]`), verified by
+     MD5 against the original `17.jpg` before deleting the old `images/campaigns/dafiti/` folder —
+     matches how the Vogue Cover pair was promoted to lead position earlier, just with a physical
+     renumber this time since the whole folder was moving anyway, not merely reordering two existing
+     array entries. (2) `projectData.dafiti` moved to sit next to `ferragamo`/`dolcegabbana` (code
+     location, not just data), dropped from `campaignsData`, and added as `ecommerceProjectsData`'s
+     4th slide (`title:'Dafiti — Vacation Look'`, `sub:'E-Commerce Photography'` — already using the
+     no-"Product" phrasing from the start this time, not needing the same correction Dolce & Gabbana
+     needed above). `campaignHoverKeys`/`campaignHoverVideos` never referenced `dafiti` to begin
+     with, so nothing needed cleanup there. Same as the L'Oréal round-trip earlier: neither move
+     needed any change to modal/JS logic, only which data array and folder the project lives under —
+     the underlying `img`/`projectKey` plain-`images` pattern is genuinely section-agnostic.
+   - **Synced `projectData` to files the user deleted directly on disk** (2026-08-27, "borre unas
+     fotos del catalogo para que actualices" — no list of which ones, so the fix started by diffing
+     each E-Commerce folder's actual contents against what `index.html` still referenced, rather
+     than guessing). Found `images/ecommerce/dolcegabbana/09.jpg` and `12.jpg` gone (11 of 13
+     remain) and `images/ecommerce/dafiti/02.jpg`, `03.jpg`, `04.jpg`, `06.jpg`, `07.jpg`, `08.jpg`
+     gone (14 of 20 remain, `01.jpg` — the cover photo — untouched); Ferragamo's folder was
+     untouched. Pulled the missing filenames out of each project's `images` array; nothing else
+     changed (no renumbering — matches this codebase's existing convention of leaving gaps in a
+     curated set rather than closing them, same as `retouching_loreal`'s non-contiguous
+     `06`–`33` range from the earlier grid curation). Cross-checked afterward by regex-extracting
+     every `images/...` path referenced anywhere in `index.html` and confirming each one still
+     exists on disk (197 references, 0 missing) — broader than just the two folders the user
+     mentioned, in case "el catalogo" meant something wider than E-Commerce specifically; nothing
+     else turned out to be affected.
+   **The old before/after *drag*-to-compare widget is gone entirely** (`.service-compare`,
+   `#compareHandle`, pointer-event drag JS — all deleted, not just hidden) — replaced by the same
+   hover-reveal used everywhere else on the site now (project modal, campaign tiles, this
+   section). If a design ever calls for a draggable compare slider again, it'll need rebuilding;
+   nothing references the old implementation to copy from except git history.
+   Source-asset history worth keeping: the retouching before/after photos (up to 42MB/7760×10328
+   each) were resized to a 1800px long edge + JPEG q85; E-Commerce's video came from a 4K HEVC
+   clip with a landscape+rotation-display-matrix flag (iPhone portrait clips often store the raw
+   sensor frame as landscape + a "rotate on playback" flag — `mdls`'s `kMDItemPixelHeight/Width`
+   reports the *display* orientation, a raw decoder's own dimensions report the *encoded* one) —
+   `avconvert` (AVFoundation) reads that flag correctly and bakes the rotation into its output
+   automatically, so a single-file `avconvert` pass never needs a manual rotation step; PyAV's raw
+   frame decode does *not* respect it, so a manual concat (frame-by-frame via PyAV, since
+   `avconvert` only transcodes one input at a time) needs `Image.rotate(-90, expand=True)` on each
+   frame first. Both Photography's and Creative Direction's clips ended up as B&W hover-gif-style
+   assets in The Studio's mini-slider instead of videos — see item 6.
+   All video on this site is silent by design (every `<video>` is `muted`) — a few source files
+   still carried an unused audio track from the original phone recording; stripped via a PyAV
+   stream-copy remux (`add_stream_from_template()`, demux+mux the video packets only, no
+   re-encode) rather than left in. Strip audio the same way from any future video before wiring
+   it in.
    - **E-Commerce & Catalog** (`images/services/ecommerce/ecommerce.mp4`, 540×960/4.5MB): source
      was a single 4K HEVC clip (3840×2160 encoded, 20MB/8.2s) with the same landscape+rotation-flag
      situation as the Photography clips — but since this one didn't need concatenation, it went
@@ -820,6 +1159,42 @@ instead of needing per-section color logic — reads dark on light sections, lig
 over the dark Contact section clearly showed the dashed line). Skips entirely
 (`prefers-reduced-motion: reduce` or `hover: none` — touch devices) via an early `return` in the
 IIFE, so it never attaches listeners or runs the draw loop there.
+
+## Codebase audit (2026-08-27)
+Same request that prompted the nav rebuild above also asked to "busca errores y inconsistencias en
+la pagina, limpia el codigo muerto" (find errors/inconsistencies, clean up dead code). What that
+turned up, beyond the nav itself (see item 1):
+- **Dead CSS removed:** `.cred-grid`/`.cred-card` (+ its `h3`/`p` descendants) — a "CREDENTIALS"
+  section's styling with no matching HTML anywhere in the file. Found by extracting every CSS
+  class selector from `<style>` and checking each against `class="..."` attributes and JS
+  string-literal usage elsewhere in the document; confirmed genuinely dead (not just missed by the
+  regex) before deleting, by grepping the class names directly.
+- **Stale copy fixed:** the Retouching stage's static HTML fallback text
+  (`<p id="retouchingSub">...Hover to see the after.</p>`) still said "after" — a leftover from
+  *before* the sitewide hover-direction reversal a few exchanges back, which updated the
+  `retouching.hint` *translation value* but missed this element's hardcoded initial text (which
+  `data-i18n` overwrites at runtime anyway, so it was never visible with JS enabled, but wrong as
+  source and as a no-JS fallback).
+- **Checked and confirmed clean, not touched:** no orphaned `getElementById` targets (75 calls, all
+  resolve), no duplicate `id` attributes anywhere, no unused named JS functions (46 defined, all
+  called), no genuinely-unused translation keys (a few false-positive flags turned out to be
+  dynamic lookups — `t(zoomed ? 'project.zoomOut' : 'project.zoomIn')`,
+  `t(s.key + '.title')` — that a plain string search can't see through), `<section>`/`<style>` tag
+  balance both even, and the apparent `<script>` tag mismatch (12 open / 11 close) traced to a
+  *comment* containing the literal text "`<script>`" describing execution order, not a real
+  unclosed tag. All 197 `images/...`/`.mp4` paths referenced anywhere in `projectData` and friends
+  resolve to a real file on disk (re-verified after every image-folder change this session, most
+  recently after the `borre unas fotos` sync a few exchanges back), and the 13 `src=`/`href=`
+  attribute-style image references separately (favicon, logo, hero frames) all resolve too.
+- **Not flagged as a bug:** a console error reported earlier this session
+  (`Cannot read properties of undefined (reading 'src')` in the hero's `step()`) turned out to be
+  stale console history from a much earlier reload in the same long-lived preview tab, not a
+  current issue — `heroFrames` reliably holds all 20 preloaded frames and `introDone` was already
+  `true` on a fresh check. Worth remembering for future sessions: this preview tool's console/network
+  logs appear to accumulate across the tab's whole lifetime rather than resetting per-navigation,
+  so a stale-looking error/request should be re-verified against current state (a live JS check,
+  not just the log) before treating it as real — same lesson as the screenshot-staleness gotcha
+  from the `before-23`/`after-23` swap earlier.
 
 ## Deployment
 No build tooling — but since images now live as real files in `/images`, deployment needs a host

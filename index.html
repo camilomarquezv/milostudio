@@ -175,51 +175,28 @@
 
   @media (max-width:860px){.about-grid{grid-template-columns:1fr;}}
 
+  /* Main visual in the About grid's first column — Photography & Production and Creative
+     Direction moved here from the old Services carousel (2026-08-26), replacing the static
+     about-bts.gif photo that used to sit here (still on disk, unused) per direct feedback that
+     the videos belonged in the big spot rather than a small box below the stats (their original
+     placement the same day). Plain click-to-toggle (no scroll-pin) since it's still just 2 items,
+     not a full browsable project set like Retouching/E-Commerce. */
+  .studio-slider{width:100%;}
+  .studio-slider-stage{position:relative; aspect-ratio:3/4; border-radius:4px; overflow:hidden; background:rgba(242,244,245,.06);}
+  .studio-slider-stage img, .studio-slider-stage video{width:100%; height:100%; object-fit:cover; display:block; filter:none;} /* overrides .about img/video's grayscale — Creative Direction's clip is in color on purpose */
+  .studio-slider-foot{display:flex; align-items:center; gap:0.9rem; margin-top:1rem;}
+  .studio-slider-arrow{flex-shrink:0; width:30px; height:30px; border-radius:50%; border:1px solid rgba(242,244,245,.3); background:transparent; color:var(--paper); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:0.9rem; transition:background .2s ease;}
+  .studio-slider-arrow:hover{background:rgba(242,244,245,.14);}
+  .studio-slider-info{flex:1; min-width:0;}
+  .studio-slider-counter{display:block; font-size:0.66rem; letter-spacing:0.1em; color:var(--mist); opacity:0.7; font-variant-numeric:tabular-nums;}
+  .studio-slider-title{display:block; font-size:0.86rem; font-weight:700; color:var(--paper); margin-top:0.2rem;}
+
   /* ===== SERVICES ===== */
-  /* ===== SERVICES SLIDER ===== */
-  /* Same scroll-scrub pin pattern as the hero logo and editorial coverflow: .services-pin gives
-     scroll room, .services-sticky pins in place while scroll progress drives the active index. */
-  .services-pin{position:relative;}
-  .services-sticky{position:sticky; top:0; min-height:100vh; display:flex; align-items:center;}
-  /* Middle "auto" column only takes up space when .service-visual has visible content — most
-     slides are text-only (see the note below the JS servicesData array), so an empty
-     display:none image collapses this track to ~0 width automatically, no per-slide CSS needed. */
-  /* min-height matches .service-visual's own height so the sticky content is the same overall
-     size whether or not the current slide has an image — sizeServicesPin() only measures once at
-     load, so a taller image-slide appearing later would otherwise desync the scroll math. */
-  .services-slide{display:grid; grid-template-columns:140px auto 1fr; gap:2.25rem; align-items:center; padding:2.8rem 0; min-height:min(46vh,380px);}
-  .service-num-col{display:flex; flex-direction:column; gap:1.6rem;}
-  .service-bignum{font-size:4.4rem; font-weight:800; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums;}
-  .services-dots{display:flex; flex-direction:column; gap:10px;}
-  .services-dots .sdot{width:8px; height:8px; border-radius:50%; background:var(--mist); border:none; cursor:pointer; padding:0; transition:background .25s ease, transform .25s ease;}
-  .services-dots .sdot.is-active{background:var(--ink); transform:scale(1.3);}
-  .service-visual{display:none; height:min(46vh,380px); aspect-ratio:3/4; border-radius:6px; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(22,27,34,.08); flex-shrink:0;}
-  .service-visual img, .service-visual video{width:100%; height:100%; object-fit:cover; display:block; filter:saturate(1) contrast(1.02);}
-  /* Before/after compare (Retouching slide only) — a real drag slider, not the third-party
-     Juxtapose embed the user first sent, so the source images can be resized/compressed like
-     every other asset on the site instead of loading at whatever resolution the embed serves.
-     Both images are full-bleed and stacked; only .compare-before's clip-path changes on drag —
-     simpler and more robust than the common alternative (a width-clipped wrapper around a
-     fixed-pixel-width inner image, which needs JS to keep resynced on window resize). */
-  .service-compare{display:none; position:relative; height:min(300px,38vw); aspect-ratio:2/1; border-radius:6px; overflow:hidden; cursor:ew-resize; -webkit-user-select:none; user-select:none; box-shadow:0 1px 3px rgba(22,27,34,.08); flex-shrink:0; touch-action:none;}
-  .compare-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; pointer-events:none;}
-  .compare-handle{position:absolute; top:0; bottom:0; left:50%; width:2px; background:var(--paper); transform:translateX(-50%); pointer-events:none; box-shadow:0 0 0 1px rgba(22,27,34,.15);}
-  .compare-grip{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:36px; height:36px; border-radius:50%; background:var(--paper); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(22,27,34,.35); font-size:.8rem; letter-spacing:-.05em;}
-  .compare-label{position:absolute; bottom:10px; font-size:.68rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--paper); background:rgba(22,27,34,.62); padding:4px 9px; border-radius:2px; pointer-events:none;}
-  .compare-label.before{left:10px;}
-  .compare-label.after{right:10px;}
-  .compare-expand{position:absolute; top:10px; right:10px; width:32px; height:32px; border:none; border-radius:50%; background:rgba(22,27,34,.62); color:var(--paper); display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:2; transition:background .2s ease;}
-  .compare-expand:hover{background:rgba(22,27,34,.82);}
-  .service-counter{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; color:var(--steel); margin-bottom:0.8rem;}
-  .service-info h3{font-size:2.1rem; font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
-  .service-info p{font-size:1.08rem; line-height:1.65; color:var(--slate); max-width:52ch;}
-  @media (max-width:860px){
-    .services-slide{grid-template-columns:1fr; text-align:left; min-height:0;}
-    .service-num-col{flex-direction:row; align-items:center; justify-content:space-between;}
-    .services-dots{flex-direction:row;}
-    .service-visual{height:auto; width:min(72vw,320px); aspect-ratio:3/4; margin:0 auto;}
-    .service-compare{height:auto; width:min(92vw,460px); aspect-ratio:2/1; margin:0 auto;}
-  }
+  /* The old 4-slide Services carousel (text+visual per service) was split up 2026-08-26:
+     Retouching and E-Commerce became their own full project-browsing sections (below, reusing
+     the .campaigns-* classes wholesale — same pinned single-project-at-a-time slider, just a
+     second and third instance of it), and Photography/Creative Direction moved into a small
+     slider inside The Studio (see .studio-slider in the About section's CSS). */
 
   /* ===== TEAM BUILDER ===== */
   .builder{background:var(--paper-dim); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
@@ -357,6 +334,17 @@
   .project-caption .behance-link{display:inline-block;pointer-events:auto;margin-top:.35rem;font-weight:600;font-size:.6rem;letter-spacing:.02em;color:var(--steel);border-bottom:1px solid var(--line);padding-bottom:1px;}
   .project-caption .behance-link:hover{color:var(--accent);border-color:var(--accent);}
   .project-progress{position:absolute;bottom:20px;left:24px;font-size:.68rem;letter-spacing:.04em;color:var(--steel);z-index:3;font-variant-numeric:tabular-nums;}
+  /* Hints that the vertical scroll/swipe you'd use anywhere else on the site drives this
+     filmstrip *sideways* instead — not obvious on first visit. Fades out the same way the hero's
+     own scroll-cue does (see .scroll-cue) once the user has actually scrolled a little. Grid-mode
+     projects scroll normally (vertically), so the hint doesn't apply there — hidden below. */
+  .project-scroll-hint{position:absolute;bottom:44px;left:24px;z-index:3;font-size:.66rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--steel);opacity:1;transition:opacity .3s ease;display:flex;align-items:center;gap:6px;pointer-events:none;}
+  .project-scroll-hint .arrow{display:inline-block;animation:projectScrollHintNudge 1.4s ease-in-out infinite;}
+  @keyframes projectScrollHintNudge{0%,100%{transform:translateX(0);} 50%{transform:translateX(4px);}}
+  .project-modal.grid-mode .project-scroll-hint{display:none;}
+  @media (max-width:700px){
+    .project-scroll-hint{font-size:.6rem;bottom:40px;}
+  }
   .project-next-btn{position:absolute;bottom:18px;right:24px;z-index:3;display:inline-flex;align-items:center;gap:.4em;padding:9px 16px;font-size:.66rem;font-weight:700;letter-spacing:.03em;border:1.5px solid var(--ink);border-radius:2px;background:transparent;color:var(--ink);cursor:pointer;transition:all .2s ease;}
   .project-next-btn:hover{background:var(--ink);color:var(--paper);}
   .project-scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
@@ -365,6 +353,12 @@
   .project-track{display:flex;align-items:center;gap:min(10vw,120px);will-change:transform;}
   .project-track img{display:block;height:74vh;width:auto;max-width:none;object-fit:cover;transition:height .25s ease;}
   .project-modal.zoomed .project-track img{height:92vh;}
+  /* A process/BTS video slide, appended after a project's photos (e.g. Tissot's speed-retouch
+     clip) — same height/transition rules as a plain photo slide, just with native controls since
+     (unlike the muted looping campaign-tile hover-gifs) this has real runtime and audio worth
+     letting someone actually play/scrub/pause rather than just glance at. */
+  .project-track video{display:block;height:74vh;width:auto;max-width:none;object-fit:cover;transition:height .25s ease;background:#000;}
+  .project-modal.zoomed .project-track video{height:92vh;}
   /* Before/after hover-reveal slide (used by the retouching example) — same "static base,
      opacity-fade hover layer" technique as the campaigns tile hover-gif (.tile-hover-gif),
      just swapping a still photo instead of a gif/video. */
@@ -387,20 +381,29 @@
   }
   @media (max-width:700px){
     .project-track img{height:56vh;}
+    .project-track video{height:56vh;}
     .project-track .project-hover-compare{height:56vh;}
     .project-modal.zoomed .project-track img{height:80vh;}
+    .project-modal.zoomed .project-track video{height:80vh;}
     .project-modal.zoomed .project-track .project-hover-compare{height:80vh;}
     .project-caption h2{font-size:.85rem;}
     .project-next-btn{font-size:.6rem;padding:8px 13px;}
   }
+  /* Grid layout — for high-volume projects (projectData[key].layout === 'grid'), replacing the
+     one-at-a-time horizontal filmstrip (scroll-driven translateX, sticky pin) with a plain wrapping
+     grid of small tiles that scrolls normally, closer to how Behance itself displays a big project.
+     The sticky/translateX JS (sizeProjectTrack/updateProjectScroll) early-returns in this mode —
+     see openProjectModal — so these overrides only need to undo the *display*, not fight a
+     transform that's still being written every frame. */
+  .project-modal.grid-mode .project-track-sticky{position:static;height:auto;display:block;overflow:visible;padding:8vh 24px;}
+  .project-modal.grid-mode .project-track{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;transform:none;}
+  .project-modal.grid-mode .project-track img{height:auto;width:100%;aspect-ratio:1;object-fit:cover;transition:opacity .2s ease;}
+  .project-modal.grid-mode .project-track img:hover{opacity:.85;}
+  @media (max-width:700px){
+    .project-modal.grid-mode .project-track{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;}
+    .project-modal.grid-mode .project-track-sticky{padding:7vh 16px;}
+  }
 
-
-  /* ===== CREDENTIALS ===== */
-  .cred-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:2.2rem;}
-  .cred-card{border-top:2px solid var(--ink); padding-top:1.2rem;}
-  .cred-card h3{font-size:1.05rem; font-weight:700; margin-bottom:0.5rem;}
-  .cred-card p{font-size:0.88rem; line-height:1.5; color:var(--slate);}
-  @media (max-width:800px){.cred-grid{grid-template-columns:1fr;}}
 
   /* ===== CONTACT ===== */
   .contact{background:var(--ink); color:var(--paper); border-radius:4px; padding:2.8rem;}
@@ -447,7 +450,13 @@
   .footer-row img{height:34px; filter:grayscale(1);}
   .footer-links{display:flex; gap:1.4rem; font-size:0.78rem; color:var(--slate);}
 
-  @media (max-width:860px){
+  /* 1040px, not 860px like the rest of the page's breakpoints — the nav grew to 7 links + CTA +
+     lang toggle (Campaigns/Retouching/E-Commerce added), whose natural content width (~950px) no
+     longer fits in the row below ~950px container width; 860px left a real gap where the header
+     overflowed horizontally with the burger still hidden. This block is nav-only (not shared with
+     the page's other max-width:860px rules for about-grid/builder-inner), so raising it doesn't
+     touch anything else's layout. */
+  @media (max-width:1040px){
     /* height set explicitly (was top+bottom, which computed a much shorter box than it should
        have — the open menu ended up only ~64px tall instead of filling the screen below the
        header, so page content behind it showed through/overlapped the nav links, unreadable).
@@ -485,10 +494,12 @@
       <span style="font-weight:800; font-size:1.05rem; letter-spacing:0.02em;">MILO STUDIO</span>
     </div>
     <nav class="nav-links" id="navLinks">
-      <a href="#services" data-i18n="nav.services">Services</a>
-      <a href="#team-builder" data-i18n="nav.buildTeam">Build a Team</a>
+      <a href="#campaigns" data-i18n="nav.campaigns">Campaigns</a>
+      <a href="#retouching" data-i18n="nav.retouching">Retouching</a>
+      <a href="#ecommerce" data-i18n="nav.ecommerce">E-Commerce</a>
       <a href="#work" data-i18n="nav.editorial">Editorial</a>
       <a href="#about" data-i18n="nav.studio">Studio</a>
+      <a href="#team-builder" data-i18n="nav.buildTeam">Build a Team</a>
       <a href="#contact" class="nav-cta" data-i18n="nav.cta">Start a Project</a>
       <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch language">ES</button>
     </nav>
@@ -583,6 +594,7 @@
     <span id="projectNote"></span>
   </div>
   <span class="project-progress" id="projectProgress">01 / 01</span>
+  <span class="project-scroll-hint" id="projectScrollHint"><span data-i18n="project.scrollHint">Scroll right to see more</span> <span class="arrow">→</span></span>
   <button class="project-next-btn" id="projectNextBtn" type="button" data-i18n="project.next">Next Project →</button>
   <div class="project-scroll" id="projectScroll">
     <div class="project-track-pin" id="projectTrackPin">
@@ -695,7 +707,20 @@
   <div class="wrap">
     <div class="about reveal" style="padding:2.8rem;">
       <div class="about-grid">
-        <img src="images/site/about-bts.gif" alt="MILO Studio behind the scenes">
+        <div class="studio-slider" id="studioSlider">
+          <div class="studio-slider-stage" id="studioSlideStage">
+            <img id="studioSlideImg" src="" alt="">
+            <video id="studioSlideVideo" muted loop playsinline preload="none"></video>
+          </div>
+          <div class="studio-slider-foot">
+            <button class="studio-slider-arrow" id="studioPrevBtn" type="button" aria-label="Previous">‹</button>
+            <div class="studio-slider-info">
+              <span class="studio-slider-counter" id="studioSlideCounter">01 / 02</span>
+              <span class="studio-slider-title" id="studioSlideTitle">Photography &amp; Production</span>
+            </div>
+            <button class="studio-slider-arrow" id="studioNextBtn" type="button" aria-label="Next">›</button>
+          </div>
+        </div>
         <div>
           <span class="eyebrow" style="color:var(--mist);" data-i18n="about.eyebrow">The Studio</span>
           <h2 style="margin-top:0.8rem;" data-i18n="about.h2">One decade. One point of contact. A full crew behind it.</h2>
@@ -714,41 +739,69 @@
   </div>
 </section>
 
-<!-- SERVICES -->
-<section id="services">
+<!-- RETOUCHING PROJECTS -->
+<section id="retouching">
   <div class="wrap">
     <div class="section-head reveal">
-      <div><span class="eyebrow" data-i18n="services.eyebrow">What We Do</span><h2 style="margin-top:0.7rem;" data-i18n="services.h2">Four things we do really well.</h2></div>
-      <p class="desc" data-i18n="services.desc">And a few more that round out a full production — all under one brief, one team, one delivery.</p>
+      <div><span class="eyebrow" data-i18n="retouching.eyebrow">Retouching</span><h2 style="margin-top:0.7rem;" data-i18n="service1.title">Retouching &amp; Post-Production</h2><p class="desc campaigns-desc" data-i18n="service1.desc">Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.</p></div>
     </div>
   </div>
 
-  <div class="services-pin" id="servicesPin">
-    <div class="services-sticky">
+  <div class="campaigns-pin" id="retouchingPin">
+    <div class="campaigns-sticky">
+      <button class="arrow-btn arrow-prev edge-arrow" id="retouchingPrevBtn" aria-label="Previous example">‹</button>
+      <button class="arrow-btn arrow-next edge-arrow" id="retouchingNextBtn" aria-label="Next example">›</button>
       <div class="wrap">
-        <div class="services-slide">
-          <div class="service-num-col">
-            <span class="service-bignum" id="serviceBigNum">01</span>
-            <div class="services-dots" id="servicesDots"></div>
+        <div class="campaigns-slide">
+          <div class="campaign-num-col">
+            <span class="campaign-bignum" id="retouchingBigNum">01</span>
+            <div class="campaigns-dots" id="retouchingDots"></div>
           </div>
-          <div class="service-visual" id="serviceVisual">
-            <img id="serviceImg" src="" alt="">
-            <video id="serviceVideo" muted loop playsinline preload="none"></video>
+          <div class="campaign-stage-wrap">
+            <div class="campaign-stage" id="retouchingStage">
+              <img id="retouchingImg" src="images/services/retouching/after.jpg" alt="Retouching example — after">
+              <img id="retouchingHoverImg" class="tile-hover-gif" src="images/services/retouching/before.jpg" alt="Retouching example — before">
+            </div>
           </div>
-          <div class="service-compare" id="serviceCompare">
-            <img id="compareAfter" class="compare-img" src="" alt="">
-            <img id="compareBefore" class="compare-img" src="" alt="">
-            <div class="compare-handle" id="compareHandle"><span class="compare-grip">↔</span></div>
-            <span class="compare-label before">Before</span>
-            <span class="compare-label after">After</span>
-            <button class="compare-expand" id="compareExpand" type="button" aria-label="Open large view">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>
-            </button>
+          <div class="campaign-info">
+            <span class="campaign-counter" id="retouchingCounter">01 / 06</span>
+            <h3 id="retouchingTitle">Adidas</h3>
+            <p id="retouchingSub" data-i18n="retouching.hint">Hover to see the before.</p>
           </div>
-          <div class="service-info">
-            <span class="service-counter" id="serviceCounter">01 / 04</span>
-            <h3 id="serviceTitle">Retouching &amp; Post-Production</h3>
-            <p id="serviceDesc">Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- E-COMMERCE PROJECTS -->
+<section id="ecommerce">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div><span class="eyebrow" data-i18n="ecommerce.eyebrow">E-Commerce</span><h2 style="margin-top:0.7rem;" data-i18n="service4.title">E-Commerce &amp; Catalog</h2><p class="desc campaigns-desc" data-i18n="service4.desc">High-volume, consistent product and model imagery built for online retail, without losing quality control.</p></div>
+    </div>
+  </div>
+
+  <div class="campaigns-pin" id="ecommercePin">
+    <div class="campaigns-sticky">
+      <button class="arrow-btn arrow-prev edge-arrow" id="ecommercePrevBtn" aria-label="Previous project">‹</button>
+      <button class="arrow-btn arrow-next edge-arrow" id="ecommerceNextBtn" aria-label="Next project">›</button>
+      <div class="wrap">
+        <div class="campaigns-slide">
+          <div class="campaign-num-col">
+            <span class="campaign-bignum" id="ecommerceBigNum">01</span>
+            <div class="campaigns-dots" id="ecommerceDots"></div>
+          </div>
+          <div class="campaign-stage-wrap">
+            <div class="campaign-stage" id="ecommerceStage">
+              <video id="ecommerceVideo" muted loop playsinline preload="none"></video>
+              <img id="ecommerceImg" src="" alt="">
+            </div>
+          </div>
+          <div class="campaign-info">
+            <span class="campaign-counter" id="ecommerceCounter">01 / 01</span>
+            <h3 id="ecommerceTitle">Catalog Production</h3>
+            <p id="ecommerceSub"></p>
           </div>
         </div>
       </div>
@@ -834,7 +887,7 @@
   <div class="wrap">
     <div class="footer-row">
       <img src="images/site/logo-mark.png" alt="MILO icon">
-      <div class="footer-links"><a href="#services" data-i18n="nav.services">Services</a><a href="#work" data-i18n="nav.editorial">Editorial</a><a href="#campaigns" data-i18n="footer.campaigns">Campaigns</a><a href="#contact" data-i18n="footer.contact">Contact</a><a href="https://www.behance.net/marquezvillegas" target="_blank" rel="noopener">Behance</a></div>
+      <div class="footer-links"><a href="#campaigns" data-i18n="footer.campaigns">Campaigns</a><a href="#retouching" data-i18n="nav.retouching">Retouching</a><a href="#ecommerce" data-i18n="nav.ecommerce">E-Commerce</a><a href="#work" data-i18n="nav.editorial">Editorial</a><a href="#contact" data-i18n="footer.contact">Contact</a><a href="https://www.behance.net/marquezvillegas" target="_blank" rel="noopener">Behance</a></div>
       <div style="font-size:0.78rem; color:var(--steel);" data-i18n="footer.tagline">Bogotá, Colombia — Design Prototype</div>
     </div>
   </div>
@@ -842,7 +895,9 @@
 
 <script>
   const translations = {
-    'nav.services': {en:'Services', es:'Servicios'},
+    'nav.campaigns': {en:'Campaigns', es:'Campañas'},
+    'nav.retouching': {en:'Retouching', es:'Retoque'},
+    'nav.ecommerce': {en:'E-Commerce', es:'E-Commerce'},
     'nav.buildTeam': {en:'Build a Team', es:'Arma un Equipo'},
     'nav.editorial': {en:'Editorial', es:'Editorial'},
     'nav.studio': {en:'Studio', es:'Estudio'},
@@ -862,14 +917,13 @@
     'about.stat3': {en:'EU + LATAM Markets', es:'Mercados UE + LATAM'},
 
     'services.eyebrow': {en:'What We Do', es:'Qué Hacemos'},
-    'services.h2': {en:'Four things we do really well.', es:'Cuatro cosas que hacemos muy bien.'},
-    'services.desc': {en:'And a few more that round out a full production — all under one brief, one team, one delivery.', es:'Y algunas más que completan una producción integral — todo bajo un solo brief, un equipo, una entrega.'},
+    'retouching.eyebrow': {en:'Retouching', es:'Retoque'},
+    'retouching.hint': {en:'Hover to see the before.', es:'Pasa el mouse para ver el antes.'},
+    'ecommerce.eyebrow': {en:'E-Commerce', es:'E-Commerce'},
     'service1.title': {en:'Retouching & Post-Production', es:'Retoque y Postproducción'},
     'service1.desc': {en:'Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.', es:'Retoque de belleza, moda y producto con estándar editorial — corrección de color y acabado fiel a la identidad de marca.'},
     'service2.title': {en:'Photography & Production', es:'Fotografía y Producción'},
-    'service2.desc': {en:'Full campaign shoots managed start to finish: casting, location, lighting, and on-set direction.', es:'Producción de campañas gestionada de principio a fin: casting, locación, iluminación y dirección en set.'},
     'service3.title': {en:'Creative Direction', es:'Dirección Creativa'},
-    'service3.desc': {en:'Concept, mood, and visual strategy defined up front, so every asset serves one clear campaign vision.', es:'Concepto, mood y estrategia visual definidos desde el inicio, para que cada pieza responda a una visión clara de campaña.'},
     'service4.title': {en:'E-Commerce & Catalog', es:'E-Commerce y Catálogo'},
     'service4.desc': {en:'High-volume, consistent product and model imagery built for online retail, without losing quality control.', es:'Imágenes de producto y modelo de alto volumen y consistentes, pensadas para retail online, sin perder control de calidad.'},
 
@@ -932,6 +986,8 @@
     'behance.more': {en:'See more work on Behance', es:'Ver más trabajo en Behance'},
 
     'project.next': {en:'Next Project →', es:'Siguiente Proyecto →'},
+    'project.photos': {en:'photos', es:'fotos'},
+    'project.scrollHint': {en:'Scroll right to see more', es:'Desliza a la derecha para ver más'},
     'project.zoomIn': {en:'Zoom in', es:'Acercar'},
     'project.zoomOut': {en:'Zoom out', es:'Alejar'},
     'project.fullscreen': {en:'Enter fullscreen', es:'Pantalla completa'},
@@ -1160,6 +1216,7 @@
   const projectTrackSticky = document.querySelector('.project-track-sticky');
   const projectTrack = document.getElementById('projectTrack');
   const projectProgress = document.getElementById('projectProgress');
+  const projectScrollHint = document.getElementById('projectScrollHint');
   const projectTitle = document.getElementById('projectModalTitle');
   const projectNote = document.getElementById('projectNote');
   const projectEyebrow = document.getElementById('projectModalEyebrow');
@@ -1187,24 +1244,66 @@
     lci: { images: ['images/campaigns/lci/01.jpg', 'images/campaigns/lci/02.jpg', 'images/campaigns/lci/03.jpg', 'images/campaigns/lci/04.jpg', 'images/campaigns/lci/05.jpg', 'images/campaigns/lci/06.jpg'], folder: 'images/campaigns/lci', title: 'LCI', sub: {en:'LCI Education Campaign', es:'Campaña LCI Education'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'} },
     rayban: { images: ['images/campaigns/rayban/01.jpg', 'images/campaigns/rayban/02.jpg', 'images/campaigns/rayban/03.jpg'], folder: 'images/campaigns/rayban', title: 'RAY-BAN', sub: {en:'Ray-Ban Meta "Masters" Project', es:'Proyecto Ray-Ban Meta "Masters"'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'} },
     fila: { images: ['images/campaigns/fila/01.jpg'], folder: 'images/campaigns/fila', title: 'FILA', sub: {en:'Campaign', es:'Campaña'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'} },
-    retouching: { pairs: [
+    ferragamo: { images: ['images/ecommerce/ferragamo/01.jpg', 'images/ecommerce/ferragamo/02.jpg', 'images/ecommerce/ferragamo/03.jpg', 'images/ecommerce/ferragamo/04.jpg', 'images/ecommerce/ferragamo/05.jpg', 'images/ecommerce/ferragamo/06.jpg', 'images/ecommerce/ferragamo/07.jpg', 'images/ecommerce/ferragamo/08.jpg', 'images/ecommerce/ferragamo/09.jpg', 'images/ecommerce/ferragamo/10.jpg', 'images/ecommerce/ferragamo/11.jpg', 'images/ecommerce/ferragamo/12.jpg', 'images/ecommerce/ferragamo/13.jpg', 'images/ecommerce/ferragamo/14.jpg'], folder: 'images/ecommerce/ferragamo', title: 'FERRAGAMO', sub: {en:'Le Collezioni Campaign', es:'Campaña Le Collezioni'}, note: {en:'Product photography from the MILO Studio e-commerce archive.', es:'Fotografía de producto del archivo de e-commerce de MILO Studio.'}, behance: 'https://www.behance.net/gallery/117541195/Salvatore-Ferragamo' },
+    dolcegabbana: { images: ['images/ecommerce/dolcegabbana/01.jpg', 'images/ecommerce/dolcegabbana/02.jpg', 'images/ecommerce/dolcegabbana/03.jpg', 'images/ecommerce/dolcegabbana/04.jpg', 'images/ecommerce/dolcegabbana/05.jpg', 'images/ecommerce/dolcegabbana/06.jpg', 'images/ecommerce/dolcegabbana/07.jpg', 'images/ecommerce/dolcegabbana/08.jpg', 'images/ecommerce/dolcegabbana/10.jpg', 'images/ecommerce/dolcegabbana/11.jpg', 'images/ecommerce/dolcegabbana/13.jpg'], folder: 'images/ecommerce/dolcegabbana', title: 'DOLCE & GABBANA', sub: {en:'Le Collezioni Campaign', es:'Campaña Le Collezioni'}, note: {en:'Product photography from the MILO Studio e-commerce archive.', es:'Fotografía de producto del archivo de e-commerce de MILO Studio.'}, behance: 'https://www.behance.net/gallery/127539565/Dolce-Gabbana' },
+    dafiti: { images: ['images/ecommerce/dafiti/01.jpg', 'images/ecommerce/dafiti/05.jpg', 'images/ecommerce/dafiti/09.jpg', 'images/ecommerce/dafiti/10.jpg', 'images/ecommerce/dafiti/11.jpg', 'images/ecommerce/dafiti/12.jpg', 'images/ecommerce/dafiti/13.jpg', 'images/ecommerce/dafiti/14.jpg', 'images/ecommerce/dafiti/15.jpg', 'images/ecommerce/dafiti/16.jpg', 'images/ecommerce/dafiti/17.jpg', 'images/ecommerce/dafiti/18.jpg', 'images/ecommerce/dafiti/19.jpg', 'images/ecommerce/dafiti/20.jpg'], folder: 'images/ecommerce/dafiti', title: 'DAFITI', sub: {en:'Vacation Look Campaign', es:'Campaña Look de Vacaciones'}, note: {en:'Product photography from the MILO Studio e-commerce archive.', es:'Fotografía de producto del archivo de e-commerce de MILO Studio.'}, behance: 'https://www.behance.net/gallery/197307639/Dafiti-Look-de-vacaciones' },
+    // Retouching is grouped into per-client/category projects (like campaignsData) rather than
+    // one flat set of 6 pairs — user's call 2026-08-26 once it became clear the pairs actually
+    // came from 3 different shoots (Adidas x3, Google x1, Beauty x2), not one continuous set, and
+    // more photos per category are coming, so each needs to open as its own separate project/modal.
+    retouching_adidas: { pairs: [
       {before: 'images/services/retouching/before.jpg', after: 'images/services/retouching/after.jpg', ratio: 2},
-      {before: 'images/services/retouching/before-02.jpg', after: 'images/services/retouching/after-02.jpg', ratio: 0.6678},
-      {before: 'images/services/retouching/before-03.jpg', after: 'images/services/retouching/after-03.jpg', ratio: 1.3333},
-      {before: 'images/services/retouching/before-04.jpg', after: 'images/services/retouching/after-04.jpg', ratio: 0.7517},
       {before: 'images/services/retouching/before-05.jpg', after: 'images/services/retouching/after-05.jpg', ratio: 0.6667},
       {before: 'images/services/retouching/before-06.jpg', after: 'images/services/retouching/after-06.jpg', ratio: 0.6672},
-    ], folder: 'images/services/retouching', title: 'RETOUCHING & POST-PRODUCTION', sub: {en:'Retouching & Post-Production', es:'Retoque y Postproducción'}, note: {en:'Hover each photo to see the after — retouching examples from the MILO Studio archive.', es:'Pasa el mouse por cada foto para ver el después — ejemplos de retoque del archivo de MILO Studio.'} },
+      {before: 'images/services/retouching/before-10.jpg', after: 'images/services/retouching/after-10.jpg', ratio: 1.1952},
+      {before: 'images/services/retouching/before-11.jpg', after: 'images/services/retouching/after-11.jpg', ratio: 1.2},
+      {before: 'images/services/retouching/before-12.jpg', after: 'images/services/retouching/after-12.jpg', ratio: 0.6672},
+      {before: 'images/services/retouching/before-13.jpg', after: 'images/services/retouching/after-13.jpg', ratio: 0.6672},
+    ], folder: 'images/services/retouching', title: 'ADIDAS', sub: {en:'Retouching — Adidas', es:'Retoque — Adidas'}, note: {en:'Hover each photo to see the before — retouching examples from the MILO Studio archive.', es:'Pasa el mouse por cada foto para ver el antes — ejemplos de retoque del archivo de MILO Studio.'} },
+    retouching_google: { pairs: [
+      {before: 'images/services/retouching/before-03.jpg', after: 'images/services/retouching/after-03.jpg', ratio: 1.3333},
+      {before: 'images/services/retouching/before-07.jpg', after: 'images/services/retouching/after-07.jpg', ratio: 1.3333},
+      {before: 'images/services/retouching/before-21.jpg', after: 'images/services/retouching/after-21.jpg', ratio: 1.6334},
+    ], folder: 'images/services/retouching', title: 'GOOGLE', sub: {en:'Retouching — Google', es:'Retoque — Google'}, note: {en:'Hover each photo to see the before — retouching examples from the MILO Studio archive.', es:'Pasa el mouse por cada foto para ver el antes — ejemplos de retoque del archivo de MILO Studio.'} },
+    retouching_beauty: { pairs: [
+      {before: 'images/services/retouching/before-02.jpg', after: 'images/services/retouching/after-02.jpg', ratio: 0.6678},
+      {before: 'images/services/retouching/before-04.jpg', after: 'images/services/retouching/after-04.jpg', ratio: 0.7517},
+      {before: 'images/services/retouching/before-08.jpg', after: 'images/services/retouching/after-08.jpg', ratio: 1.4988},
+      {before: 'images/services/retouching/before-09.jpg', after: 'images/services/retouching/after-09.jpg', ratio: 0.6672},
+    ], folder: 'images/services/retouching', title: 'BEAUTY', sub: {en:'Retouching — Beauty', es:'Retoque — Beauty'}, note: {en:'Hover each photo to see the before — retouching examples from the MILO Studio archive.', es:'Pasa el mouse por cada foto para ver el antes — ejemplos de retoque del archivo de MILO Studio.'} },
+    retouching_loreal: { pairs: [
+      {before: 'images/services/retouching/before-23.jpg', after: 'images/services/retouching/after-23.jpg', ratio: 0.6672},
+      {before: 'images/services/retouching/before-14.jpg', after: 'images/services/retouching/after-14.jpg', ratio: 0.6667},
+      {before: 'images/services/retouching/before-15.jpg', after: 'images/services/retouching/after-15.jpg', ratio: 0.8583},
+      {before: 'images/services/retouching/before-16.jpg', after: 'images/services/retouching/after-16.jpg', ratio: 1},
+    ], folder: 'images/services/retouching', title: "VOGUE L'ORÉAL", sub: {en:'Retouching — Vogue x L’Oréal', es:'Retoque — Vogue x L’Oréal'}, note: {en:'Hover each photo to see the before — retouching examples from the MILO Studio archive.', es:'Pasa el mouse por cada foto para ver el antes — ejemplos de retoque del archivo de MILO Studio.'}, behance: 'https://www.behance.net/gallery/233984255/Vogue-Retouch-LOral-Colombia' },
+    retouching_falabella: { pairs: [
+      {before: 'images/services/retouching/before-17.jpg', after: 'images/services/retouching/after-17.jpg', ratio: 0.6656},
+      {before: 'images/services/retouching/before-18.jpg', after: 'images/services/retouching/after-18.jpg', ratio: 0.6667},
+      {before: 'images/services/retouching/before-19.jpg', after: 'images/services/retouching/after-19.jpg', ratio: 0.6667},
+      {before: 'images/services/retouching/before-20.jpg', after: 'images/services/retouching/after-20.jpg', ratio: 0.6667},
+    ], folder: 'images/services/retouching', title: 'FALABELLA', sub: {en:'Retouching — Falabella x Sybilla', es:'Retoque — Falabella x Sybilla'}, note: {en:'Hover each photo to see the before — retouching examples from the MILO Studio archive.', es:'Pasa el mouse por cada foto para ver el antes — ejemplos de retoque del archivo de MILO Studio.'}, behance: 'https://www.behance.net/gallery/237260351/Retouch-Falabella-Sybilla' },
+    retouching_tissot: { pairs: [
+      {before: 'images/services/retouching/before-22.jpg', after: 'images/services/retouching/after-22.jpg', ratio: 0.7144},
+    ], videos: ['images/services/retouching/tissot-speed-retouch.mp4'], folder: 'images/services/retouching', title: 'TISSOT', sub: {en:'Retouching — Tissot', es:'Retoque — Tissot'}, note: {en:'Hover each photo to see the before — retouching examples from the MILO Studio archive.', es:'Pasa el mouse por cada foto para ver el antes — ejemplos de retoque del archivo de MILO Studio.'} },
   };
 
   let currentProjectKey = null, currentProjectImg = null, projectMaxTranslate = 0;
+
+  // Total slide count for a project — pairs/images (mutually exclusive) plus any trailing
+  // process/BTS videos (e.g. Tissot's speed-retouch clip), used for both the progress counter and
+  // the grid-mode "n photos" label.
+  function projectSlideCount(project){
+    return ((project.pairs ? project.pairs.length : project.images.length) || 0) + (project.videos ? project.videos.length : 0) || 1;
+  }
 
   // Vertical scroll/swipe inside .project-scroll drives horizontal translateX of .project-track
   // — same scroll-progress math as the site's other pinned sliders (coverflow/services/
   // campaigns), just measured off this element's own scrollTop since the modal is an overlay,
   // not part of normal page flow, so there's no window-scroll position to read.
   function sizeProjectTrack(){
-    const imgs = projectTrack.querySelectorAll('img');
+    if(projectModal.classList.contains('grid-mode')) return; // grid flows/scrolls natively, no scroll-driven translateX to size for
+    const imgs = projectTrack.querySelectorAll('img, video');
     if(!imgs.length) return;
     const viewportWidth = projectScroll.clientWidth;
     // Pad each end of the track with however much space is needed to center that end's image in
@@ -1221,13 +1320,15 @@
     updateProjectScroll();
   }
   function updateProjectScroll(){
+    if(projectModal.classList.contains('grid-mode')) return; // no filmstrip transform or per-image progress in grid mode
     const total = projectScroll.scrollHeight - projectScroll.clientHeight;
     const progress = total > 0 ? clamp(projectScroll.scrollTop / total, 0, 1) : 0;
     projectTrack.style.transform = `translateX(${-progress * projectMaxTranslate}px)`;
     const project = projectData[currentProjectKey];
-    const n = project ? ((project.pairs ? project.pairs.length : project.images.length) || 1) : 1;
+    const n = project ? projectSlideCount(project) : 1;
     const shown = Math.min(n, Math.max(1, Math.round(progress * (n - 1)) + 1));
     projectProgress.textContent = `${String(shown).padStart(2,'0')} / ${String(n).padStart(2,'0')}`;
+    projectScrollHint.style.opacity = progress > 0.05 ? 0 : 1; // same "fade once they've actually scrolled" instinct as the hero's own scroll-cue
   }
   let projectScrollTicking = false;
   projectScroll.addEventListener('scroll', () => {
@@ -1259,12 +1360,40 @@
       // technique as the campaigns tile hover-gif) instead of a single flat photo. The wrapper's
       // aspect-ratio is baked into projectData per pair (all sizes were fixed at export time), so
       // no measurement/load-wait is needed to size it, unlike a plain <img>'s natural width.
+      // Base layer is the "after" (retouched) shot, hover layer the "before" — deliberately
+      // reversed from a literal reading of "before/after" so the page reads as polished at a
+      // glance and hovering is the surprise, not the other way round.
       projectTrack.innerHTML = project.pairs.map(p =>
-        `<div class="project-hover-compare" style="aspect-ratio:${p.ratio}"><img src="${p.before}" alt="${project.title} — before" class="hc-base"><img src="${p.after}" alt="${project.title} — after" class="hc-hover"></div>`
+        `<div class="project-hover-compare" style="aspect-ratio:${p.ratio}"><img src="${p.after}" alt="${project.title} — after" class="hc-base"><img src="${p.before}" alt="${project.title} — before" class="hc-hover"></div>`
       ).join('');
     } else {
       const images = project.images && project.images.length ? project.images : (imgSrc ? [imgSrc] : []);
       projectTrack.innerHTML = images.map(src => `<img src="${src}" alt="${project.title}">`).join('');
+    }
+    if(project.videos && project.videos.length){
+      // A process/BTS clip tacked on after the photos, e.g. Tissot's speed-retouch video — real
+      // controls (not the muted auto-loop the hover-gifs use) since it has actual runtime/audio
+      // worth letting someone play through deliberately.
+      projectTrack.innerHTML += project.videos.map(src =>
+        `<video src="${src}" controls playsinline preload="metadata"></video>`
+      ).join('');
+    }
+
+    // High-volume projects (projectData[key].layout === 'grid') skip the one-at-a-time scroll
+    // filmstrip entirely and lay out as a plain wrapping grid — see the .grid-mode CSS — closer to
+    // how Behance itself shows a big project, per the user's own request for this pattern.
+    const isGrid = project.layout === 'grid';
+    projectModal.classList.toggle('grid-mode', isGrid);
+    modalZoom.style.display = isGrid ? 'none' : ''; // pinch/fullscreen-zoom is a single-image concept, doesn't apply to a thumbnail grid
+    if(isGrid){
+      // sizeProjectTrack() early-returns in grid mode, so it won't clear inline styles a *previous*
+      // filmstrip-mode project left behind on these same elements — reset them explicitly, or a
+      // stale desktop-viewport padding/height can survive into this render and wreck the grid.
+      projectTrack.style.paddingLeft = '';
+      projectTrack.style.paddingRight = '';
+      projectTrack.style.transform = '';
+      projectTrackPin.style.height = '';
+      projectProgress.textContent = `${projectSlideCount(project)} ${t('project.photos')}`;
     }
 
     projectModal.classList.add('open');
@@ -1272,15 +1401,22 @@
     updateZoomIcon();
     document.body.style.overflow = 'hidden';
     projectScroll.scrollTop = 0;
+    projectScrollHint.style.opacity = 1; // scrollTop may already have been 0, which wouldn't fire a 'scroll' event to reset this on its own
 
     // Each image is height:74vh; width:auto, so its rendered width depends on its own intrinsic
     // aspect ratio — resize the pin as each one finishes loading (not just once at the end) so
-    // the gallery is usable almost immediately and just settles into its final size.
+    // the gallery is usable almost immediately and just settles into its final size. Skipped
+    // entirely in grid mode (sizeProjectTrack early-returns) since the grid needs no such sizing.
     sizeProjectTrack();
     projectTrack.querySelectorAll('img').forEach(img => {
       if(img.complete) return;
       img.addEventListener('load', sizeProjectTrack, {once:true});
       img.addEventListener('error', sizeProjectTrack, {once:true});
+    });
+    projectTrack.querySelectorAll('video').forEach(video => {
+      if(video.readyState >= 1) return; // HAVE_METADATA — dimensions already known
+      video.addEventListener('loadedmetadata', sizeProjectTrack, {once:true});
+      video.addEventListener('error', sizeProjectTrack, {once:true});
     });
   }
   function closeProject(){
@@ -1288,6 +1424,7 @@
     document.body.style.overflow = '';
     currentProjectKey = null;
     if(isModalFullscreen()) exitModalFullscreen();
+    projectTrack.querySelectorAll('video').forEach(video => video.pause()); // otherwise a playing clip's audio keeps going after the modal's gone
   }
   modalClose.addEventListener('click', closeProject);
 
@@ -1469,154 +1606,250 @@
       if(wasZoomed) setProjectZoom(true);
       projectScroll.scrollTop = savedScrollTop;
     }
-    if(typeof renderServiceSlide === 'function') renderServiceSlide();
+    if(typeof renderRetouchingSlide === 'function') renderRetouchingSlide();
+    if(typeof renderEcommerceSlide === 'function') renderEcommerceSlide();
+    if(typeof renderStudioSlide === 'function') renderStudioSlide();
     if(typeof renderCampaignSlide === 'function') renderCampaignSlide();
   });
 </script>
 
 <script>
-  // ===== Services slider ===== (same scroll-scrub pin pattern as the hero logo / coverflow)
-  // Text-only for most slides (user decided it reads fine without images) except E-Commerce &
-  // Catalog, which reuses the Fila campaign photo — Fila moved out of the Campaigns slider into
-  // here since it's a catalog/e-commerce shoot, not a brand campaign. .service-visual is
-  // display:none by default and only shown for slides with an `img` set below.
-  const servicesData = [
-    {key: 'service1', folder: 'images/services/retouching', compareBefore: 'images/services/retouching/before.jpg', compareAfter: 'images/services/retouching/after.jpg', compareProjectKey: 'retouching'},
-    {key: 'service2', folder: 'images/services/photography', img: 'images/services/photography/production.gif'},
-    {key: 'service3', folder: 'images/services/creative_direction', video: 'images/services/creative_direction/creative-direction.mp4'},
-    {key: 'service4', folder: 'images/services/ecommerce', video: 'images/services/ecommerce/ecommerce.mp4'},
+  // ===== Retouching projects ===== (dedicated section, split out of the old Services carousel
+  // 2026-08-26 per feedback — reuses the exact .campaigns-*/.campaign-* classes wholesale (same
+  // pinned single-item-at-a-time slider as Campaigns, just a second instance). Grouped by
+  // client/category (Adidas, Google, Beauty — see the projectData entries above) rather than one
+  // flat set of 6 pairs, since more photos per category are coming and each needs to open as its
+  // own separate project/modal, same as any campaign. The stage previews each project's *first*
+  // pair; clicking opens that project's own modal with all of its pairs.
+  const retouchingProjectsData = [
+    {key: 'retouching_adidas'},
+    {key: 'retouching_google'},
+    {key: 'retouching_beauty'},
+    {key: 'retouching_loreal'},
+    {key: 'retouching_falabella'},
+    {key: 'retouching_tissot'},
   ];
-  const servicesPin = document.getElementById('servicesPin');
-  const servicesSticky = document.querySelector('.services-sticky');
-  const serviceBigNum = document.getElementById('serviceBigNum');
-  const serviceCounter = document.getElementById('serviceCounter');
-  const serviceVisual = document.getElementById('serviceVisual');
-  const serviceCompare = document.getElementById('serviceCompare');
-  const compareBeforeImg = document.getElementById('compareBefore');
-  const compareAfterImg = document.getElementById('compareAfter');
-  const compareHandle = document.getElementById('compareHandle');
-  const compareExpand = document.getElementById('compareExpand');
-  const serviceImg = document.getElementById('serviceImg');
-  const serviceVideo = document.getElementById('serviceVideo');
-  const serviceTitleEl = document.getElementById('serviceTitle');
-  const serviceDescEl = document.getElementById('serviceDesc');
-  const servicesDotsWrap = document.getElementById('servicesDots');
-  const SERVICES_SCROLL_ROOM = 700;
-  let activeService = 0;
+  const retouchingPin = document.getElementById('retouchingPin');
+  const retouchingSticky = document.querySelector('#retouchingPin .campaigns-sticky');
+  const retouchingBigNum = document.getElementById('retouchingBigNum');
+  const retouchingCounter = document.getElementById('retouchingCounter');
+  const retouchingStage = document.getElementById('retouchingStage');
+  const retouchingImg = document.getElementById('retouchingImg');
+  const retouchingHoverImg = document.getElementById('retouchingHoverImg');
+  const retouchingTitleEl = document.getElementById('retouchingTitle');
+  const retouchingDotsWrap = document.getElementById('retouchingDots');
+  let activeRetouching = 0;
 
-  servicesData.forEach((s, i) => {
+  retouchingProjectsData.forEach((rp, i) => {
     const dot = document.createElement('button');
-    dot.className = 'sdot';
+    dot.className = 'cdot';
     dot.type = 'button';
-    dot.setAttribute('aria-label', 'Go to service ' + (i + 1));
-    dot.addEventListener('click', () => { activeService = i; renderServiceSlide(); });
-    servicesDotsWrap.appendChild(dot);
+    dot.setAttribute('aria-label', 'Go to project ' + (i + 1));
+    dot.addEventListener('click', () => { activeRetouching = i; renderRetouchingSlide(); });
+    retouchingDotsWrap.appendChild(dot);
   });
-  const serviceDots = Array.from(servicesDotsWrap.children);
+  const retouchingDots = Array.from(retouchingDotsWrap.children);
 
-  function renderServiceSlide(){
-    const s = servicesData[activeService];
-    const n = servicesData.length;
-    serviceBigNum.textContent = String(activeService + 1).padStart(2, '0');
-    serviceCounter.textContent = `${String(activeService + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
-    serviceTitleEl.textContent = t(s.key + '.title');
-    serviceDescEl.textContent = t(s.key + '.desc');
-    if(s.img){
-      serviceImg.src = s.img;
-      serviceImg.alt = t(s.key + '.title');
-      serviceImg.style.display = 'block';
-      serviceVideo.style.display = 'none';
-      serviceVideo.pause();
-      serviceVisual.style.display = 'block';
-    } else if(s.video){
-      serviceVideo.src = s.video;
-      serviceVideo.style.display = 'block';
-      serviceImg.style.display = 'none';
-      serviceVideo.play().catch(() => {}); // ignored: autoplay can be blocked pre-interaction, harmless for a muted BTS loop
-      serviceVisual.style.display = 'block';
-    } else {
-      serviceVisual.style.display = 'none';
-    }
-    serviceVisual.style.cursor = s.projectKey ? 'pointer' : 'default';
-    if(s.compareBefore){
-      compareBeforeImg.src = s.compareBefore;
-      compareAfterImg.src = s.compareAfter;
-      serviceCompare.style.display = 'block';
-      setComparePosition(50);
-    } else {
-      serviceCompare.style.display = 'none';
-    }
-    serviceDots.forEach((d, i) => d.classList.toggle('is-active', i === activeService));
+  // Same mobile no-hover fallback as the campaigns tiles and the modal's own before/after pairs —
+  // "before" shows first, "after" cross-fades in automatically 2s later on touch devices.
+  let retouchingRevealTimer = null;
+  function scheduleRetouchingReveal(){
+    retouchingStage.classList.remove('show-hover');
+    if(retouchingRevealTimer) clearTimeout(retouchingRevealTimer);
+    if(!window.matchMedia('(hover: none)').matches) return;
+    retouchingRevealTimer = setTimeout(() => retouchingStage.classList.add('show-hover'), 2000);
   }
 
-  document.getElementById('serviceVisual').addEventListener('click', () => {
-    const s = servicesData[activeService];
-    if(s.projectKey) openProjectModal(s.projectKey, serviceImg.src);
-  });
-
-  // Before/after drag slider — real native drag (pointer events, unified mouse+touch), not the
-  // third-party Juxtapose embed the user first sent. Only compareBefore's clip-path moves; both
-  // images stay full-bleed and stacked, so there's no wrapper-width/inner-image resync to keep
-  // straight on window resize like the classic clipped-wrapper technique needs.
-  function setComparePosition(pct){
-    pct = clamp(pct, 0, 100);
-    compareBeforeImg.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
-    compareHandle.style.left = pct + '%';
-  }
-  let compareDragging = false;
-  function updateCompareFromEvent(e){
-    const rect = serviceCompare.getBoundingClientRect();
-    const pct = ((e.clientX - rect.left) / rect.width) * 100;
-    setComparePosition(pct);
-  }
-  serviceCompare.addEventListener('pointerdown', (e) => {
-    compareDragging = true;
-    serviceCompare.setPointerCapture(e.pointerId);
-    updateCompareFromEvent(e);
-  });
-  serviceCompare.addEventListener('pointermove', (e) => {
-    if(compareDragging) updateCompareFromEvent(e);
-  });
-  serviceCompare.addEventListener('pointerup', () => { compareDragging = false; });
-  serviceCompare.addEventListener('pointercancel', () => { compareDragging = false; });
-
-  // Expand button — stopPropagation on pointerdown so it doesn't also register as a
-  // compare-slider drag (serviceCompare's own pointerdown listener would otherwise fire too,
-  // since pointer events bubble, and jump the before/after divider right as the modal opens).
-  compareExpand.addEventListener('pointerdown', e => e.stopPropagation());
-  compareExpand.addEventListener('click', e => {
-    e.stopPropagation();
-    const s = servicesData[activeService];
-    if(s.compareProjectKey) openProjectModal(s.compareProjectKey, compareBeforeImg.src);
-  });
-
-  function sizeServicesPin(){
-    servicesPin.style.height = (servicesSticky.offsetHeight + SERVICES_SCROLL_ROOM) + 'px';
+  function renderRetouchingSlide(){
+    const rp = retouchingProjectsData[activeRetouching];
+    const project = projectData[rp.key];
+    const firstPair = project.pairs[0];
+    const n = retouchingProjectsData.length;
+    retouchingBigNum.textContent = String(activeRetouching + 1).padStart(2, '0');
+    retouchingCounter.textContent = `${String(activeRetouching + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
+    retouchingImg.src = firstPair.after;
+    retouchingHoverImg.src = firstPair.before;
+    retouchingTitleEl.textContent = project.title;
+    retouchingDots.forEach((d, i) => d.classList.toggle('is-active', i === activeRetouching));
+    scheduleRetouchingReveal();
   }
 
-  function updateServicesScroll(){
-    const rect = servicesPin.getBoundingClientRect();
-    const total = servicesPin.offsetHeight - servicesSticky.offsetHeight;
+  retouchingStage.addEventListener('click', () => {
+    const rp = retouchingProjectsData[activeRetouching];
+    openProjectModal(rp.key, projectData[rp.key].pairs[0].before);
+  });
+
+  function goToRetouching(i){
+    activeRetouching = ((i % retouchingProjectsData.length) + retouchingProjectsData.length) % retouchingProjectsData.length;
+    renderRetouchingSlide();
+  }
+  document.getElementById('retouchingPrevBtn').addEventListener('click', () => goToRetouching(activeRetouching - 1));
+  document.getElementById('retouchingNextBtn').addEventListener('click', () => goToRetouching(activeRetouching + 1));
+
+  // Scroll room scales with item count (same ballpark as Campaigns' 1200px/9-items) instead of a
+  // flat constant, so it stays proportionate as more categories get added later.
+  function sizeRetouchingPin(){
+    const room = Math.max(300, (retouchingProjectsData.length - 1) * 150);
+    retouchingPin.style.height = (retouchingSticky.offsetHeight + room) + 'px';
+  }
+  function updateRetouchingScroll(){
+    const rect = retouchingPin.getBoundingClientRect();
+    const total = retouchingPin.offsetHeight - retouchingSticky.offsetHeight;
     const scrolled = clamp(-rect.top, 0, total);
     const progress = total > 0 ? scrolled / total : 0;
-    const idx = Math.min(servicesData.length - 1, Math.round(progress * (servicesData.length - 1)));
-    if(idx !== activeService){
-      activeService = idx;
-      renderServiceSlide();
+    const idx = Math.min(retouchingProjectsData.length - 1, Math.round(progress * (retouchingProjectsData.length - 1)));
+    if(idx !== activeRetouching){
+      activeRetouching = idx;
+      renderRetouchingSlide();
+    }
+  }
+  sizeRetouchingPin();
+  window.addEventListener('resize', sizeRetouchingPin);
+  let retouchingTicking = false;
+  window.addEventListener('scroll', () => {
+    if(!retouchingTicking){
+      requestAnimationFrame(() => { updateRetouchingScroll(); retouchingTicking = false; });
+      retouchingTicking = true;
+    }
+  });
+  renderRetouchingSlide();
+  updateRetouchingScroll();
+</script>
+
+<script>
+  // ===== E-Commerce projects ===== (same pattern as Retouching above, also split out of the old
+  // Services carousel.) A slide with `projectKey` opens that project's own filmstrip modal on
+  // click (same as Campaigns/Retouching), same as the plain `img`/`video` slides.
+  const ecommerceProjectsData = [
+    {title: {en:'Catalog Production', es:'Producción de Catálogo'}, video: 'images/services/ecommerce/ecommerce.mp4'},
+    {title: {en:'Ferragamo — Le Collezioni', es:'Ferragamo — Le Collezioni'}, sub: {en:'E-Commerce Product Photography', es:'Fotografía de Producto E-Commerce'}, img: 'images/ecommerce/ferragamo/01.jpg', projectKey: 'ferragamo'},
+    {title: {en:'Dolce & Gabbana — Le Collezioni', es:'Dolce & Gabbana — Le Collezioni'}, sub: {en:'E-Commerce Photography', es:'Fotografía E-Commerce'}, img: 'images/ecommerce/dolcegabbana/01.jpg', projectKey: 'dolcegabbana'},
+    {title: {en:'Dafiti — Vacation Look', es:'Dafiti — Look de Vacaciones'}, sub: {en:'E-Commerce Photography', es:'Fotografía E-Commerce'}, img: 'images/ecommerce/dafiti/01.jpg', projectKey: 'dafiti'},
+  ];
+  const ecommercePin = document.getElementById('ecommercePin');
+  const ecommerceSticky = document.querySelector('#ecommercePin .campaigns-sticky');
+  const ecommerceBigNum = document.getElementById('ecommerceBigNum');
+  const ecommerceCounter = document.getElementById('ecommerceCounter');
+  const ecommerceStage = document.getElementById('ecommerceStage');
+  const ecommerceImg = document.getElementById('ecommerceImg');
+  const ecommerceVideo = document.getElementById('ecommerceVideo');
+  const ecommerceTitleEl = document.getElementById('ecommerceTitle');
+  const ecommerceSubEl = document.getElementById('ecommerceSub');
+  const ecommerceDotsWrap = document.getElementById('ecommerceDots');
+  let activeEcommerce = 0;
+
+  ecommerceProjectsData.forEach((p, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'cdot';
+    dot.type = 'button';
+    dot.setAttribute('aria-label', 'Go to project ' + (i + 1));
+    dot.addEventListener('click', () => { activeEcommerce = i; renderEcommerceSlide(); });
+    ecommerceDotsWrap.appendChild(dot);
+  });
+  const ecommerceDots = Array.from(ecommerceDotsWrap.children);
+
+  function renderEcommerceSlide(){
+    const p = ecommerceProjectsData[activeEcommerce];
+    const n = ecommerceProjectsData.length;
+    ecommerceBigNum.textContent = String(activeEcommerce + 1).padStart(2, '0');
+    ecommerceCounter.textContent = `${String(activeEcommerce + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
+    ecommerceTitleEl.textContent = p.title[currentLang] || p.title.en;
+    ecommerceSubEl.textContent = p.sub ? (p.sub[currentLang] || p.sub.en) : '';
+    if(p.video){
+      ecommerceVideo.src = p.video;
+      ecommerceVideo.style.display = 'block';
+      ecommerceImg.style.display = 'none';
+      ecommerceVideo.play().catch(() => {}); // ignored: autoplay can be blocked pre-interaction, harmless for a muted BTS loop
+    } else if(p.img){
+      ecommerceImg.src = p.img;
+      ecommerceImg.style.display = 'block';
+      ecommerceVideo.style.display = 'none';
+      ecommerceVideo.pause();
+    }
+    ecommerceStage.style.cursor = p.projectKey ? 'pointer' : 'default';
+    ecommerceDots.forEach((d, i) => d.classList.toggle('is-active', i === activeEcommerce));
+  }
+
+  ecommerceStage.addEventListener('click', () => {
+    const p = ecommerceProjectsData[activeEcommerce];
+    if(p.projectKey) openProjectModal(p.projectKey, ecommerceImg.src);
+  });
+
+  function goToEcommerce(i){
+    activeEcommerce = ((i % ecommerceProjectsData.length) + ecommerceProjectsData.length) % ecommerceProjectsData.length;
+    renderEcommerceSlide();
+  }
+  document.getElementById('ecommercePrevBtn').addEventListener('click', () => goToEcommerce(activeEcommerce - 1));
+  document.getElementById('ecommerceNextBtn').addEventListener('click', () => goToEcommerce(activeEcommerce + 1));
+
+  function sizeEcommercePin(){
+    const room = Math.max(300, (ecommerceProjectsData.length - 1) * 150);
+    ecommercePin.style.height = (ecommerceSticky.offsetHeight + room) + 'px';
+  }
+  function updateEcommerceScroll(){
+    const rect = ecommercePin.getBoundingClientRect();
+    const total = ecommercePin.offsetHeight - ecommerceSticky.offsetHeight;
+    const scrolled = clamp(-rect.top, 0, total);
+    const progress = total > 0 ? scrolled / total : 0;
+    const idx = Math.min(ecommerceProjectsData.length - 1, Math.round(progress * (ecommerceProjectsData.length - 1)));
+    if(idx !== activeEcommerce){
+      activeEcommerce = idx;
+      renderEcommerceSlide();
+    }
+  }
+  sizeEcommercePin();
+  window.addEventListener('resize', sizeEcommercePin);
+  let ecommerceTicking = false;
+  window.addEventListener('scroll', () => {
+    if(!ecommerceTicking){
+      requestAnimationFrame(() => { updateEcommerceScroll(); ecommerceTicking = false; });
+      ecommerceTicking = true;
+    }
+  });
+  renderEcommerceSlide();
+  updateEcommerceScroll();
+</script>
+
+<script>
+  // ===== Studio mini-slider ===== (Photography & Production + Creative Direction, moved into
+  // The Studio from the old Services carousel 2026-08-26 — plain click-to-toggle, no scroll-pin,
+  // since it's a small supporting element under the stats rather than a full section.)
+  const studioSlides = [
+    {key: 'service2', img: 'images/services/photography/production.gif'},
+    {key: 'service3', video: 'images/services/creative_direction/creative-direction.mp4'},
+  ];
+  const studioSlideImg = document.getElementById('studioSlideImg');
+  const studioSlideVideo = document.getElementById('studioSlideVideo');
+  const studioSlideCounter = document.getElementById('studioSlideCounter');
+  const studioSlideTitle = document.getElementById('studioSlideTitle');
+  let activeStudioSlide = 0;
+
+  function renderStudioSlide(){
+    const s = studioSlides[activeStudioSlide];
+    const n = studioSlides.length;
+    studioSlideCounter.textContent = `${String(activeStudioSlide + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
+    studioSlideTitle.textContent = t(s.key + '.title');
+    if(s.img){
+      studioSlideImg.src = s.img;
+      studioSlideImg.alt = t(s.key + '.title');
+      studioSlideImg.style.display = 'block';
+      studioSlideVideo.style.display = 'none';
+      studioSlideVideo.pause();
+    } else if(s.video){
+      studioSlideVideo.src = s.video;
+      studioSlideVideo.style.display = 'block';
+      studioSlideImg.style.display = 'none';
+      studioSlideVideo.play().catch(() => {});
     }
   }
 
-  sizeServicesPin();
-  window.addEventListener('resize', sizeServicesPin);
-  let servicesTicking = false;
-  window.addEventListener('scroll', () => {
-    if(!servicesTicking){
-      requestAnimationFrame(() => { updateServicesScroll(); servicesTicking = false; });
-      servicesTicking = true;
-    }
-  });
-  renderServiceSlide();
-  updateServicesScroll();
+  function goToStudioSlide(i){
+    activeStudioSlide = ((i % studioSlides.length) + studioSlides.length) % studioSlides.length;
+    renderStudioSlide();
+  }
+  document.getElementById('studioPrevBtn').addEventListener('click', () => goToStudioSlide(activeStudioSlide - 1));
+  document.getElementById('studioNextBtn').addEventListener('click', () => goToStudioSlide(activeStudioSlide + 1));
+  renderStudioSlide();
 </script>
 
 <script>
