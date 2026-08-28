@@ -411,18 +411,34 @@
   .project-track .project-hover-compare img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
   .project-track .project-hover-compare .hc-hover{opacity:0;transition:opacity .35s ease;}
   .project-track .project-hover-compare:hover .hc-hover{opacity:1;}
+  /* Badge naming whichever version is on screen. The base layer is the retouched shot, so it
+     reads AFTER at rest and flips to BEFORE while the hover layer is showing — the two states are
+     stacked in one grid cell so the box keeps the width of the longer word and never reflows. */
+  .project-track .project-hover-compare .hc-label{position:absolute; bottom:14px; left:14px; z-index:3; display:grid; background:var(--paper); border:2px solid var(--ink); padding:7px 13px; font-size:.62rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink); pointer-events:none;}
+  .project-track .project-hover-compare .hc-label > span{grid-area:1/1; transition:opacity .35s ease;}
+  .project-track .project-hover-compare .hc-label-before{opacity:0;}
+  .project-track .project-hover-compare:hover .hc-label-after{opacity:0;}
+  .project-track .project-hover-compare:hover .hc-label-before{opacity:1;}
   .project-modal.zoomed .project-track .project-hover-compare{height:92vh;}
   /* Touch devices can't hover, so the before/after would otherwise just sit frozen on "before" —
      auto-loop it slowly instead. Scoped to (hover:none), same feature check already used for the
      cursor trail, so real hover-capable devices (including touchscreen laptops) keep the
      hover-to-reveal interaction untouched. prefers-reduced-motion is handled globally above. */
   @media (hover:none){
-    .project-track .project-hover-compare .hc-hover{animation:hoverCompareLoop 4.5s ease-in-out infinite;}
+    .project-track .project-hover-compare .hc-hover,
+    .project-track .project-hover-compare .hc-label-before{animation:hoverCompareLoop 4.5s ease-in-out infinite;}
+    .project-track .project-hover-compare .hc-label-after{animation:hoverCompareLoopLabel 4.5s ease-in-out infinite;}
   }
   @keyframes hoverCompareLoop{
     0%, 18%{opacity:0;}
     50%, 68%{opacity:1;}
     100%{opacity:0;}
+  }
+  /* Inverse of hoverCompareLoop, so the AFTER badge fades out exactly as the BEFORE image fades in. */
+  @keyframes hoverCompareLoopLabel{
+    0%, 18%{opacity:1;}
+    50%, 68%{opacity:0;}
+    100%{opacity:1;}
   }
   @media (max-width:700px){
     .project-track img{height:56vh;}
@@ -1027,6 +1043,8 @@
     'services.eyebrow': {en:'What We Do', es:'Qué Hacemos'},
     'retouching.eyebrow': {en:'Retouching', es:'Retoque'},
     'retouching.hint': {en:'Hover to see the before.', es:'Pasa el mouse para ver el antes.'},
+    'ba.before': {en:'Before', es:'Antes'},
+    'ba.after': {en:'After', es:'Después'},
     'ecommerce.eyebrow': {en:'E-Commerce', es:'E-Commerce'},
     'service1.title': {en:'Retouching & Post-Production', es:'Retoque y Postproducción'},
     'service1.desc': {en:'Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.', es:'Retoque de belleza, moda y producto con estándar editorial — corrección de color y acabado fiel a la identidad de marca.'},
@@ -1037,7 +1055,6 @@
     'service4.title': {en:'E-Commerce & Catalog', es:'E-Commerce y Catálogo'},
     'service4.desc': {en:'High-volume, consistent product and model imagery built for online retail, without losing quality control.', es:'Imágenes de producto y modelo de alto volumen y consistentes, pensadas para retail online, sin perder control de calidad.'},
 
-    'services.eyebrow': {en:'What We Do', es:'Qué Hacemos'},
     'services.h2': {en:'Services', es:'Servicios'},
     'services.note': {en:'Hover each cell', es:'Pasa el mouse por cada casilla'},
 
@@ -1385,7 +1402,7 @@
     elegant: { images: ['images/editorial/elegant/01.jpg', 'images/editorial/elegant/02.webp', 'images/editorial/elegant/04.webp', 'images/editorial/elegant/05.webp', 'images/editorial/elegant/06.webp', 'images/editorial/elegant/07.webp', 'images/editorial/elegant/08.webp', 'images/editorial/elegant/09.webp', 'images/editorial/elegant/10.webp', 'images/editorial/elegant/11.webp', 'images/editorial/elegant/12.webp'], folder: 'images/editorial/elegant', title: 'ELEGANT', sub: {en:'Elegant Magazine — Otto by Eriko', es:'Revista Elegant — Otto by Eriko'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/136375879/Otto' },
     imirage: { images: ['images/editorial/imirage/01.jpg', 'images/editorial/imirage/07.webp', 'images/editorial/imirage/08.webp', 'images/editorial/imirage/09.webp', 'images/editorial/imirage/10.webp'], folder: 'images/editorial/imirage', title: 'IMIRAGE', sub: {en:'Imirage Magazine — Beauty Editorial', es:'Revista Imirage — Editorial de Belleza'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/121980999/Red-Muse' },
     shuba: { images: ['images/editorial/shuba/01.jpg', 'images/editorial/shuba/08.webp', 'images/editorial/shuba/09.webp', 'images/editorial/shuba/10.webp'], folder: 'images/editorial/shuba', title: 'SHUBA', sub: {en:'Shuba Magazine — Diversity Makeup, Issue 11', es:'Revista Shuba — Maquillaje Diversidad, Edición 11'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/170986845/Shuba-MAG' },
-    scorpiovin: { images: ['images/editorial/scorpiovin/01.jpg', 'images/editorial/scorpiovin/02.webp', 'images/editorial/scorpiovin/04.webp', 'images/editorial/scorpiovin/05.webp', 'images/editorial/scorpiovin/06.webp', 'images/editorial/scorpiovin/07.webp', 'images/editorial/scorpiovin/09.webp', 'images/editorial/scorpiovin/10.webp', 'images/editorial/scorpiovin/11.webp'], folder: 'images/editorial/scorpiovin', title: 'SCORPIO VIN', sub: {en:'Scorpio Vin — Neoscivic Editorial', es:'Scorpio Vin — Editorial Neoscivic'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/237730315/Neoscivic' },
+    scorpiovin: { images: ['images/editorial/scorpiovin/01.jpg', 'images/editorial/scorpiovin/02.webp', 'images/editorial/scorpiovin/04.webp', 'images/editorial/scorpiovin/05.webp', 'images/editorial/scorpiovin/06.webp', 'images/editorial/scorpiovin/07.webp', 'images/editorial/scorpiovin/09.webp', 'images/editorial/scorpiovin/10.webp', 'images/editorial/scorpiovin/11.webp'], folder: 'images/editorial/scorpiovin', title: 'SCORPIO VIN', sub: {en:'Scorpio Vin Magazine — Neoscivic Editorial', es:'Revista Scorpio Vin — Editorial Neoscivic'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/237730315/Neoscivic' },
     mob: { images: ['images/editorial/mob/04.webp', 'images/editorial/mob/02.webp', 'images/editorial/mob/03.webp', 'images/editorial/mob/05.webp', 'images/editorial/mob/06.webp', 'images/editorial/mob/07.webp', 'images/editorial/mob/08.webp', 'images/editorial/mob/09.webp'], folder: 'images/editorial/mob', title: 'MOB', sub: {en:'MOB Magazine — Editorial', es:'Revista MOB — Editorial'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/217204699/Muskaria-Mob-Journal' },
     tag: { images: ['images/editorial/tag/01-full.jpg', 'images/editorial/tag/02.webp', 'images/editorial/tag/03.webp', 'images/editorial/tag/05.webp', 'images/editorial/tag/06.webp', 'images/editorial/tag/07.webp', 'images/editorial/tag/08.webp', 'images/editorial/tag/09.webp', 'images/editorial/tag/10.webp', 'images/editorial/tag/11.webp', 'images/editorial/tag/12.webp', 'images/editorial/tag/13.webp', 'images/editorial/tag/14.webp', 'images/editorial/tag/15.webp', 'images/editorial/tag/16.webp'], folder: 'images/editorial/tag', title: 'TAG', sub: {en:'Tag Magazine — Editorial', es:'Revista Tag — Editorial'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/249848237/Tag-FILM-Editorial' },
     nike: { images: ['images/campaigns/nike/01.jpg', 'images/campaigns/nike/02.webp'], folder: 'images/campaigns/nike', title: 'NIKE', sub: {en:'Dafiti LATAM Campaign', es:'Campaña Dafiti LATAM'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'}, behance: 'https://www.behance.net/gallery/190502323/Nike-Dafiti-Colombia' },
@@ -1396,10 +1413,9 @@
     payless: { images: ['images/campaigns/payless/01.jpg', 'images/campaigns/payless/03.webp', 'images/campaigns/payless/04.webp', 'images/campaigns/payless/05.webp', 'images/campaigns/payless/07.webp', 'images/campaigns/payless/08.webp', 'images/campaigns/payless/09.webp', 'images/campaigns/payless/10.webp'], folder: 'images/campaigns/payless', title: 'PAYLESS', sub: {en:'Back to School Campaign', es:'Campaña Regreso a Clases'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'}, behance: 'https://www.behance.net/gallery/216206603/Payless-Back-to-School' },
     lci: { images: ['images/campaigns/lci/01.jpg', 'images/campaigns/lci/02.jpg', 'images/campaigns/lci/03.jpg', 'images/campaigns/lci/04.jpg', 'images/campaigns/lci/05.jpg', 'images/campaigns/lci/06.jpg'], folder: 'images/campaigns/lci', title: 'LCI', sub: {en:'LCI Education Campaign', es:'Campaña LCI Education'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'} },
     rayban: { images: ['images/campaigns/rayban/01.jpg', 'images/campaigns/rayban/02.jpg', 'images/campaigns/rayban/03.jpg'], folder: 'images/campaigns/rayban', title: 'RAY-BAN', sub: {en:'Ray-Ban Meta "Masters" Project', es:'Proyecto Ray-Ban Meta "Masters"'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'} },
-    fila: { images: ['images/campaigns/fila/01.jpg'], folder: 'images/campaigns/fila', title: 'FILA', sub: {en:'Campaign', es:'Campaña'}, note: {en:'Campaign imagery from the MILO Studio production archive.', es:'Imágenes de campaña del archivo de producción de MILO Studio.'} },
-    ferragamo: { images: ['images/ecommerce/ferragamo/01.jpg', 'images/ecommerce/ferragamo/02.jpg', 'images/ecommerce/ferragamo/03.jpg', 'images/ecommerce/ferragamo/04.jpg', 'images/ecommerce/ferragamo/05.jpg', 'images/ecommerce/ferragamo/06.jpg', 'images/ecommerce/ferragamo/07.jpg', 'images/ecommerce/ferragamo/08.jpg', 'images/ecommerce/ferragamo/09.jpg', 'images/ecommerce/ferragamo/10.jpg', 'images/ecommerce/ferragamo/11.jpg', 'images/ecommerce/ferragamo/12.jpg', 'images/ecommerce/ferragamo/13.jpg', 'images/ecommerce/ferragamo/14.jpg'], folder: 'images/ecommerce/ferragamo', title: 'FERRAGAMO', sub: {en:'Le Collezioni Campaign', es:'Campaña Le Collezioni'}, note: {en:'Product photography from the MILO Studio e-commerce archive.', es:'Fotografía de producto del archivo de e-commerce de MILO Studio.'}, behance: 'https://www.behance.net/gallery/117541195/Salvatore-Ferragamo' },
-    dolcegabbana: { images: ['images/ecommerce/dolcegabbana/01.jpg', 'images/ecommerce/dolcegabbana/02.jpg', 'images/ecommerce/dolcegabbana/03.jpg', 'images/ecommerce/dolcegabbana/04.jpg', 'images/ecommerce/dolcegabbana/05.jpg', 'images/ecommerce/dolcegabbana/06.jpg', 'images/ecommerce/dolcegabbana/07.jpg', 'images/ecommerce/dolcegabbana/08.jpg', 'images/ecommerce/dolcegabbana/10.jpg', 'images/ecommerce/dolcegabbana/11.jpg', 'images/ecommerce/dolcegabbana/13.jpg'], folder: 'images/ecommerce/dolcegabbana', title: 'DOLCE & GABBANA', sub: {en:'Le Collezioni Campaign', es:'Campaña Le Collezioni'}, note: {en:'Product photography from the MILO Studio e-commerce archive.', es:'Fotografía de producto del archivo de e-commerce de MILO Studio.'}, behance: 'https://www.behance.net/gallery/127539565/Dolce-Gabbana' },
-    dafiti: { images: ['images/ecommerce/dafiti/01.jpg', 'images/ecommerce/dafiti/05.jpg', 'images/ecommerce/dafiti/09.jpg', 'images/ecommerce/dafiti/10.jpg', 'images/ecommerce/dafiti/11.jpg', 'images/ecommerce/dafiti/12.jpg', 'images/ecommerce/dafiti/13.jpg', 'images/ecommerce/dafiti/14.jpg', 'images/ecommerce/dafiti/15.jpg', 'images/ecommerce/dafiti/16.jpg', 'images/ecommerce/dafiti/17.jpg', 'images/ecommerce/dafiti/18.jpg', 'images/ecommerce/dafiti/19.jpg', 'images/ecommerce/dafiti/20.jpg'], folder: 'images/ecommerce/dafiti', title: 'DAFITI', sub: {en:'Vacation Look Campaign', es:'Campaña Look de Vacaciones'}, note: {en:'Product photography from the MILO Studio e-commerce archive.', es:'Fotografía de producto del archivo de e-commerce de MILO Studio.'}, behance: 'https://www.behance.net/gallery/197307639/Dafiti-Look-de-vacaciones' },
+    ferragamo: { images: ['images/ecommerce/ferragamo/01.jpg', 'images/ecommerce/ferragamo/02.jpg', 'images/ecommerce/ferragamo/03.jpg', 'images/ecommerce/ferragamo/04.jpg', 'images/ecommerce/ferragamo/05.jpg', 'images/ecommerce/ferragamo/06.jpg', 'images/ecommerce/ferragamo/07.jpg', 'images/ecommerce/ferragamo/08.jpg', 'images/ecommerce/ferragamo/09.jpg', 'images/ecommerce/ferragamo/10.jpg', 'images/ecommerce/ferragamo/11.jpg', 'images/ecommerce/ferragamo/12.jpg', 'images/ecommerce/ferragamo/13.jpg', 'images/ecommerce/ferragamo/14.jpg'], folder: 'images/ecommerce/ferragamo', title: 'FERRAGAMO', sub: {en:'E-Commerce Photography — Le Collezioni', es:'Fotografía E-Commerce — Le Collezioni'}, note: {en:'Product photography from the MILO Studio e-commerce archive.', es:'Fotografía de producto del archivo de e-commerce de MILO Studio.'}, behance: 'https://www.behance.net/gallery/117541195/Salvatore-Ferragamo' },
+    dolcegabbana: { images: ['images/ecommerce/dolcegabbana/01.jpg', 'images/ecommerce/dolcegabbana/02.jpg', 'images/ecommerce/dolcegabbana/03.jpg', 'images/ecommerce/dolcegabbana/04.jpg', 'images/ecommerce/dolcegabbana/05.jpg', 'images/ecommerce/dolcegabbana/06.jpg', 'images/ecommerce/dolcegabbana/07.jpg', 'images/ecommerce/dolcegabbana/08.jpg', 'images/ecommerce/dolcegabbana/10.jpg', 'images/ecommerce/dolcegabbana/11.jpg', 'images/ecommerce/dolcegabbana/13.jpg'], folder: 'images/ecommerce/dolcegabbana', title: 'DOLCE & GABBANA', sub: {en:'E-Commerce Photography — Le Collezioni', es:'Fotografía E-Commerce — Le Collezioni'}, note: {en:'Product photography from the MILO Studio e-commerce archive.', es:'Fotografía de producto del archivo de e-commerce de MILO Studio.'}, behance: 'https://www.behance.net/gallery/127539565/Dolce-Gabbana' },
+    dafiti: { images: ['images/ecommerce/dafiti/01.jpg', 'images/ecommerce/dafiti/05.jpg', 'images/ecommerce/dafiti/09.jpg', 'images/ecommerce/dafiti/10.jpg', 'images/ecommerce/dafiti/11.jpg', 'images/ecommerce/dafiti/12.jpg', 'images/ecommerce/dafiti/13.jpg', 'images/ecommerce/dafiti/14.jpg', 'images/ecommerce/dafiti/15.jpg', 'images/ecommerce/dafiti/16.jpg', 'images/ecommerce/dafiti/17.jpg', 'images/ecommerce/dafiti/18.jpg', 'images/ecommerce/dafiti/19.jpg', 'images/ecommerce/dafiti/20.jpg'], folder: 'images/ecommerce/dafiti', title: 'DAFITI', sub: {en:'E-Commerce Photography — Vacation Look', es:'Fotografía E-Commerce — Look de Vacaciones'}, note: {en:'Product photography from the MILO Studio e-commerce archive.', es:'Fotografía de producto del archivo de e-commerce de MILO Studio.'}, behance: 'https://www.behance.net/gallery/197307639/Dafiti-Look-de-vacaciones' },
     // Retouching is grouped into per-client/category projects (like campaignsData) rather than
     // one flat set of 6 pairs — user's call 2026-08-26 once it became clear the pairs actually
     // came from 3 different shoots (Adidas x3, Google x1, Beauty x2), not one continuous set, and
@@ -1429,7 +1445,7 @@
       {before: 'images/services/retouching/before-14.jpg', after: 'images/services/retouching/after-14.jpg', ratio: 0.6667},
       {before: 'images/services/retouching/before-15.jpg', after: 'images/services/retouching/after-15.jpg', ratio: 0.8583},
       {before: 'images/services/retouching/before-16.jpg', after: 'images/services/retouching/after-16.jpg', ratio: 1},
-    ], folder: 'images/services/retouching', title: "VOGUE L'ORÉAL", sub: {en:'Retouching — Vogue x L’Oréal', es:'Retoque — Vogue x L’Oréal'}, note: {en:'Hover each photo to see the before — retouching examples from the MILO Studio archive.', es:'Pasa el mouse por cada foto para ver el antes — ejemplos de retoque del archivo de MILO Studio.'}, behance: 'https://www.behance.net/gallery/233984255/Vogue-Retouch-LOral-Colombia' },
+    ], folder: 'images/services/retouching', title: 'VOGUE L’ORÉAL', sub: {en:'Retouching — Vogue x L’Oréal', es:'Retoque — Vogue x L’Oréal'}, note: {en:'Hover each photo to see the before — retouching examples from the MILO Studio archive.', es:'Pasa el mouse por cada foto para ver el antes — ejemplos de retoque del archivo de MILO Studio.'}, behance: 'https://www.behance.net/gallery/233984255/Vogue-Retouch-LOral-Colombia' },
     retouching_falabella: { pairs: [
       {before: 'images/services/retouching/before-17.jpg', after: 'images/services/retouching/after-17.jpg', ratio: 0.6656},
       {before: 'images/services/retouching/before-18.jpg', after: 'images/services/retouching/after-18.jpg', ratio: 0.6667},
@@ -1438,7 +1454,7 @@
     ], folder: 'images/services/retouching', title: 'FALABELLA', sub: {en:'Retouching — Falabella x Sybilla', es:'Retoque — Falabella x Sybilla'}, note: {en:'Hover each photo to see the before — retouching examples from the MILO Studio archive.', es:'Pasa el mouse por cada foto para ver el antes — ejemplos de retoque del archivo de MILO Studio.'}, behance: 'https://www.behance.net/gallery/237260351/Retouch-Falabella-Sybilla' },
     retouching_tissot: { pairs: [
       {before: 'images/services/retouching/before-22.jpg', after: 'images/services/retouching/after-22.jpg', ratio: 0.7144},
-    ], videos: ['images/services/retouching/tissot-speed-retouch.mp4'], folder: 'images/services/retouching', title: 'TISSOT', sub: {en:'Retouching — Tissot', es:'Retoque — Tissot'}, note: {en:'Hover each photo to see the before — retouching examples from the MILO Studio archive.', es:'Pasa el mouse por cada foto para ver el antes — ejemplos de retoque del archivo de MILO Studio.'} },
+    ], videos: ['images/services/retouching/tissot-speed-retouch.mp4'], folder: 'images/services/retouching', title: 'TISSOT', sub: {en:'Retouching — Tissot', es:'Retoque — Tissot'}, note: {en:'Hover the photo to see the before, then play the process clip.', es:'Pasa el mouse por la foto para ver el antes, luego reproduce el clip del proceso.'} },
   };
 
   let currentProjectKey = null, currentProjectImg = null, projectMaxTranslate = 0;
@@ -1490,16 +1506,44 @@
       projectScrollTicking = true;
     }
   });
+  // Touch: the filmstrip reads as horizontal but is driven by vertical scroll, so swiping
+  // sideways — the gesture the layout actually invites — did nothing and people got stuck.
+  // Translate a horizontal drag into the equivalent scroll offset (the track moves 1:1 with
+  // scrollTop, see sizeProjectTrack), and leave vertical swipes alone so they keep scrolling
+  // normally. Grid-mode projects are untouched: they scroll natively in both senses.
+  let touchStartX = 0, touchStartY = 0, touchStartTop = 0, touchAxis = null;
+  projectScroll.addEventListener('touchstart', e => {
+    if(projectModal.classList.contains('grid-mode') || e.touches.length !== 1) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTop = projectScroll.scrollTop;
+    touchAxis = null;
+  }, {passive: true});
+  projectScroll.addEventListener('touchmove', e => {
+    if(projectModal.classList.contains('grid-mode') || e.touches.length !== 1 || projectMaxTranslate <= 0) return;
+    const dx = touchStartX - e.touches[0].clientX;
+    const dy = touchStartY - e.touches[0].clientY;
+    if(touchAxis === null){
+      if(Math.abs(dx) < 8 && Math.abs(dy) < 8) return; // wait for the gesture to declare a direction
+      touchAxis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+    }
+    if(touchAxis !== 'x') return; // a vertical swipe still means "scroll"
+    const total = projectScroll.scrollHeight - projectScroll.clientHeight;
+    projectScroll.scrollTop = touchStartTop + dx * (total / projectMaxTranslate);
+    e.preventDefault(); // stop the page from also panning underneath the drag
+  }, {passive: false});
+
   window.addEventListener('resize', () => { if(projectModal.classList.contains('open')) sizeProjectTrack(); });
 
   function openProjectModal(key, imgSrc){
     const project = projectData[key];
     if(!project) return;
     currentProjectKey = key; currentProjectImg = imgSrc;
-    projectEyebrow.textContent = project.folder.includes('/editorial/') ? t('editorial.eyebrow')
-      : project.folder.includes('/services/') ? t('services.eyebrow')
-      : t('campaigns.eyebrow');
+    projectEyebrow.textContent = t(projectCategory(key) + '.eyebrow');
     projectTitle.textContent = project.title;
+    // Hide Next Project on the last item of the section so the chain visibly ends there.
+    const navOrder = getProjectOrder(key), navIdx = navOrder.indexOf(key);
+    projectNextBtn.style.display = (navIdx > -1 && navIdx < navOrder.length - 1) ? '' : 'none';
     const behanceUrl = project.behance || 'https://www.behance.net/marquezvillegas';
     const linkLabel = project.behance ? t('behance.full') : t('behance.more');
     projectNote.innerHTML = `<a href="${behanceUrl}" target="_blank" rel="noopener" class="behance-link">${linkLabel}</a>`;
@@ -1517,7 +1561,7 @@
       // reversed from a literal reading of "before/after" so the page reads as polished at a
       // glance and hovering is the surprise, not the other way round.
       projectTrack.innerHTML = project.pairs.map(p =>
-        `<div class="project-hover-compare" style="aspect-ratio:${p.ratio}"><img src="${p.after}" alt="${project.title} — after" class="hc-base"><img src="${p.before}" alt="${project.title} — before" class="hc-hover"></div>`
+        `<div class="project-hover-compare" style="aspect-ratio:${p.ratio}"><img src="${p.after}" alt="${project.title} — after" class="hc-base"><img src="${p.before}" alt="${project.title} — before" class="hc-hover"><span class="hc-label"><span class="hc-label-after">${t('ba.after')}</span><span class="hc-label-before">${t('ba.before')}</span></span></div>`
       ).join('');
     } else {
       const images = project.images && project.images.length ? project.images : (imgSrc ? [imgSrc] : []);
@@ -1623,21 +1667,40 @@
   document.addEventListener('fullscreenchange', updateFullscreenIcon);
   document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
 
-  // ===== Next Project — cycles through the editorial covers, then the campaigns, so
-  // one button walks the entire portfolio regardless of which grid it was opened from.
-  // Reads coverOrder/campaignsData lazily (only at click time) since campaignsData is
-  // declared in a later <script> block that hasn't run yet when this one is parsed. =====
-  function getProjectOrder(){
-    return [...coverOrder, ...campaignsData.map(c => c.key), 'fila'];
+  // ===== Next Project — walks the projects of ONE section and stops at its last one, so
+  // browsing campaigns never spills into editorial (and vice versa). Previously this was a
+  // single wrap-around list of editorial+campaigns, which also meant retouching/e-commerce
+  // projects (absent from it) jumped to the first editorial cover.
+  // Reads coverOrder/campaignsData/etc. lazily (only at click time) since they are declared
+  // in later <script> blocks that have not run yet when this one is parsed. =====
+  function projectCategory(key){
+    const p = projectData[key];
+    if(!p) return 'campaigns';
+    if(key.startsWith('retouching_')) return 'retouching';
+    if(p.folder.includes('/editorial/')) return 'editorial';
+    if(p.folder.includes('/ecommerce/')) return 'ecommerce';
+    return 'campaigns';
+  }
+  function getProjectOrder(key){
+    switch(projectCategory(key)){
+      case 'editorial':  return [...coverOrder];
+      case 'retouching': return retouchingProjectsData.map(r => r.key);
+      case 'ecommerce':  return ecommerceProjectsData.filter(e => e.projectKey).map(e => e.projectKey);
+      default:           return campaignsData.map(c => c.key);
+    }
+  }
+  // Retouching projects carry before/after pairs instead of a flat images array.
+  function projectFirstAsset(project){
+    return project.pairs ? project.pairs[0].before : (project.images && project.images[0]);
   }
   function goToNextProject(){
     if(!currentProjectKey) return;
-    const order = getProjectOrder();
+    const order = getProjectOrder(currentProjectKey);
     const idx = order.indexOf(currentProjectKey);
-    const nextKey = order[idx === -1 ? 0 : (idx + 1) % order.length];
-    const nextProject = projectData[nextKey];
+    if(idx === -1 || idx === order.length - 1) return; // last of its section — the chain ends here
+    const nextProject = projectData[order[idx + 1]];
     if(!nextProject) return;
-    openProjectModal(nextKey, nextProject.images[0]);
+    openProjectModal(order[idx + 1], projectFirstAsset(nextProject));
   }
   projectNextBtn.addEventListener('click', goToNextProject);
   // Clicking anywhere that isn't a photo closes the modal — the only things that can eat a click
@@ -1657,6 +1720,7 @@
 
   // ===== Coverflow =====
   const coverOrder = ['penida', 'elegant', 'imirage', 'shuba', 'scorpiovin', 'mob', 'tag'];
+  const coverflowStage = document.querySelector('.coverflow-stage');
   const covers = Array.from(document.querySelectorAll('#coverTrack .mag-cover'));
   const dotsWrap = document.getElementById('coverDots');
   const captionTitle = document.getElementById('captionTitle');
@@ -1698,19 +1762,31 @@
     layoutCovers();
   }
 
-  covers.forEach((c, i) => {
-    c.addEventListener('click', () => {
-      if(i === active){
-        const key = coverOrder[i];
-        const img = c.querySelector('img');
-        openProjectModal(key, img.src);
-      } else {
-        setActiveCover(i);
-      }
+  // The covers are 3D-transformed (rotateY + translateZ) and overlap heavily, and per-cover
+  // hit-testing did not match what is painted: only the centred cover actually received clicks,
+  // so tapping a smaller cover either did nothing or re-opened the centred project. Resolve the
+  // target from the click's position instead — among the covers whose projected box contains the
+  // point, the one visible on top is always the closest to the centre, which is exactly the
+  // stacking order z-index paints. One listener on the stage, so it works no matter which
+  // element under the cursor won the hit-test.
+  coverflowStage.addEventListener('click', e => {
+    if(e.target.closest('.arrow-btn')) return; // arrows have their own handlers
+    let target = -1, closest = Infinity;
+    covers.forEach((c, i) => {
+      const r = c.getBoundingClientRect();
+      if(e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
+      const d = Math.abs(i - active);
+      if(d < closest){ closest = d; target = i; }
     });
+    if(target === -1) return;
+    if(target === active){
+      openProjectModal(coverOrder[target], covers[target].querySelector('img').src);
+    } else {
+      scrollToCover(target);
+    }
   });
-  prevBtn.addEventListener('click', () => setActiveCover(active - 1));
-  nextBtn.addEventListener('click', () => setActiveCover(active + 1));
+  prevBtn.addEventListener('click', () => scrollToCover(active - 1));
+  nextBtn.addEventListener('click', () => scrollToCover(active + 1));
 
   layoutCovers();
 
@@ -1722,6 +1798,26 @@
 
   function sizeCoverflowPin(){
     coverflowPin.style.height = (coverflowSticky.offsetHeight + COVERFLOW_SCROLL_ROOM) + 'px';
+  }
+
+  // Which cover is centered is derived from scroll position (see updateCoverflowScroll), so just
+  // setting `active` on a click was undone by the very next scroll event — the carousel snapped
+  // back and the only thing that actually worked was scrolling. Move the page to the offset that
+  // maps to the requested cover instead, so clicking a cover, the arrows and the scroll position
+  // all agree. Falls back to setting it directly if the pin has no scroll room (very short pins).
+  function scrollToCover(i){
+    const idx = ((i % covers.length) + covers.length) % covers.length;
+    const total = coverflowPin.offsetHeight - coverflowSticky.offsetHeight;
+    if(total <= 0){ setActiveCover(idx); return; }
+    // Update the carousel right away so the tap feels instant, then move the page to the matching
+    // offset so the scroll-derived state agrees and nothing snaps back on the next scroll event.
+    setActiveCover(idx);
+    const pinTop = coverflowPin.getBoundingClientRect().top + window.scrollY;
+    const progress = covers.length > 1 ? idx / (covers.length - 1) : 0;
+    // Two-argument form on purpose: the smoothing comes from html{scroll-behavior:smooth}, which
+    // the global prefers-reduced-motion block already switches to auto. Passing
+    // {behavior:'smooth'} instead was silently ignored in some engines, leaving the page put.
+    window.scrollTo(0, Math.round(pinTop + progress * total));
   }
 
   function updateCoverflowScroll(){
@@ -1875,7 +1971,7 @@
   // click (same as Campaigns/Retouching), same as the plain `img`/`video` slides.
   const ecommerceProjectsData = [
     {title: {en:'Catalog Production', es:'Producción de Catálogo'}, video: 'images/services/ecommerce/ecommerce.mp4'},
-    {title: {en:'Ferragamo — Le Collezioni', es:'Ferragamo — Le Collezioni'}, sub: {en:'E-Commerce Product Photography', es:'Fotografía de Producto E-Commerce'}, img: 'images/ecommerce/ferragamo/01.jpg', projectKey: 'ferragamo'},
+    {title: {en:'Ferragamo — Le Collezioni', es:'Ferragamo — Le Collezioni'}, sub: {en:'E-Commerce Photography', es:'Fotografía E-Commerce'}, img: 'images/ecommerce/ferragamo/01.jpg', projectKey: 'ferragamo'},
     {title: {en:'Dolce & Gabbana — Le Collezioni', es:'Dolce & Gabbana — Le Collezioni'}, sub: {en:'E-Commerce Photography', es:'Fotografía E-Commerce'}, img: 'images/ecommerce/dolcegabbana/01.jpg', projectKey: 'dolcegabbana'},
     {title: {en:'Dafiti — Vacation Look', es:'Dafiti — Look de Vacaciones'}, sub: {en:'E-Commerce Photography', es:'Fotografía E-Commerce'}, img: 'images/ecommerce/dafiti/01.jpg', projectKey: 'dafiti'},
   ];

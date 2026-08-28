@@ -3,6 +3,5 @@
 # Local design-tooling skills (third-party, ~3.4MB) — not part of the site
 .claude/skills/
 
-# Local working files for the redesign, not served
-index-preview.html
+# Local design concept, not served
 milo-brutalist-concept.html
