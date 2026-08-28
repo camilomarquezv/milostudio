@@ -6,7 +6,7 @@
 <title>MILO Studio — Fashion Production &amp; Retouching</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&display=swap" rel="stylesheet">
 <style>
   :root{
     --ink:#161B22;
@@ -14,6 +14,9 @@
     --steel:#6E7F8D;
     --mist:#C7D0D6;
     --paper:#F2F4F5;
+    /* the exact neutral gray baked into images/site/hero-sequence/*.jpg — the hero block uses
+       this instead of --paper (which is faintly blue) so the masked frame edge doesn't halo */
+    --hero-paper:#F4F4F4;
     --paper-dim:#E4E8EA;
     --line: rgba(22,27,34,0.14);
     --accent:#2E5C73;
@@ -38,7 +41,7 @@
      Safari still honors: listing only pan-x/pan-y (omitting pinch-zoom) blocks the pinch gesture
      while leaving normal scroll panning untouched. Backed up by a gesturestart/gesturechange JS
      block further down for the same reason belt-and-suspenders. */
-  html{scroll-behavior:smooth; font-size:clamp(16px, 14.63px + 0.3661vw, 24px); touch-action:pan-x pan-y;}
+  html{scroll-behavior:smooth; font-size:clamp(15px, 14.14px + 0.2288vw, 20px); touch-action:pan-x pan-y;}
   @media (prefers-reduced-motion: reduce){
     *{animation-duration:0.001ms !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
   }
@@ -57,63 +60,78 @@
     overflow-x:hidden;
   }
 
-  h1,h2,h3{font-family:'Archivo', sans-serif; letter-spacing:-0.01em; line-height:1.02;}
+  h1,h2,h3{font-family:'Archivo', sans-serif; font-weight:900; text-transform:uppercase; letter-spacing:-0.02em; line-height:1.02;}
+  p{font-family:'Bricolage Grotesque', sans-serif;}
 
   .eyebrow{
     font-size:0.72rem;
     font-weight:700;
     letter-spacing:0.16em;
     text-transform:uppercase;
-    color:var(--steel);
+    color:var(--slate);
     display:inline-flex; align-items:center; gap:0.5em;
   }
   .eyebrow::before{content:""; width:6px; height:6px; background:var(--accent); border-radius:50%; display:inline-block;}
+  .eyebrow-idx::before{content:"✦"; width:auto; height:auto; background:none; border-radius:0; display:inline;}
+  .hl{background:var(--accent); color:var(--paper); padding:0 .1em;}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:3px;}
 
   a{color:inherit; text-decoration:none;}
   .wrap{max-width:80rem; margin:0 auto; padding:0 2.25rem;}
 
   /* ===== NAV ===== */
-  header{position:fixed; top:0; left:0; right:0; z-index:200; background:rgba(242,244,245,0.85); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
-  .nav{display:flex; align-items:center; justify-content:space-between; padding:14px 2.25rem;}
+  #fixedTopStack{position:fixed; top:0; left:0; right:0; z-index:200;}
+  .top-accent{height:6px; background:var(--paper);}
+  .top-tag{background:var(--ink); color:var(--paper); font-size:0.68rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:6px 0;}
+  .top-tag .wrap{display:flex; justify-content:space-between; align-items:center;}
+  header{background:var(--paper); border-bottom:2px solid var(--ink);}
+  .nav{display:flex; align-items:center; justify-content:space-between; max-width:80rem; margin:0 auto; padding:12px 2.25rem;}
   .logo-wrap{display:flex; align-items:center; gap:10px;}
-  .logo-wrap img{height:30px; width:auto; display:block; transform:translateY(-3px);}
-  .nav-links{display:flex; gap:2.2rem; align-items:center;}
-  .nav-links a{font-size:0.85rem; font-weight:600; position:relative; padding-bottom:3px;}
+  .logo-wrap img{height:26px; width:auto; display:block; transform:translateY(-2px);}
+  .nav-links{display:flex; gap:1.7rem; align-items:center;}
+  .nav-links a{font-size:0.72rem; font-weight:700; letter-spacing:0.02em; text-transform:uppercase; position:relative; padding-bottom:3px;}
   .nav-links a::after{content:""; position:absolute; left:0; bottom:0; width:0; height:2px; background:var(--ink); transition:width 0.25s ease;}
   .nav-links a:hover::after{width:100%;}
-  .lang-toggle{font-size:0.72rem; font-weight:800; letter-spacing:0.06em; border:1.5px solid var(--ink); background:transparent; color:var(--ink); padding:6px 12px; border-radius:100px; cursor:pointer; transition:background 0.2s ease, color 0.2s ease;}
+
+  .nav-dropdown{position:relative;}
+  .nav-dropdown-trigger{background:none; border:none; font:inherit; color:inherit; cursor:pointer; font-size:0.72rem; font-weight:700; letter-spacing:0.02em; text-transform:uppercase; padding:0;}
+  .nav-dropdown-menu{position:absolute; top:calc(100% + 16px); left:50%; transform:translateX(-50%); background:var(--paper); border:2px solid var(--ink); min-width:170px; display:none; flex-direction:column; z-index:250;}
+  .nav-dropdown-menu a{padding:11px 16px; font-size:0.72rem; font-weight:700; letter-spacing:0.02em; text-transform:uppercase; border-bottom:1px solid var(--line);}
+  .nav-dropdown-menu a:last-child{border-bottom:none;}
+  .nav-dropdown-menu a:hover{background:var(--paper-dim);}
+  .nav-dropdown-menu a::after{display:none;}
+  .nav-dropdown:hover .nav-dropdown-menu, .nav-dropdown.open .nav-dropdown-menu{display:flex;}
+  .lang-toggle{font-size:0.66rem; font-weight:800; letter-spacing:0.06em; border:2px solid var(--ink); background:transparent; color:var(--ink); padding:5px 11px; border-radius:0; cursor:pointer; transition:background 0.2s ease, color 0.2s ease;}
   .lang-toggle:hover{background:var(--ink); color:var(--paper);}
-  .nav-cta{background:var(--ink); color:var(--paper); padding:9px 18px; font-size:0.8rem; font-weight:700; border-radius:2px;}
+  .nav-cta{background:var(--ink); color:var(--paper); padding:8px 15px; font-size:0.7rem; font-weight:700; letter-spacing:0.02em; text-transform:uppercase; border-radius:0; border:2px solid var(--ink);}
   .nav-cta:hover{background:var(--accent);}
   .burger{display:none; flex-direction:column; gap:5px; cursor:pointer; background:none; border:none;}
   .burger span{width:22px; height:2px; background:var(--ink);}
 
   /* ===== SCROLL-PINNED HERO ===== */
-  .hero-pin{position:relative; padding:0; background:var(--paper);} /* height set in JS to match .hero-stage's natural (content-fit) height plus a scroll-scrub distance — see sizeHeroPin(). background matches .hero-stage's own so the body's dot-grid doesn't show through the scroll-room gap below the sticky stage — that gap is real (needed for the frame-scrub distance) but looked like an unstyled rendering gap without this, especially on mobile where the whole pin can fit within one screen at scrollY 0 */
+  .hero-pin{position:relative; padding:0; background:var(--hero-paper);} /* height set in JS to match .hero-stage's natural (content-fit) height plus a scroll-scrub distance — see sizeHeroPin(). background matches .hero-stage's own so the body's line grid doesn't show through the scroll-room gap below the sticky stage — that gap is real (needed for the frame-scrub distance) but looked like an unstyled rendering gap without this, especially on mobile where the whole pin can fit within one screen at scrollY 0 */
   .hero-stage{
     position:sticky; top:0; overflow:hidden;
     display:flex; align-items:flex-start; justify-content:center;
     padding:4.5rem 0 2.5rem;
-    background:var(--paper); /* same exact base tone as the rest of the page — just without the dot grid drawn on top, so there's no seam at the section's own edge */
+    background:var(--hero-paper); /* exact tone baked into the frame sequence, so the masked frame edge blends instead of reading as a floating box */
   }
 
   .logo-layer{ width:100%; display:flex; justify-content:center; }
+  /* No edge mask needed: .hero-stage now paints --hero-paper (#F4F4F4), the exact tone baked
+     into the frame sequence, so the frame's rectangular edge is already invisible. */
   .logo-layer img{
     width:min(78vw, 980px); height:auto; display:block;
-    /* soft-fade the frame's own rectangular edge so it blends into .hero-stage's matching
-       background instead of reading as a floating box, regardless of tiny per-frame render noise */
-    -webkit-mask-image: radial-gradient(ellipse 72% 78% at 50% 50%, #000 68%, transparent 100%);
-    mask-image: radial-gradient(ellipse 72% 78% at 50% 50%, #000 68%, transparent 100%);
   }
 
-  #heroContent{padding:1.5rem 0; background:var(--paper);} /* override both top AND bottom of the generic section{padding} rule — top so the headline sits close under the logo, bottom so the marquee (already a strong dark full-width band) doesn't leave a huge gap before the next section, which adds its own top padding on top of this one. Solid background (no grid) through the headline and marquee — the dot grid resumes right after, at Campaigns */
+  #heroContent{padding:1.5rem 0; background:var(--hero-paper);} /* override both top AND bottom of the generic section{padding} rule — top so the headline sits close under the logo, bottom so the marquee (already a strong dark full-width band) doesn't leave a huge gap before the next section, which adds its own top padding on top of this one. Solid background (no grid) through the headline and marquee — the line grid resumes right after, at Campaigns */
   .hero-content{text-align:center;}
   .hero-content h1{
-    font-size:3.1rem; font-weight:800; line-height:1.05; margin-top:0.8rem;
+    font-size:3.1rem; font-weight:800; line-height:1.05; margin-top:0.8rem; text-transform:none;
   }
-  .hero-content h1 em{font-style:italic; font-weight:500; color:var(--slate);}
+  .hero-content h1 em{font-style:italic; font-weight:500; text-transform:none; color:var(--slate);}
   .hero-content p{font-size:1.08rem; line-height:1.55; color:var(--slate); max-width:44ch; margin:1.1rem auto 0;}
-  .btn{display:inline-flex; align-items:center; gap:0.5em; padding:13px 24px; font-size:0.85rem; font-weight:700; border-radius:2px; border:1.5px solid var(--ink); transition:all 0.2s ease;}
+  .btn{display:inline-flex; align-items:center; gap:0.5em; padding:13px 24px; font-size:0.85rem; font-weight:700; border-radius:0; border:2px solid var(--ink); transition:all 0.2s ease;}
   .btn-solid{background:var(--ink); color:var(--paper);}
   .btn-solid:hover{background:var(--accent); border-color:var(--accent);}
   .btn-outline{background:transparent; color:var(--ink);}
@@ -122,7 +140,7 @@
 
   .scroll-cue{
     position:absolute; bottom:32px; left:50%; transform:translateX(-50%);
-    font-size:0.7rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--steel);
+    font-size:0.7rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--slate);
     display:flex; flex-direction:column; align-items:center; gap:8px;
     opacity:1; transition:opacity 0.3s ease;
   }
@@ -136,7 +154,7 @@
   .marquee-track{display:flex; width:max-content; animation:scroll 30s linear infinite; padding:14px 0;}
   @keyframes scroll{from{transform:translateX(0);} to{transform:translateX(-50%);}}
   .marquee-track span{font-size:0.8rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; padding:0 2rem; white-space:nowrap; opacity:0.8;}
-  .marquee-track span::after{content:"·"; margin-left:2rem; color:var(--steel);}
+  .marquee-track span::after{content:"✦"; margin-left:2rem; color:var(--accent); font-size:.7em;}
   .hero-marquee{margin-top:3.375rem;}
   .hero-marquee .marquee-track{padding:12px 0;}
   .hero-marquee .marquee-track span{font-size:0.7rem; padding:0 1.35rem;}
@@ -144,14 +162,18 @@
 
   /* ===== CURSOR TRAIL ===== */
   /* mix-blend-mode:difference inverts against whatever's underneath, so a single white stroke
-     reads dark on light sections and light on dark sections (About, Contact) without needing
+     reads dark on light sections and light on dark sections (Contact) without needing
      per-section color logic. */
   #cursorTrail{position:fixed; inset:0; width:100vw; height:100vh; pointer-events:none; z-index:9999; mix-blend-mode:difference;}
 
   /* ===== SECTION SHELL ===== */
-  section{padding:5rem 0;}
+  section{padding:5rem 0; border-bottom:2px solid var(--ink);}
+  /* the pinned logo reveal, headline, and marquee are one hero moment — no seam between them */
+  #heroPin, #heroContent{border-bottom:none;}
+  /* dense grid of hairline cell borders/rows — the body's line grid would fight them, so it's suppressed here */
+  #services, #process{background:var(--paper);}
   .section-head{display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; margin-bottom:2.8rem; flex-wrap:wrap;}
-  .section-head h2{font-size:2.5rem; font-weight:800;}
+  .section-head h2{font-size:2.5rem; font-weight:900;}
   .section-head .desc{max-width:32ch; font-size:1.03rem; line-height:1.5; color:var(--slate);}
   /* Campaigns moved its .desc from floating far-right (same row as the h2) to right under the
      heading instead — much smaller too, per feedback that the full-size paragraph sitting way
@@ -163,14 +185,20 @@
   .reveal.in{opacity:1; transform:translateY(0);}
 
   /* ===== ABOUT ===== */
-  .about{background:var(--ink); color:var(--paper); border-radius:4px;}
-  .about-grid{display:grid; grid-template-columns:0.75fr 1.25fr; gap:3rem; align-items:center;}
-  .about img, .about video{width:100%; display:block; border-radius:4px; filter:grayscale(1) contrast(1.05);}
-  .about h2{font-size:1.8rem; font-weight:800; color:var(--paper); line-height:1.25;}
+  #about{background:var(--paper); color:var(--ink);}
+  .about{margin-top:2.2rem;}
+  .about-grid{display:grid; grid-template-columns:1.3fr 1fr; gap:3rem; align-items:start;}
+  .about-grid .about-copy-col{padding-left:3rem; border-left:2px solid var(--line);}
+  @media(max-width:860px){.about-grid .about-copy-col{padding-left:0; border-left:none;}}
+  .about-grid h2{font-size:2.1rem; margin-bottom:1.6rem;}
+  .about-grid h2 .hl{background:var(--accent); color:var(--paper); padding:0 .12em;}
+  .about-grid .studio-slider{margin:0.4rem auto 0; max-width:420px;}
+  .about-grid .studio-slider-stage{aspect-ratio:16/10;}
+  .about img, .about video{width:100%; display:block; border-radius:0; filter:grayscale(1) contrast(1.05);}
   .about-copy p{font-size:1rem; line-height:1.6; opacity:0.82; margin-top:1.1rem; max-width:50ch;}
   .stat-row{display:flex; gap:2.2rem; margin-top:1.8rem; flex-wrap:wrap;}
-  .stat-row div{border-top:1px solid rgba(242,244,245,0.24); padding-top:0.7rem; min-width:110px;}
-  .stat-num{font-size:2.1rem; font-weight:800; display:block;}
+  .stat-row div{display:flex; align-items:baseline; gap:0.5rem; border-top:1px solid var(--line); padding-top:0.7rem; min-width:110px; white-space:nowrap;}
+  .stat-num{font-size:2.1rem; font-weight:800;}
   .stat-label{font-size:0.72rem; opacity:0.68; text-transform:uppercase; letter-spacing:0.05em;}
 
   @media (max-width:860px){.about-grid{grid-template-columns:1fr;}}
@@ -182,14 +210,14 @@
      placement the same day). Plain click-to-toggle (no scroll-pin) since it's still just 2 items,
      not a full browsable project set like Retouching/E-Commerce. */
   .studio-slider{width:100%;}
-  .studio-slider-stage{position:relative; aspect-ratio:3/4; border-radius:4px; overflow:hidden; background:rgba(242,244,245,.06);}
+  .studio-slider-stage{position:relative; aspect-ratio:3/4; border-radius:0; overflow:hidden; background:rgba(22,27,34,.05);}
   .studio-slider-stage img, .studio-slider-stage video{width:100%; height:100%; object-fit:cover; display:block; filter:none;} /* overrides .about img/video's grayscale — Creative Direction's clip is in color on purpose */
   .studio-slider-foot{display:flex; align-items:center; gap:0.9rem; margin-top:1rem;}
-  .studio-slider-arrow{flex-shrink:0; width:30px; height:30px; border-radius:50%; border:1px solid rgba(242,244,245,.3); background:transparent; color:var(--paper); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:0.9rem; transition:background .2s ease;}
-  .studio-slider-arrow:hover{background:rgba(242,244,245,.14);}
+  .studio-slider-arrow{flex-shrink:0; width:30px; height:30px; border-radius:0; border:2px solid var(--ink); background:transparent; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:0.9rem; transition:background .2s ease;}
+  .studio-slider-arrow:hover{background:rgba(22,27,34,.08);}
   .studio-slider-info{flex:1; min-width:0;}
-  .studio-slider-counter{display:block; font-size:0.66rem; letter-spacing:0.1em; color:var(--mist); opacity:0.7; font-variant-numeric:tabular-nums;}
-  .studio-slider-title{display:block; font-size:0.86rem; font-weight:700; color:var(--paper); margin-top:0.2rem;}
+  .studio-slider-counter{display:block; font-size:0.66rem; letter-spacing:0.1em; color:var(--slate); opacity:0.7; font-variant-numeric:tabular-nums;}
+  .studio-slider-title{display:block; font-size:0.86rem; font-weight:700; color:var(--ink); margin-top:0.2rem;}
 
   /* ===== SERVICES ===== */
   /* The old 4-slide Services carousel (text+visual per service) was split up 2026-08-26:
@@ -198,16 +226,35 @@
      second and third instance of it), and Photography/Creative Direction moved into a small
      slider inside The Studio (see .studio-slider in the About section's CSS). */
 
+  /* ===== SERVICES OVERVIEW GRID ===== */
+  .services-head{display:flex; justify-content:space-between; align-items:flex-end; gap:1rem; flex-wrap:wrap; padding-bottom:1.6rem; border-bottom:1px solid var(--line);}
+  .services-head h2{font-size:2.5rem;}
+  .services-head .eyebrow, .services-head .desc{font-size:.75rem; color:var(--slate);}
+  .svc-grid{display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); margin-top:2.2rem;}
+  @media(max-width:900px){.svc-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:520px){.svc-grid{grid-template-columns:1fr;}}
+  .svc-cell{border-right:1px solid var(--line); border-bottom:1px solid var(--line); padding:1.8rem 1.6rem; min-height:280px; display:flex; flex-direction:column; justify-content:flex-end; position:relative; overflow:hidden;}
+  .svc-grid .svc-cell:last-child{border-right:none;}
+  .svc-cell h3{font-size:1.3rem;}
+  .svc-cell p{font-size:.84rem; color:var(--slate); margin-top:.6rem; max-width:26ch;}
+  .svc-cell .svc-img{position:absolute; inset:0; opacity:0; transition:opacity .35s ease;}
+  .svc-cell .svc-img img, .svc-cell .svc-img video{width:100%; height:100%; object-fit:cover; filter:grayscale(1) contrast(1.1);}
+  .svc-cell:hover .svc-img{opacity:1;}
+  .svc-cell:hover h3{color:var(--paper); position:relative; z-index:2;}
+  .svc-cell:hover p{opacity:0;}
+  .svc-cell::before{content:""; position:absolute; inset:0; background:var(--ink); opacity:0; transition:opacity .35s ease; z-index:1;}
+  .svc-cell:hover::before{opacity:.25;}
+
   /* ===== TEAM BUILDER ===== */
-  .builder{background:var(--paper-dim); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .builder{background:var(--paper-dim); border-top:2px solid var(--ink); border-bottom:2px solid var(--ink);}
   .builder-inner{display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:start;}
   .role-grid{display:flex; flex-wrap:wrap; gap:0.6rem;}
-  .role-chip{font-size:0.82rem; font-weight:600; padding:11px 16px; border:1.5px solid var(--ink); border-radius:2px; cursor:pointer; background:transparent; transition:all 0.2s ease;}
+  .role-chip{font-size:0.82rem; font-weight:600; padding:11px 16px; border:2px solid var(--ink); border-radius:0; cursor:pointer; background:transparent; transition:all 0.2s ease;}
   .role-chip:hover{background:rgba(22,27,34,0.06);}
   .role-chip.active{background:var(--ink); color:var(--paper);}
-  .builder-output{border:1.5px dashed var(--steel); border-radius:4px; padding:1.8rem; min-height:200px; display:flex; flex-direction:column; justify-content:space-between; background:var(--paper);}
+  .builder-output{border:2px solid var(--ink); border-radius:0; padding:1.8rem; min-height:200px; display:flex; flex-direction:column; justify-content:space-between; background:var(--paper);}
   #team-list{font-size:1.5rem; font-weight:700; line-height:1.35; margin:0.9rem 0;}
-  #team-list .empty{opacity:0.45; font-style:italic; font-weight:400; font-size:1rem;}
+  #team-list .empty{color:var(--slate); font-style:italic; font-weight:400; font-size:1rem;}
   .team-tag{display:inline-block; text-decoration:underline; text-decoration-color:var(--steel); text-underline-offset:4px; margin-right:0.15em;}
   .builder-note{font-size:0.82rem; color:var(--slate); line-height:1.5;}
   .builder-cta{display:none; align-self:flex-start; margin-top:1.3rem;}
@@ -215,25 +262,23 @@
   @media (max-width:860px){.builder-inner{grid-template-columns:1fr;}}
 
   /* ===== PROCESS ===== */
-  .process-list{border-top:1px solid var(--line); background:var(--paper); border-radius:4px; padding:0 1.7rem;}
+  .process-list{border-top:1px solid var(--line); background:var(--paper); border-radius:0; padding:0 1.7rem;}
   .process-row{
     display:grid; grid-template-columns:70px 1fr 1.4fr; gap:2rem; padding:1.7rem;
     margin:0 -1.7rem; border-bottom:1px solid var(--line); align-items:baseline;
-    border-radius:3px; transition:background .3s ease;
+    transition:background .3s ease;
   }
-  .process-row .pnum{font-size:1.3rem; font-weight:800; color:var(--steel); transition:color .3s ease;}
+  .process-row .pnum{font-size:1.3rem; font-weight:800; color:var(--slate); transition:color .3s ease;}
   .process-row h3{font-size:1.15rem; font-weight:700; transition:color .3s ease;}
   .process-row p{font-size:0.88rem; line-height:1.5; color:var(--slate); max-width:52ch; transition:color .3s ease;}
-  .process-row:hover{background:var(--ink); border-bottom-color:var(--ink);}
+  .process-row:hover{background:var(--paper-dim);}
   .process-row:hover .pnum{color:var(--accent);}
-  .process-row:hover h3{color:var(--paper);}
-  .process-row:hover p{color:var(--mist);}
   @media (max-width:700px){.process-row{grid-template-columns:44px 1fr; row-gap:0.4rem;} .process-row p{grid-column:2/3;}}
 
   /* ===== EDITORIAL / MAGAZINES (3D Coverflow) ===== */
   .editorial-intro{display:grid;grid-template-columns:1.1fr 0.9fr;gap:3rem;align-items:start;} /* was align-items:end — the numbered index column runs longer (7 lines) than .lead's 3, so bottom-aligning pushed .lead's top edge well below the heading instead of starting right under it */
   .editorial-intro .lead{font-size:1.08rem;line-height:1.5;color:var(--slate);max-width:46ch;}
-  .editorial-index{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--steel);line-height:1.7;justify-self:end;text-align:right;}
+  .editorial-index{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--slate);line-height:1.7;justify-self:end;text-align:right;}
 
   .coverflow-pin{position:relative;} /* height set in JS (sizeCoverflowPin) to match .coverflow-sticky's content height + a fixed scroll-scrub distance */
   .coverflow-sticky{position:sticky; top:0; padding-top:4.5rem;}
@@ -241,10 +286,10 @@
   .coverflow-stage::before{content:"";position:absolute;left:50%;bottom:8%;width:min(72vw,760px);height:56px;transform:translateX(-50%);background:radial-gradient(ellipse, rgba(22,27,34,.24) 0%, rgba(22,27,34,.08) 45%, transparent 72%);filter:blur(10px);pointer-events:none;}
   .coverflow-track{position:relative;width:100%;height:100%;transform-style:preserve-3d;}
   .mag-cover{position:absolute;top:50%;left:50%;width:320px;height:427px;margin:-213.5px 0 0 -160px;background:none;border:none;padding:0;cursor:pointer;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.22,.9,.24,1), filter .5s ease;}
-  .mag-cover-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;border-radius:2px;box-shadow:0 26px 52px rgba(22,27,34,.34);}
-  .mag-cover img{width:100%;height:100%;object-fit:cover;display:block;border-radius:2px;backface-visibility:hidden;}
+  .mag-cover-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;border-radius:0;box-shadow:0 26px 52px rgba(22,27,34,.34);}
+  .mag-cover img{width:100%;height:100%;object-fit:cover;display:block;border-radius:0;backface-visibility:hidden;}
   .mag-spine{position:absolute;top:0;bottom:0;left:0;width:16px;background:linear-gradient(to right, rgba(0,0,0,.55), rgba(0,0,0,.05));transform:rotateY(90deg) translateZ(-8px);transform-origin:left center;}
-  .mag-shine{position:absolute;inset:0;border-radius:2px;background:linear-gradient(115deg, rgba(255,255,255,.16) 0%, transparent 30%, transparent 70%, rgba(0,0,0,.18) 100%);pointer-events:none;}
+  .mag-shine{position:absolute;inset:0;background:linear-gradient(115deg, rgba(255,255,255,.16) 0%, transparent 30%, transparent 70%, rgba(0,0,0,.18) 100%);pointer-events:none;}
   .mag-cover.is-active .mag-cover-inner{box-shadow:0 34px 66px rgba(22,27,34,.4);}
 
   .coverflow-nav{display:flex;justify-content:center;gap:.5rem;margin-top:2.2rem;}
@@ -254,9 +299,9 @@
   .coverflow-caption{text-align:center;margin-top:1.4rem;}
   .coverflow-caption .title{font-size:1.7rem;font-weight:800;}
   .coverflow-caption .sub{font-size:.85rem;color:var(--slate);margin-top:.3rem;}
-  .coverflow-caption .hint{font-size:.72rem;color:var(--steel);margin-top:.6rem;letter-spacing:.06em;text-transform:uppercase;}
+  .coverflow-caption .hint{font-size:.72rem;color:var(--slate);margin-top:.6rem;letter-spacing:.06em;text-transform:uppercase;}
 
-  .arrow-btn{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:100px;border:1.5px solid var(--ink);background:var(--paper);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;font-size:1.1rem;transition:background .2s ease, color .2s ease;}
+  .arrow-btn{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:0;border:2px solid var(--ink);background:var(--paper);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;font-size:1.1rem;transition:background .2s ease, color .2s ease;}
   .arrow-btn:hover{background:var(--ink);color:var(--paper);}
   .arrow-prev{left:0;}
   .arrow-next{right:0;}
@@ -292,7 +337,7 @@
   .campaigns-dots .cdot{width:8px; height:8px; border-radius:50%; background:var(--mist); border:none; cursor:pointer; padding:0; transition:background .25s ease, transform .25s ease;}
   .campaigns-dots .cdot.is-active{background:var(--ink); transform:scale(1.3);}
   .campaign-stage-wrap{flex-shrink:0;}
-  .campaign-stage{position:relative; height:min(58vh,560px); aspect-ratio:3/4; border-radius:6px; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(22,27,34,.08);}
+  .campaign-stage{position:relative; height:min(58vh,560px); aspect-ratio:3/4; border-radius:0; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(22,27,34,.08);}
   .campaign-stage img, .campaign-stage video{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1) contrast(1.02);}
   /* Most hover clips are B&W BTS footage overlaid as a GIF on top of the static photo and
      cross-faded in — the photo stays underneath so there's no flash of empty space while it
@@ -305,8 +350,8 @@
   .campaign-stage:hover .tile-hover-gif{opacity:1;}
   .campaign-stage.show-hover .tile-hover-gif{opacity:1;}
   .campaign-info{max-width:46ch;}
-  .campaign-counter{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; color:var(--steel); margin-bottom:0.8rem;}
-  .campaign-info h3{font-size:2.1rem; font-weight:800; margin-bottom:1.1rem; line-height:1.1;}
+  .campaign-counter{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; color:var(--slate); margin-bottom:0.8rem;}
+  .campaign-info h3{font-size:1.6rem; font-weight:900; margin-bottom:1.1rem; line-height:1.1;}
   .campaign-info p{font-size:1.08rem; line-height:1.65; color:var(--slate);}
   @media (max-width:860px){
     .campaigns-slide{grid-template-columns:1fr; text-align:left;}
@@ -330,22 +375,22 @@
   .modal-close{font-size:1.3rem;line-height:1;}
   .project-caption{position:absolute;top:22px;left:24px;z-index:3;pointer-events:none;}
   .project-caption .eyebrow{font-size:.64rem;}
-  .project-caption h2{font-size:.9rem;font-weight:800;letter-spacing:.02em;margin-top:.3rem;}
-  .project-caption .behance-link{display:inline-block;pointer-events:auto;margin-top:.35rem;font-weight:600;font-size:.6rem;letter-spacing:.02em;color:var(--steel);border-bottom:1px solid var(--line);padding-bottom:1px;}
+  .project-caption h2{font-size:.9rem;font-weight:900;letter-spacing:.02em;margin-top:.3rem;}
+  .project-caption .behance-link{display:inline-block;pointer-events:auto;margin-top:.35rem;font-weight:600;font-size:.6rem;letter-spacing:.02em;color:var(--slate);border-bottom:1px solid var(--line);padding-bottom:1px;}
   .project-caption .behance-link:hover{color:var(--accent);border-color:var(--accent);}
-  .project-progress{position:absolute;bottom:20px;left:24px;font-size:.68rem;letter-spacing:.04em;color:var(--steel);z-index:3;font-variant-numeric:tabular-nums;}
+  .project-progress{position:absolute;bottom:20px;left:24px;font-size:.68rem;letter-spacing:.04em;color:var(--slate);z-index:3;font-variant-numeric:tabular-nums;}
   /* Hints that the vertical scroll/swipe you'd use anywhere else on the site drives this
      filmstrip *sideways* instead — not obvious on first visit. Fades out the same way the hero's
      own scroll-cue does (see .scroll-cue) once the user has actually scrolled a little. Grid-mode
      projects scroll normally (vertically), so the hint doesn't apply there — hidden below. */
-  .project-scroll-hint{position:absolute;bottom:44px;left:24px;z-index:3;font-size:.66rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--steel);opacity:1;transition:opacity .3s ease;display:flex;align-items:center;gap:6px;pointer-events:none;}
+  .project-scroll-hint{position:absolute;bottom:44px;left:24px;z-index:3;font-size:.66rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--slate);opacity:1;transition:opacity .3s ease;display:flex;align-items:center;gap:6px;pointer-events:none;}
   .project-scroll-hint .arrow{display:inline-block;animation:projectScrollHintNudge 1.4s ease-in-out infinite;}
   @keyframes projectScrollHintNudge{0%,100%{transform:translateX(0);} 50%{transform:translateX(4px);}}
   .project-modal.grid-mode .project-scroll-hint{display:none;}
   @media (max-width:700px){
     .project-scroll-hint{font-size:.6rem;bottom:40px;}
   }
-  .project-next-btn{position:absolute;bottom:18px;right:24px;z-index:3;display:inline-flex;align-items:center;gap:.4em;padding:9px 16px;font-size:.66rem;font-weight:700;letter-spacing:.03em;border:1.5px solid var(--ink);border-radius:2px;background:transparent;color:var(--ink);cursor:pointer;transition:all .2s ease;}
+  .project-next-btn{position:absolute;bottom:18px;right:24px;z-index:3;display:inline-flex;align-items:center;gap:.4em;padding:9px 16px;font-size:.66rem;font-weight:700;letter-spacing:.03em;border:2px solid var(--ink);border-radius:0;background:transparent;color:var(--ink);cursor:pointer;transition:all .2s ease;}
   .project-next-btn:hover{background:var(--ink);color:var(--paper);}
   .project-scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
   .project-track-pin{position:relative;}
@@ -406,19 +451,18 @@
 
 
   /* ===== CONTACT ===== */
-  .contact{background:var(--ink); color:var(--paper); border-radius:4px; padding:2.8rem;}
+  #contact{background:var(--ink); color:var(--paper);}
   .contact-grid{display:grid; grid-template-columns:1fr 1fr; gap:3rem;}
   /* Grid items default to min-width:auto, meaning a track won't shrink narrower than its
      content's intrinsic width — a long unbroken word (the ES h2 especially: "construyendo" runs
      longer than the EN copy) or the WhatsApp pill's own width:fit-content would otherwise force
      the whole grid, card, and page wider than the viewport on mobile instead of wrapping. */
   .contact-grid > div{min-width:0;}
-  .contact h2{font-size:2.9rem; font-weight:800; color:var(--paper); overflow-wrap:break-word;}
+  .contact h2{font-size:2.5rem; font-weight:900; color:var(--paper); overflow-wrap:break-word;}
   .contact-copy p{font-size:1rem; line-height:1.5; margin-top:1rem; max-width:38ch; opacity:0.8;}
-  .contact-direct{display:flex; flex-direction:column; justify-content:center; height:100%;}
-  .whatsapp-cta{margin-top:1rem; display:inline-flex; align-items:center; gap:0.65rem; background:var(--paper); color:var(--ink); padding:16px 26px; border-radius:100px; width:fit-content; max-width:100%; transition:transform 0.15s ease, background 0.2s ease; box-shadow:0 8px 24px rgba(0,0,0,0.18);}
-  .whatsapp-cta:hover{background:var(--mist); transform:translateY(-1px);}
-  .whatsapp-cta-number{font-size:1.6rem; font-weight:800; letter-spacing:-0.01em;}
+  .whatsapp-cta{margin-top:1rem; display:inline-flex; align-items:center; gap:0.65rem; background:var(--accent); color:var(--paper); padding:16px 26px; border-radius:0; border:2px solid var(--accent); width:fit-content; max-width:100%; transition:background 0.2s ease, color 0.2s ease, border-color 0.2s ease;}
+  .whatsapp-cta:hover{background:transparent; color:var(--paper); border-color:var(--paper);}
+  .whatsapp-cta-number{font-size:1.6rem; font-weight:800; letter-spacing:-0.01em; text-transform:uppercase;}
   .contact-direct-note{font-size:0.85rem; color:var(--paper); opacity:0.7; margin-top:1.1rem; max-width:34ch; line-height:1.5;}
   @media (max-width:800px){
     .contact-grid{grid-template-columns:1fr;}
@@ -428,15 +472,15 @@
     .whatsapp-cta-number{font-size:1.2rem;}
   }
 
-  .contact-form-wrap{margin-top:2.6rem; padding-top:2.4rem; border-top:1px solid rgba(242,244,245,0.14);}
+  .contact-form-wrap{display:flex; flex-direction:column;}
   .contact-form{margin-top:1.2rem; display:flex; flex-direction:column; gap:1.1rem; max-width:640px;}
   .form-honeypot{position:absolute; left:-9999px; width:1px; height:1px; opacity:0;}
   .form-row{display:grid; grid-template-columns:1fr 1fr; gap:1.1rem;}
   .form-field label{display:block; font-size:0.72rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--mist); margin-bottom:0.45rem;}
-  .form-field input, .form-field textarea{width:100%; background:rgba(242,244,245,0.06); border:1px solid rgba(242,244,245,0.25); border-radius:2px; padding:0.7rem 0.85rem; color:var(--paper); font-family:inherit; font-size:0.92rem; resize:vertical;}
+  .form-field input, .form-field textarea{width:100%; background:rgba(242,244,245,0.06); border:2px solid rgba(242,244,245,0.25); border-radius:0; padding:0.7rem 0.85rem; color:var(--paper); font-family:inherit; font-size:0.92rem; resize:vertical;}
   .form-field input:focus, .form-field textarea:focus{outline:none; border-color:var(--paper);}
   .form-field input::placeholder, .form-field textarea::placeholder{color:rgba(242,244,245,0.4);}
-  .form-submit{align-self:flex-start; background:var(--paper); color:var(--ink); font-weight:700; padding:0.85rem 1.9rem; border-radius:2px; border:none; cursor:pointer; font-size:0.85rem; transition:background 0.2s ease, opacity 0.2s ease;}
+  .form-submit{align-self:flex-start; background:var(--paper); color:var(--ink); font-weight:700; padding:0.85rem 1.9rem; border-radius:0; border:none; cursor:pointer; font-size:0.85rem; transition:background 0.2s ease, opacity 0.2s ease;}
   .form-submit:hover{background:var(--mist);}
   .form-submit:disabled{opacity:0.6; cursor:default;}
   .form-status{font-size:0.85rem; margin-top:-0.3rem; min-height:1.2em;}
@@ -462,10 +506,16 @@
        header, so page content behind it showed through/overlapped the nav links, unreadable).
        Frosted-glass background (same recipe as header{}'s own backdrop-filter) instead of a flat
        fill, plus a shadow so the panel edge reads clearly against whatever's behind it. */
-    .nav-links{position:fixed; top:60px; left:0; right:0; height:calc(100vh - 60px); background:rgba(242,244,245,0.92); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); box-shadow:-8px 0 32px rgba(22,27,34,0.12); flex-direction:column; align-items:flex-start; padding:2rem 2.25rem; gap:1.4rem; transform:translateX(100%); transition:transform 0.3s ease; z-index:99;}
+    .nav-links{position:fixed; top:84px; left:0; right:0; height:calc(100vh - 84px); background:rgba(242,244,245,0.92); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); box-shadow:-8px 0 32px rgba(22,27,34,0.12); flex-direction:column; align-items:flex-start; padding:2rem 2.25rem; gap:1.4rem; transform:translateX(100%); transition:transform 0.3s ease; z-index:99;}
     .nav-links.open{transform:translateX(0);}
     .nav-links a{font-size:1.2rem;}
     .burger{display:flex;}
+    .nav-dropdown{width:100%;}
+    .nav-dropdown-trigger{font-size:1.2rem;}
+    .nav-dropdown-menu{position:static; transform:none; border:none; border-left:2px solid var(--ink); margin:0.8rem 0 0 0.2rem; min-width:0;}
+    .nav-dropdown-menu a{font-size:1rem; padding:10px 0 10px 1rem;}
+    .nav-dropdown:hover .nav-dropdown-menu{display:none;}
+    .nav-dropdown.open .nav-dropdown-menu{display:flex;}
   }
 </style>
 </head>
@@ -487,25 +537,44 @@
   }, {passive:false});
 </script>
 
+<div id="fixedTopStack">
+<div class="top-accent"></div>
+<div class="top-tag">
+  <div class="wrap">
+    <span data-i18n="topTag.left">MILO STUDIO™ — Fashion Production &amp; Retouching</span>
+    <span data-i18n="topTag.right">Bogotá, Colombia</span>
+  </div>
+</div>
 <header>
   <div class="nav">
     <div class="logo-wrap">
       <img src="images/site/logo-mark.png" alt="MILO icon">
-      <span style="font-weight:800; font-size:1.05rem; letter-spacing:0.02em;">MILO STUDIO</span>
+      <span style="font-weight:800; font-size:1.05rem; letter-spacing:0.02em;">MILO</span>
     </div>
     <nav class="nav-links" id="navLinks">
-      <a href="#campaigns" data-i18n="nav.campaigns">Campaigns</a>
-      <a href="#retouching" data-i18n="nav.retouching">Retouching</a>
-      <a href="#ecommerce" data-i18n="nav.ecommerce">E-Commerce</a>
-      <a href="#work" data-i18n="nav.editorial">Editorial</a>
-      <a href="#about" data-i18n="nav.studio">Studio</a>
-      <a href="#team-builder" data-i18n="nav.buildTeam">Build a Team</a>
+      <div class="nav-dropdown" id="navWorkDropdown">
+        <button class="nav-dropdown-trigger" type="button" id="navWorkTrigger" aria-expanded="false" data-i18n="nav.work">Work</button>
+        <div class="nav-dropdown-menu">
+          <a href="#campaigns" data-i18n="nav.campaigns">Campaigns</a>
+          <a href="#work" data-i18n="nav.editorial">Editorial</a>
+          <a href="#retouching" data-i18n="nav.retouching">Retouching</a>
+          <a href="#ecommerce" data-i18n="nav.ecommerce">E-Commerce</a>
+        </div>
+      </div>
+      <div class="nav-dropdown" id="navServicesDropdown">
+        <button class="nav-dropdown-trigger" type="button" id="navServicesTrigger" aria-expanded="false" data-i18n="nav.services">Services</button>
+        <div class="nav-dropdown-menu">
+          <a href="#about" data-i18n="nav.studio">Studio</a>
+          <a href="#team-builder" data-i18n="nav.buildTeam">Build a Team</a>
+        </div>
+      </div>
       <a href="#contact" class="nav-cta" data-i18n="nav.cta">Start a Project</a>
       <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch language">ES</button>
     </nav>
     <button class="burger" id="burgerBtn" aria-label="Toggle menu"><span></span><span></span><span></span></button>
   </div>
 </header>
+</div>
 
 <!-- HERO: logo assembly (pinned, scroll-scrubbed) -->
 <section class="hero-pin" id="heroPin">
@@ -538,13 +607,44 @@
   </div>
 </section>
 
-
+<!-- SERVICES OVERVIEW -->
+<section id="services">
+  <div class="wrap">
+    <div class="services-head reveal">
+      <span class="eyebrow eyebrow-idx"><span data-i18n="services.eyebrow">What We Do</span> / 001</span>
+      <h2 data-i18n="services.h2">Services</h2>
+      <span class="desc" data-i18n="services.note">Hover each cell</span>
+    </div>
+    <div class="svc-grid reveal">
+      <a class="svc-cell" href="#retouching">
+        <h3 data-i18n="retouching.eyebrow">Retouching</h3>
+        <p data-i18n="service1.desc">Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.</p>
+        <div class="svc-img"><img src="images/services/retouching/after.jpg" alt=""></div>
+      </a>
+      <a class="svc-cell" href="#ecommerce">
+        <h3 data-i18n="ecommerce.eyebrow">E-Commerce</h3>
+        <p data-i18n="service4.desc">High-volume, consistent product and model imagery built for online retail, without losing quality control.</p>
+        <div class="svc-img"><img src="images/ecommerce/ferragamo/01.jpg" alt=""></div>
+      </a>
+      <a class="svc-cell" href="#about">
+        <h3 data-i18n="service2.title">Photography &amp; Production</h3>
+        <p data-i18n="service2.desc">On-set direction and full crew management, from casting to final capture.</p>
+        <div class="svc-img"><img src="images/services/photography/production.gif" alt=""></div>
+      </a>
+      <a class="svc-cell" href="#about">
+        <h3 data-i18n="service3.title">Creative Direction</h3>
+        <p data-i18n="service3.desc">Concept, styling, and art direction that carries a campaign from brief to finished asset.</p>
+        <div class="svc-img"><video src="images/services/creative_direction/creative-direction.mp4" muted loop playsinline autoplay></video></div>
+      </a>
+    </div>
+  </div>
+</section>
 
 <!-- CAMPAIGNS -->
 <section id="campaigns">
   <div class="wrap">
     <div class="section-head reveal">
-      <div><span class="eyebrow" data-i18n="campaigns.eyebrow">Campaigns</span><h2 style="margin-top:0.7rem;" data-i18n="campaigns.h2">Brand work, shot and produced.</h2><p class="desc campaigns-desc" data-i18n="campaigns.desc">A selection of commercial campaigns across footwear, fashion, and lifestyle brands.</p></div>
+      <div><span class="eyebrow eyebrow-idx"><span data-i18n="campaigns.eyebrow">Campaigns</span> / 002</span><h2 style="margin-top:0.7rem;" data-i18n="campaigns.h2">Brand work, shot and produced.</h2><p class="desc campaigns-desc" data-i18n="campaigns.desc">A selection of commercial campaigns across footwear, fashion, and lifestyle brands.</p></div>
     </div>
 
   </div>
@@ -594,7 +694,7 @@
     <span id="projectNote"></span>
   </div>
   <span class="project-progress" id="projectProgress">01 / 01</span>
-  <span class="project-scroll-hint" id="projectScrollHint"><span data-i18n="project.scrollHint">Scroll right to see more</span> <span class="arrow">→</span></span>
+  <span class="project-scroll-hint" id="projectScrollHint"><span data-i18n="project.scrollHint">Scroll to see more</span> <span class="arrow">→</span></span>
   <button class="project-next-btn" id="projectNextBtn" type="button" data-i18n="project.next">Next Project →</button>
   <div class="project-scroll" id="projectScroll">
     <div class="project-track-pin" id="projectTrackPin">
@@ -608,7 +708,7 @@
 <section id="work">
   <div class="wrap">
     <div class="section-head reveal">
-      <div><span class="eyebrow" data-i18n="editorial.eyebrow">Editorial</span><h2 style="margin-top:0.7rem;" data-i18n="editorial.h2">Stories made to be opened.</h2></div>
+      <div><span class="eyebrow eyebrow-idx"><span data-i18n="editorial.eyebrow">Editorial</span> / 003</span><h2 style="margin-top:0.7rem;" data-i18n="editorial.h2">Stories made to be opened.</h2></div>
     </div>
 
     <div class="editorial-intro reveal">
@@ -692,7 +792,7 @@
 <!-- PROCESS -->
 <section id="process">
   <div class="wrap">
-    <div class="section-head reveal"><div><span class="eyebrow" data-i18n="process.eyebrow">The Process</span><h2 style="margin-top:0.7rem;" data-i18n="process.h2">From brief to delivery.</h2></div></div>
+    <div class="section-head reveal"><div><span class="eyebrow eyebrow-idx"><span data-i18n="process.eyebrow">The Process</span> / 004</span><h2 style="margin-top:0.7rem;" data-i18n="process.h2">From brief to delivery.</h2></div></div>
     <div class="process-list reveal">
       <div class="process-row"><span class="pnum">01</span><h3 data-i18n="process1.title">Briefing</h3><p data-i18n="process1.desc">Brand, market, timeline, and budget — one conversation to define the scope of the campaign.</p></div>
       <div class="process-row"><span class="pnum">02</span><h3 data-i18n="process2.title">Team Assembly</h3><p data-i18n="process2.desc">MILO staffs the project: stylist, MUA, casting, production support — matched to what the brief actually requires.</p></div>
@@ -705,25 +805,31 @@
 <!-- ABOUT -->
 <section id="about">
   <div class="wrap">
-    <div class="about reveal" style="padding:2.8rem;">
+    <div class="services-head reveal">
+      <span class="eyebrow eyebrow-idx"><span data-i18n="about.eyebrow">The Studio</span> / 005</span>
+      <h2 data-i18n="about.studioTitle">Studio</h2>
+      <span class="desc" data-i18n="about.note">Led by Camilo Márquez Villegas, Art Director &amp; Photographer</span>
+    </div>
+    <div class="about reveal">
       <div class="about-grid">
-        <div class="studio-slider" id="studioSlider">
-          <div class="studio-slider-stage" id="studioSlideStage">
-            <img id="studioSlideImg" src="" alt="">
-            <video id="studioSlideVideo" muted loop playsinline preload="none"></video>
-          </div>
-          <div class="studio-slider-foot">
-            <button class="studio-slider-arrow" id="studioPrevBtn" type="button" aria-label="Previous">‹</button>
-            <div class="studio-slider-info">
-              <span class="studio-slider-counter" id="studioSlideCounter">01 / 02</span>
-              <span class="studio-slider-title" id="studioSlideTitle">Photography &amp; Production</span>
+        <div>
+          <h2 data-i18n-html="about.h2">One decade. One point of contact. <span class="hl">A full crew</span> behind it.</h2>
+          <div class="studio-slider" id="studioSlider">
+            <div class="studio-slider-stage" id="studioSlideStage">
+              <img id="studioSlideImg" src="" alt="">
+              <video id="studioSlideVideo" muted loop playsinline preload="none"></video>
             </div>
-            <button class="studio-slider-arrow" id="studioNextBtn" type="button" aria-label="Next">›</button>
+            <div class="studio-slider-foot">
+              <button class="studio-slider-arrow" id="studioPrevBtn" type="button" aria-label="Previous">‹</button>
+              <div class="studio-slider-info">
+                <span class="studio-slider-counter" id="studioSlideCounter">01 / 02</span>
+                <span class="studio-slider-title" id="studioSlideTitle">Photography &amp; Production</span>
+              </div>
+              <button class="studio-slider-arrow" id="studioNextBtn" type="button" aria-label="Next">›</button>
+            </div>
           </div>
         </div>
-        <div>
-          <span class="eyebrow" style="color:var(--mist);" data-i18n="about.eyebrow">The Studio</span>
-          <h2 style="margin-top:0.8rem;" data-i18n="about.h2">One decade. One point of contact. A full crew behind it.</h2>
+        <div class="about-copy-col">
           <div class="about-copy">
             <p data-i18n="about.p1">MILO Studio is led by Camilo Márquez Villegas, an art director and fashion photographer with ten years producing campaigns for luxury and lifestyle brands across Latin America and Europe.</p>
             <p data-i18n="about.p2">Clients brief MILO once. We assemble the stylists, makeup artists, models, and retouchers the project actually calls for, and manage them as one accountable studio — from concept to delivery.</p>
@@ -743,7 +849,7 @@
 <section id="retouching">
   <div class="wrap">
     <div class="section-head reveal">
-      <div><span class="eyebrow" data-i18n="retouching.eyebrow">Retouching</span><h2 style="margin-top:0.7rem;" data-i18n="service1.title">Retouching &amp; Post-Production</h2><p class="desc campaigns-desc" data-i18n="service1.desc">Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.</p></div>
+      <div><span class="eyebrow eyebrow-idx"><span data-i18n="retouching.eyebrow">Retouching</span> / 006</span><h2 style="margin-top:0.7rem;" data-i18n="service1.title">Retouching &amp; Post-Production</h2><p class="desc campaigns-desc" data-i18n="service1.desc">Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.</p></div>
     </div>
   </div>
 
@@ -778,7 +884,7 @@
 <section id="ecommerce">
   <div class="wrap">
     <div class="section-head reveal">
-      <div><span class="eyebrow" data-i18n="ecommerce.eyebrow">E-Commerce</span><h2 style="margin-top:0.7rem;" data-i18n="service4.title">E-Commerce &amp; Catalog</h2><p class="desc campaigns-desc" data-i18n="service4.desc">High-volume, consistent product and model imagery built for online retail, without losing quality control.</p></div>
+      <div><span class="eyebrow eyebrow-idx"><span data-i18n="ecommerce.eyebrow">E-Commerce</span> / 007</span><h2 style="margin-top:0.7rem;" data-i18n="service4.title">E-Commerce &amp; Catalog</h2><p class="desc campaigns-desc" data-i18n="service4.desc">High-volume, consistent product and model imagery built for online retail, without losing quality control.</p></div>
     </div>
   </div>
 
@@ -813,7 +919,7 @@
 <section class="builder" id="team-builder">
   <div class="wrap">
     <div class="section-head reveal">
-      <div><span class="eyebrow" data-i18n="team.eyebrow">How Projects Are Staffed</span><h2 style="margin-top:0.7rem;" data-i18n="team.h2">Every brief gets its own crew.</h2></div>
+      <div><span class="eyebrow eyebrow-idx"><span data-i18n="team.eyebrow">How Projects Are Staffed</span> / 008</span><h2 style="margin-top:0.7rem;" data-i18n="team.h2">Every brief gets its own crew.</h2></div>
       <p class="desc" data-i18n="team.desc">No fixed package. Tap the roles your project needs and see the team MILO puts together for it.</p>
     </div>
     <div class="builder-inner reveal">
@@ -842,20 +948,16 @@
     <div class="contact reveal">
       <div class="contact-grid">
         <div>
-          <span class="eyebrow" style="color:var(--mist);" data-i18n="contact.eyebrow">Start a Project</span>
-          <h2 style="margin-top:0.8rem;" data-i18n="contact.h2">Tell us what you're building.</h2>
+          <span class="eyebrow eyebrow-idx" style="color:var(--mist);"><span data-i18n="contact.eyebrow">Start a Project</span> / 009</span>
+          <h2 style="margin-top:0.8rem;" data-i18n-html="contact.h2">Tell us what <span class="hl">you're building.</span></h2>
           <div class="contact-copy"><p data-i18n="contact.copy">Send over the brand, the brief, and the timeline. We'll come back with the team and the plan.</p></div>
-        </div>
-        <div class="contact-direct">
-          <span class="eyebrow" style="color:var(--mist);" data-i18n="contact.callEyebrow">Call or WhatsApp</span>
           <a href="https://wa.me/573045448900" target="_blank" rel="noopener" class="whatsapp-cta">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4a8.94 8.94 0 0 0-7.75 13.4L3 21l3.72-1.24a8.9 8.9 0 0 0 5.32 1.72h.01a8.94 8.94 0 0 0 8.93-8.93 8.87 8.87 0 0 0-3.38-6.23zm-5.55 13.73h-.01a7.4 7.4 0 0 1-3.78-1.04l-.27-.16-2.8.93.94-2.73-.18-.28a7.44 7.44 0 0 1 11.6-9.2 7.37 7.37 0 0 1 2.18 5.25 7.44 7.44 0 0 1-7.68 7.23zm4.08-5.56c-.22-.11-1.31-.65-1.52-.72-.2-.08-.35-.11-.5.11-.15.22-.57.72-.7.87-.13.15-.26.16-.48.05a6.1 6.1 0 0 1-1.8-1.11 6.75 6.75 0 0 1-1.24-1.55c-.13-.22-.01-.34.1-.45.1-.1.22-.26.33-.39.11-.13.15-.22.22-.37.07-.15.04-.28-.02-.39-.05-.11-.5-1.2-.68-1.65-.18-.43-.36-.37-.5-.38h-.43a.82.82 0 0 0-.6.28 2.5 2.5 0 0 0-.78 1.86c0 1.1.8 2.16.91 2.31.11.15 1.57 2.4 3.81 3.36.53.23.95.37 1.27.47.53.17 1.02.14 1.4.09.43-.06 1.31-.53 1.49-1.05.19-.51.19-.95.13-1.04-.06-.09-.2-.15-.42-.26z"/></svg>
             <span class="whatsapp-cta-number">+57 304 544 8900</span>
           </a>
           <p class="contact-direct-note" data-i18n="contact.note">Fastest way to reach the studio directly — tell us your brand and what you're producing.</p>
         </div>
-      </div>
-      <div class="contact-form-wrap reveal">
+        <div class="contact-form-wrap">
         <span class="eyebrow" style="color:var(--mist);" data-i18n="contact.formEyebrow">Or Send a Message</span>
         <form id="contactForm" class="contact-form" action="https://api.web3forms.com/submit" method="POST">
           <input type="hidden" name="access_key" value="9d4972d0-cbe2-4fb3-b4c0-41cdf2a9ddb7">
@@ -878,6 +980,7 @@
           <button type="submit" class="form-submit" data-i18n="contact.form.submit">Send Message</button>
           <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
         </form>
+        </div>
       </div>
     </div>
   </div>
@@ -888,13 +991,17 @@
     <div class="footer-row">
       <img src="images/site/logo-mark.png" alt="MILO icon">
       <div class="footer-links"><a href="#campaigns" data-i18n="footer.campaigns">Campaigns</a><a href="#retouching" data-i18n="nav.retouching">Retouching</a><a href="#ecommerce" data-i18n="nav.ecommerce">E-Commerce</a><a href="#work" data-i18n="nav.editorial">Editorial</a><a href="#contact" data-i18n="footer.contact">Contact</a><a href="https://www.behance.net/marquezvillegas" target="_blank" rel="noopener">Behance</a></div>
-      <div style="font-size:0.78rem; color:var(--steel);" data-i18n="footer.tagline">Bogotá, Colombia — Design Prototype</div>
+      <div style="font-size:0.78rem; color:var(--slate);" data-i18n="footer.tagline">Bogotá, Colombia — Design Prototype</div>
     </div>
   </div>
 </footer>
 
 <script>
   const translations = {
+    'topTag.left': {en:'MILO STUDIO™ — Fashion Production & Retouching', es:'MILO STUDIO™ — Producción y Retoque de Moda'},
+    'topTag.right': {en:'Bogotá, Colombia', es:'Bogotá, Colombia'},
+    'nav.work': {en:'Work', es:'Trabajo'},
+    'nav.services': {en:'Services', es:'Servicios'},
     'nav.campaigns': {en:'Campaigns', es:'Campañas'},
     'nav.retouching': {en:'Retouching', es:'Retoque'},
     'nav.ecommerce': {en:'E-Commerce', es:'E-Commerce'},
@@ -909,7 +1016,8 @@
     'hero.cta1': {en:'See the Work', es:'Ver el Trabajo'},
 
     'about.eyebrow': {en:'The Studio', es:'El Estudio'},
-    'about.h2': {en:'One decade. One point of contact. A full crew behind it.', es:'Una década. Un solo punto de contacto. Todo un equipo detrás.'},
+    'about.studioTitle': {en:'Studio', es:'Estudio'},
+    'about.note': {en:'Led by Camilo Márquez Villegas, Art Director & Photographer', es:'Liderado por Camilo Márquez Villegas, Director de Arte y Fotógrafo'},
     'about.p1': {en:"MILO Studio is led by Camilo Márquez Villegas, an art director and fashion photographer with ten years producing campaigns for luxury and lifestyle brands across Latin America and Europe.", es:'MILO Studio está dirigido por Camilo Márquez Villegas, director de arte y fotógrafo de moda con diez años produciendo campañas para marcas de lujo y lifestyle en Latinoamérica y Europa.'},
     'about.p2': {en:'Clients brief MILO once. We assemble the stylists, makeup artists, models, and retouchers the project actually calls for, and manage them as one accountable studio — from concept to delivery.', es:'Los clientes hacen el brief una sola vez. Nosotros reunimos a los estilistas, maquilladores, modelos y retocadores que el proyecto realmente necesita, y los gestionamos como un solo estudio responsable — desde el concepto hasta la entrega.'},
     'about.stat1': {en:'Years in Production', es:'Años en Producción'},
@@ -923,9 +1031,15 @@
     'service1.title': {en:'Retouching & Post-Production', es:'Retoque y Postproducción'},
     'service1.desc': {en:'Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.', es:'Retoque de belleza, moda y producto con estándar editorial — corrección de color y acabado fiel a la identidad de marca.'},
     'service2.title': {en:'Photography & Production', es:'Fotografía y Producción'},
+    'service2.desc': {en:'On-set direction and full crew management, from casting to final capture.', es:'Dirección en set y manejo de todo el equipo, desde el casting hasta la captura final.'},
     'service3.title': {en:'Creative Direction', es:'Dirección Creativa'},
+    'service3.desc': {en:'Concept, styling, and art direction that carries a campaign from brief to finished asset.', es:'Concepto, styling y dirección de arte que llevan una campaña del brief al asset terminado.'},
     'service4.title': {en:'E-Commerce & Catalog', es:'E-Commerce y Catálogo'},
     'service4.desc': {en:'High-volume, consistent product and model imagery built for online retail, without losing quality control.', es:'Imágenes de producto y modelo de alto volumen y consistentes, pensadas para retail online, sin perder control de calidad.'},
+
+    'services.eyebrow': {en:'What We Do', es:'Qué Hacemos'},
+    'services.h2': {en:'Services', es:'Servicios'},
+    'services.note': {en:'Hover each cell', es:'Pasa el mouse por cada casilla'},
 
     'team.eyebrow': {en:'How Projects Are Staffed', es:'Cómo se Arman los Equipos'},
     'team.h2': {en:'Every brief gets its own crew.', es:'Cada brief tiene su propio equipo.'},
@@ -965,7 +1079,6 @@
     'campaigns.desc': {en:'A selection of commercial campaigns across footwear, fashion, and lifestyle brands.', es:'Una selección de campañas comerciales de marcas de calzado, moda y lifestyle.'},
 
     'contact.eyebrow': {en:'Start a Project', es:'Inicia un Proyecto'},
-    'contact.h2': {en:"Tell us what you're building.", es:'Cuéntanos qué estás construyendo.'},
     'contact.copy': {en:"Send over the brand, the brief, and the timeline. We'll come back with the team and the plan.", es:'Envíanos la marca, el brief y los tiempos. Te responderemos con el equipo y el plan.'},
     'contact.callEyebrow': {en:'Call or WhatsApp', es:'Llama o Escribe por WhatsApp'},
     'contact.note': {en:"Fastest way to reach the studio directly — tell us your brand and what you're producing.", es:'La forma más rápida de contactar al estudio directamente — cuéntanos tu marca y qué estás produciendo.'},
@@ -987,16 +1100,26 @@
 
     'project.next': {en:'Next Project →', es:'Siguiente Proyecto →'},
     'project.photos': {en:'photos', es:'fotos'},
-    'project.scrollHint': {en:'Scroll right to see more', es:'Desliza a la derecha para ver más'},
+    'project.scrollHint': {en:'Scroll to see more', es:'Desliza para ver más'},
     'project.zoomIn': {en:'Zoom in', es:'Acercar'},
     'project.zoomOut': {en:'Zoom out', es:'Alejar'},
     'project.fullscreen': {en:'Enter fullscreen', es:'Pantalla completa'},
     'project.exitFullscreen': {en:'Exit fullscreen', es:'Salir de pantalla completa'},
   };
 
-  const heroH1 = {
-    en: 'Full-service <em>fashion</em> production &amp;<br>retouching.',
-    es: 'Producción y retoque de <em>moda</em><br>integral.'
+  const htmlTranslations = {
+    'hero.h1': {
+      en: 'Full-service <em>fashion</em> production &amp;<br>retouching.',
+      es: 'Producción y retoque de <em>moda</em><br>integral.'
+    },
+    'contact.h2': {
+      en: 'Tell us what <span class="hl">you\'re building.</span>',
+      es: 'Cuéntanos qué <span class="hl">estás construyendo.</span>'
+    },
+    'about.h2': {
+      en: 'One decade. One point of contact. <span class="hl">A full crew</span> behind it.',
+      es: 'Una década. Un solo punto de contacto. <span class="hl">Todo un equipo</span> detrás.'
+    },
   };
 
   let currentLang = 'en';
@@ -1014,7 +1137,8 @@
     });
     document.querySelectorAll('[data-i18n-html]').forEach(el => {
       const key = el.getAttribute('data-i18n-html');
-      el.innerHTML = key === 'hero.h1' ? heroH1[currentLang] : '';
+      const entry = htmlTranslations[key];
+      el.innerHTML = entry ? (entry[currentLang] || entry.en) : '';
     });
     const toggle = document.getElementById('langToggle');
     if(toggle) toggle.textContent = currentLang === 'en' ? 'ES' : 'EN';
@@ -1051,6 +1175,14 @@
     heroFrames.push(img);
   }
 
+  // Guards the frame lookup: a non-finite index (a rAF callback invoked without its timestamp
+  // argument makes `t`, and therefore the index, NaN) used to throw "reading 'src' of undefined"
+  // and abort the intro, leaving the logo frozen on the scattered first frame. Clamp instead.
+  function heroFrameAt(i){
+    const idx = Number.isFinite(i) ? Math.min(HERO_FRAME_COUNT - 1, Math.max(0, i)) : 0;
+    return heroFrames[idx];
+  }
+
   // Scroll room dedicated to the frame-scrub, as a fraction of viewport height instead of a flat
   // px value (was a flat 420px, independent of viewport size) — that read fine on desktop but
   // left a long stretch of pinned empty space after the logo finished assembling on short mobile
@@ -1080,7 +1212,7 @@
     const progress = total > 0 ? scrolled / total : 0;
 
     const frameIdx = Math.min(HERO_FRAME_COUNT - 1, Math.round(progress * (HERO_FRAME_COUNT - 1)));
-    const frameSrc = heroFrames[frameIdx].src;
+    const frameSrc = heroFrameAt(frameIdx).src;
     if(logoFrameImg.src !== frameSrc) logoFrameImg.src = frameSrc;
 
     scrollCue.style.opacity = progress > 0.05 ? 0 : 1;
@@ -1090,9 +1222,13 @@
   function playIntro(){
     const start = performance.now();
     function step(now){
-      const t = Math.min(1, (now - start) / HERO_INTRO_MS);
+      // A non-finite timestamp would make `t` NaN; `NaN < 1` is false, which used to end the
+      // intro on its first tick and strand the logo on the scattered frame. Treat it as 0 and
+      // keep going instead.
+      const elapsed = Number.isFinite(now) ? now - start : 0;
+      const t = Math.min(1, Math.max(0, elapsed / HERO_INTRO_MS));
       const frameIdx = Math.min(HERO_FRAME_COUNT - 1, Math.round(t * (HERO_FRAME_COUNT - 1)));
-      const frameSrc = heroFrames[frameIdx].src;
+      const frameSrc = heroFrameAt(frameIdx).src;
       if(logoFrameImg.src !== frameSrc) logoFrameImg.src = frameSrc;
       if(t < 1){
         requestAnimationFrame(step);
@@ -1136,6 +1272,23 @@
   const navLinks = document.getElementById('navLinks');
   burger.addEventListener('click', () => navLinks.classList.toggle('open'));
   navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+
+  function setupNavDropdown(dropdownId, triggerId){
+    const dropdown = document.getElementById(dropdownId);
+    const trigger = document.getElementById(triggerId);
+    trigger.addEventListener('click', () => {
+      const isOpen = dropdown.classList.toggle('open');
+      trigger.setAttribute('aria-expanded', String(isOpen));
+    });
+    document.addEventListener('click', (e) => {
+      if(!dropdown.contains(e.target)){
+        dropdown.classList.remove('open');
+        trigger.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+  setupNavDropdown('navWorkDropdown', 'navWorkTrigger');
+  setupNavDropdown('navServicesDropdown', 'navServicesTrigger');
 
   const revealEls = document.querySelectorAll('.reveal');
   const io = new IntersectionObserver((entries) => {
@@ -1815,7 +1968,7 @@
   // The Studio from the old Services carousel 2026-08-26 — plain click-to-toggle, no scroll-pin,
   // since it's a small supporting element under the stats rather than a full section.)
   const studioSlides = [
-    {key: 'service2', img: 'images/services/photography/production.gif'},
+    {key: 'service2', video: 'images/services/photography/production.mp4'},
     {key: 'service3', video: 'images/services/creative_direction/creative-direction.mp4'},
   ];
   const studioSlideImg = document.getElementById('studioSlideImg');
