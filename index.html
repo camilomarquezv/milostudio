@@ -14,9 +14,6 @@
     --steel:#6E7F8D;
     --mist:#C7D0D6;
     --paper:#F2F4F5;
-    /* the exact neutral gray baked into images/site/hero-sequence/*.jpg — the hero block uses
-       this instead of --paper (which is faintly blue) so the masked frame edge doesn't halo */
-    --hero-paper:#F4F4F4;
     --paper-dim:#E4E8EA;
     --line: rgba(22,27,34,0.14);
     --accent:#2E5C73;
@@ -117,8 +114,8 @@
   }
 
   .logo-layer{ width:100%; display:flex; justify-content:center; }
-  /* No edge mask needed: .hero-stage now paints --hero-paper (#F4F4F4), the exact tone baked
-     into the frame sequence, so the frame's rectangular edge is already invisible. */
+  /* No edge mask needed: the frame sequence is transparent PNG, so there is no rectangular
+     panel to hide and the page's line grid shows straight through the logo. */
   .logo-layer img{
     width:min(78vw, 980px); height:auto; display:block;
   }
@@ -215,7 +212,7 @@
   .studio-slider-arrow{flex-shrink:0; width:30px; height:30px; border-radius:0; border:2px solid var(--ink); background:transparent; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:0.9rem; transition:background .2s ease;}
   .studio-slider-arrow:hover{background:rgba(22,27,34,.08);}
   .studio-slider-info{flex:1; min-width:0;}
-  .studio-slider-counter{display:block; font-size:0.66rem; letter-spacing:0.1em; color:var(--slate); opacity:0.7; font-variant-numeric:tabular-nums;}
+  .studio-slider-counter{display:block; font-size:0.72rem; letter-spacing:0.1em; color:var(--slate); opacity:0.7; font-variant-numeric:tabular-nums;}
   .studio-slider-title{display:block; font-size:0.86rem; font-weight:700; color:var(--ink); margin-top:0.2rem;}
 
   /* ===== SERVICES ===== */
@@ -227,7 +224,7 @@
 
   /* ===== SECTION ICONS (chrome letter marks, one per section, floating above the h2) ===== */
   .section-icon-wrap{display:flex; flex-direction:column; align-items:flex-start;}
-  .services-head .section-icon-wrap{align-items:center;}
+  .services-head .section-icon-wrap, .section-head-left .section-icon-wrap{align-items:center;}
   .section-icon{width:112px; height:auto; display:block; margin-bottom:0.3rem; animation:section-icon-float 4.5s ease-in-out infinite;}
   @keyframes section-icon-float{
     0%,100%{transform:translateY(0);}
@@ -237,16 +234,34 @@
 
   /* ===== SERVICES OVERVIEW GRID ===== */
   .services-head{display:flex; justify-content:space-between; align-items:flex-end; gap:1rem; flex-wrap:wrap; padding-bottom:1.6rem; border-bottom:1px solid var(--line);}
-  .section-head-left{display:flex; flex-direction:column; align-items:flex-start; gap:0.5rem; padding-bottom:1.6rem; border-bottom:1px solid var(--line);}
-  .services-head h2{font-size:2.5rem;}
-  .services-head .eyebrow, .services-head .desc{font-size:.75rem; color:var(--slate);}
+  /* Same three-column row as Services: index label left, icon + heading centred, note right.
+     Was a left-aligned stack, which made every section read differently from Services. */
+  .section-head-left{display:flex; justify-content:space-between; align-items:flex-end; gap:1rem; flex-wrap:wrap; padding-bottom:1.6rem; border-bottom:1px solid var(--line);}
+  /* Without this these headings fell back to the browser's default h2 size (1.5em), rendering
+     at 24px next to Services' 40px — the sections looked like different levels of the page. */
+  .services-head h2, .section-head-left h2{font-size:2.5rem;}
+  .services-head .eyebrow, .services-head .desc,
+  .section-head-left .eyebrow, .section-head-left .desc{font-size:.75rem; color:var(--slate);}
+  /* space-between alone centres nothing: it just spreads three items of unequal width, which
+     left each section's heading offset by a different amount. Giving both side labels the same
+     flex basis makes the middle column land on the true centre in every section. */
+  .services-head > .eyebrow, .section-head-left > .eyebrow,
+  .services-head > .desc, .section-head-left > .desc{flex:1 1 0; min-width:0;}
+  .services-head > .desc, .section-head-left > .desc{text-align:right;}
+  /* Three columns need room. Below the site's usual breakpoint they stack, centred, instead of
+     squeezing the heading between the two side labels. */
+  @media (max-width:860px){
+    .services-head, .section-head-left{flex-direction:column; align-items:center; gap:0.6rem;}
+    .services-head > .eyebrow, .section-head-left > .eyebrow,
+    .services-head > .desc, .section-head-left > .desc{flex:0 0 auto; text-align:center;}
+  }
   .svc-grid{display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); margin-top:2.2rem;}
   @media(max-width:900px){.svc-grid{grid-template-columns:repeat(2,1fr);}}
   @media(max-width:520px){.svc-grid{grid-template-columns:1fr;}}
   .svc-cell{border-right:1px solid var(--line); border-bottom:1px solid var(--line); padding:1.8rem 1.6rem; min-height:280px; display:flex; flex-direction:column; justify-content:flex-end; position:relative; overflow:hidden;}
   .svc-grid .svc-cell:last-child{border-right:none;}
   .svc-cell h3{font-size:1.3rem;}
-  .svc-cell p{font-size:.84rem; color:var(--slate); margin-top:.6rem; max-width:26ch;}
+  .svc-cell p{font-size:.85rem; color:var(--slate); margin-top:.6rem; max-width:26ch;}
   .svc-cell .svc-img{position:absolute; inset:0; opacity:0; transition:opacity .35s ease;}
   .svc-cell .svc-img img, .svc-cell .svc-img video{width:100%; height:100%; object-fit:cover; filter:grayscale(1) contrast(1.1);}
   .svc-cell:hover .svc-img{opacity:1;}
@@ -280,14 +295,14 @@
   }
   .process-row .pnum{font-size:1.3rem; font-weight:800; color:var(--slate); transition:color .3s ease;}
   .process-row h3{font-size:1.15rem; font-weight:700; transition:color .3s ease;}
-  .process-row p{font-size:0.88rem; line-height:1.5; color:var(--slate); max-width:52ch; transition:color .3s ease;}
+  .process-row p{font-size:0.85rem; line-height:1.5; color:var(--slate); max-width:52ch; transition:color .3s ease;}
   .process-row:hover{background:var(--paper-dim);}
   .process-row:hover .pnum{color:var(--accent);}
   @media (max-width:700px){.process-row{grid-template-columns:44px 1fr; row-gap:0.4rem;} .process-row p{grid-column:2/3;}}
 
   /* ===== EDITORIAL / MAGAZINES (3D Coverflow) ===== */
   .editorial-intro{display:grid;grid-template-columns:1.1fr 0.9fr;gap:3rem;align-items:start;} /* was align-items:end — the numbered index column runs longer (7 lines) than .lead's 3, so bottom-aligning pushed .lead's top edge well below the heading instead of starting right under it */
-  .editorial-intro .lead{font-size:1.08rem;line-height:1.5;color:var(--slate);max-width:46ch;}
+  .editorial-intro .lead{font-size:0.85rem;line-height:1.5;color:var(--ink);max-width:46ch;}
   .editorial-index{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--slate);line-height:1.7;justify-self:end;text-align:right;}
 
   .coverflow-pin{position:relative;} /* height set in JS (sizeCoverflowPin) to match .coverflow-sticky's content height + a fixed scroll-scrub distance */
@@ -340,7 +355,11 @@
      justify-content:center centers that now-intrinsic-width cluster within the wrap — otherwise
      on wide viewports the short campaign note left a lot of empty space on the right, making the
      whole composition (numbers + photo) read as pushed to the left. */
-  .campaigns-slide{display:grid; grid-template-columns:140px auto minmax(200px,300px); justify-content:center; gap:2.25rem; align-items:center; padding:2.8rem 0;}
+  /* Side tracks share one width so the photo lands on the container's true centre, under the
+     centred section heading. With 140px against 300px the middle column sat left of centre. */
+  .campaigns-slide{display:grid; grid-template-columns:minmax(140px,1fr) auto minmax(140px,1fr); gap:2.25rem; align-items:center; padding:2.8rem 0;}
+  .campaign-num-col{justify-self:end;}
+  .campaign-info{justify-self:start;}
   .campaign-num-col{display:flex; flex-direction:column; gap:1.6rem;}
   .campaign-bignum{font-size:4.4rem; font-weight:800; line-height:1; color:var(--ink); font-variant-numeric:tabular-nums;}
   .campaigns-dots{display:flex; flex-direction:column; gap:10px;}
@@ -1142,7 +1161,6 @@
 
     'contact.eyebrow': {en:'Start a Project', es:'Inicia un Proyecto'},
     'contact.copy': {en:"Send over the brand, the brief, and the timeline. We'll come back with the team and the plan.", es:'Envíanos la marca, el brief y los tiempos. Te responderemos con el equipo y el plan.'},
-    'contact.callEyebrow': {en:'Call or WhatsApp', es:'Llama o Escribe por WhatsApp'},
     'contact.note': {en:"Fastest way to reach the studio directly — tell us your brand and what you're producing.", es:'La forma más rápida de contactar al estudio directamente — cuéntanos tu marca y qué estás produciendo.'},
     'contact.formEyebrow': {en:'Or Send a Message', es:'O Envía un Mensaje'},
     'contact.form.name': {en:'Name', es:'Nombre'},
@@ -1304,7 +1322,7 @@
     scrollCue.style.opacity = progress > 0.05 ? 0 : 1;
   }
 
-  const HERO_INTRO_MS = 1100;
+  const HERO_INTRO_MS = 750;
   function playIntro(){
     const start = performance.now();
     function step(now){
@@ -2430,6 +2448,44 @@
       requestAnimationFrame(draw);
     }
     requestAnimationFrame(draw);
+  })();
+</script>
+
+
+<script>
+  // The page's background grid is a fixed 56px, while type and spacing scale fluidly with the
+  // viewport — so the rule each section head draws under itself landed at a different point
+  // inside a grid cell in every section, and moved again at every window width. Pad each head
+  // down to the next grid line so its rule sits exactly on one. Heads are processed in document
+  // order: nudging one shifts the ones below it, and each is measured after the previous move.
+  (function(){
+    const GRID = 56;
+    // offsetTop chain, not getBoundingClientRect: the heads carry .reveal, whose translateY
+    // would otherwise offset the reading by the animation distance.
+    function layoutTop(el){ let y = 0; for(let n = el; n; n = n.offsetParent) y += n.offsetTop; return y; }
+    const heads = document.querySelectorAll('.services-head, .section-head-left');
+    function snap(){
+      heads.forEach(h => {
+        h.style.paddingBottom = '';
+        const base = parseFloat(getComputedStyle(h).paddingBottom) || 0;
+        const rest = (layoutTop(h) + h.offsetHeight) % GRID;
+        h.style.paddingBottom = (base + (GRID - rest) % GRID) + 'px';
+      });
+      // Section heights just changed, so the scroll-scrubbed pins need their room recomputed.
+      // Flagged, because this listener also reacts to resize and would otherwise re-enter here.
+      reentrante = true;
+      window.dispatchEvent(new Event('resize'));
+      reentrante = false;
+    }
+    let reentrante = false;
+    snap();
+    // Web fonts land after first layout and change the heading heights.
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(snap);
+    let t;
+    window.addEventListener('resize', () => {
+      if(reentrante) return;
+      clearTimeout(t); t = setTimeout(snap, 150);
+    });
   })();
 </script>
 
