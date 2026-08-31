@@ -109,12 +109,11 @@
   .burger span{width:22px; height:2px; background:var(--ink);}
 
   /* ===== SCROLL-PINNED HERO ===== */
-  .hero-pin{position:relative; padding:0; background:var(--hero-paper);} /* height set in JS to match .hero-stage's natural (content-fit) height plus a scroll-scrub distance — see sizeHeroPin(). background matches .hero-stage's own so the body's line grid doesn't show through the scroll-room gap below the sticky stage — that gap is real (needed for the frame-scrub distance) but looked like an unstyled rendering gap without this, especially on mobile where the whole pin can fit within one screen at scrollY 0 */
+  .hero-pin{position:relative; padding:0;} /* height set in JS to match .hero-stage's natural (content-fit) height plus a scroll-scrub distance — see sizeHeroPin(). No solid background: the frame sequence is now transparent PNG, so the body's line grid shows straight through both the stage and the scroll-room gap below it */
   .hero-stage{
     position:sticky; top:0; overflow:hidden;
     display:flex; align-items:flex-start; justify-content:center;
     padding:4.5rem 0 2.5rem;
-    background:var(--hero-paper); /* exact tone baked into the frame sequence, so the masked frame edge blends instead of reading as a floating box */
   }
 
   .logo-layer{ width:100%; display:flex; justify-content:center; }
@@ -124,7 +123,7 @@
     width:min(78vw, 980px); height:auto; display:block;
   }
 
-  #heroContent{padding:1.5rem 0; background:var(--hero-paper);} /* override both top AND bottom of the generic section{padding} rule — top so the headline sits close under the logo, bottom so the marquee (already a strong dark full-width band) doesn't leave a huge gap before the next section, which adds its own top padding on top of this one. Solid background (no grid) through the headline and marquee — the line grid resumes right after, at Campaigns */
+  #heroContent{padding:1.5rem 0;} /* override both top AND bottom of the generic section{padding} rule — top so the headline sits close under the logo, bottom so the marquee (already a strong dark full-width band) doesn't leave a huge gap before the next section, which adds its own top padding on top of this one. No solid background here either now — the grid runs continuously from the hero through the headline/marquee */
   .hero-content{text-align:center;}
   .hero-content h1{
     font-size:3.1rem; font-weight:800; line-height:1.05; margin-top:0.8rem; text-transform:none;
@@ -226,8 +225,19 @@
      second and third instance of it), and Photography/Creative Direction moved into a small
      slider inside The Studio (see .studio-slider in the About section's CSS). */
 
+  /* ===== SECTION ICONS (chrome letter marks, one per section, floating above the h2) ===== */
+  .section-icon-wrap{display:flex; flex-direction:column; align-items:flex-start;}
+  .services-head .section-icon-wrap{align-items:center;}
+  .section-icon{width:112px; height:auto; display:block; margin-bottom:0.3rem; animation:section-icon-float 4.5s ease-in-out infinite;}
+  @keyframes section-icon-float{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-8px);}
+  }
+  @media (prefers-reduced-motion: reduce){ .section-icon{animation:none;} }
+
   /* ===== SERVICES OVERVIEW GRID ===== */
   .services-head{display:flex; justify-content:space-between; align-items:flex-end; gap:1rem; flex-wrap:wrap; padding-bottom:1.6rem; border-bottom:1px solid var(--line);}
+  .section-head-left{display:flex; flex-direction:column; align-items:flex-start; gap:0.5rem; padding-bottom:1.6rem; border-bottom:1px solid var(--line);}
   .services-head h2{font-size:2.5rem;}
   .services-head .eyebrow, .services-head .desc{font-size:.75rem; color:var(--slate);}
   .svc-grid{display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); margin-top:2.2rem;}
@@ -596,7 +606,7 @@
 <section class="hero-pin" id="heroPin">
   <div class="hero-stage">
     <div class="logo-layer" id="logoLayer">
-      <img src="images/site/hero-sequence/frame-01.jpg" alt="MILO" id="logoFrameImg" width="1080" height="622">
+      <img src="images/site/hero-sequence/frame-01.png" alt="MILO" id="logoFrameImg" width="1080" height="622">
     </div>
     <div class="scroll-cue" id="scrollCue"><span data-i18n="hero.scroll">Scroll</span><div class="line"></div></div>
   </div>
@@ -628,7 +638,10 @@
   <div class="wrap">
     <div class="services-head reveal">
       <span class="eyebrow eyebrow-idx"><span data-i18n="services.eyebrow">What We Do</span> / 001</span>
-      <h2 data-i18n="services.h2">Services</h2>
+      <div class="section-icon-wrap">
+        <img class="section-icon" src="images/site/section-icons/icon-s.png" alt="">
+        <h2 data-i18n="services.h2">Services</h2>
+      </div>
       <span class="desc" data-i18n="services.note">Hover each cell</span>
     </div>
     <div class="svc-grid reveal">
@@ -659,9 +672,15 @@
 <!-- CAMPAIGNS -->
 <section id="campaigns">
   <div class="wrap">
-    <div class="section-head reveal">
-      <div><span class="eyebrow eyebrow-idx"><span data-i18n="campaigns.eyebrow">Campaigns</span> / 002</span><h2 style="margin-top:0.7rem;" data-i18n="campaigns.h2">Brand work, shot and produced.</h2><p class="desc campaigns-desc" data-i18n="campaigns.desc">A selection of commercial campaigns across footwear, fashion, and lifestyle brands.</p></div>
+    <div class="section-head-left reveal">
+      <span class="eyebrow eyebrow-idx"><span data-i18n="campaigns.eyebrow">Brand Work</span> / 002</span>
+      <div class="section-icon-wrap">
+        <img class="section-icon" src="images/site/section-icons/icon-c.png" alt="">
+        <h2 data-i18n="campaigns.h2">Campaigns</h2>
+      </div>
+      <span class="desc" data-i18n="campaigns.note">Shot and produced.</span>
     </div>
+    <p class="desc campaigns-desc" data-i18n="campaigns.desc">A selection of commercial campaigns across footwear, fashion, and lifestyle brands.</p>
 
   </div>
 
@@ -723,8 +742,13 @@
 <!-- EDITORIAL PORTFOLIO -->
 <section id="work">
   <div class="wrap">
-    <div class="section-head reveal">
-      <div><span class="eyebrow eyebrow-idx"><span data-i18n="editorial.eyebrow">Editorial</span> / 003</span><h2 style="margin-top:0.7rem;" data-i18n="editorial.h2">Stories made to be opened.</h2></div>
+    <div class="section-head-left reveal">
+      <span class="eyebrow eyebrow-idx"><span data-i18n="editorial.eyebrow">The Archive</span> / 003</span>
+      <div class="section-icon-wrap">
+        <img class="section-icon" src="images/site/section-icons/icon-e.png" alt="">
+        <h2 data-i18n="editorial.h2">Editorial</h2>
+      </div>
+      <span class="desc" data-i18n="editorial.note">Stories made to be opened.</span>
     </div>
 
     <div class="editorial-intro reveal">
@@ -821,9 +845,12 @@
 <!-- ABOUT -->
 <section id="about">
   <div class="wrap">
-    <div class="services-head reveal">
+    <div class="section-head-left reveal">
       <span class="eyebrow eyebrow-idx"><span data-i18n="about.eyebrow">The Studio</span> / 005</span>
-      <h2 data-i18n="about.studioTitle">Studio</h2>
+      <div class="section-icon-wrap">
+        <img class="section-icon" src="images/site/section-icons/icon-s.png" alt="">
+        <h2 data-i18n="about.studioTitle">Studio</h2>
+      </div>
       <span class="desc" data-i18n="about.note">Led by Camilo Márquez Villegas, Art Director &amp; Photographer</span>
     </div>
     <div class="about reveal">
@@ -864,9 +891,15 @@
 <!-- RETOUCHING PROJECTS -->
 <section id="retouching">
   <div class="wrap">
-    <div class="section-head reveal">
-      <div><span class="eyebrow eyebrow-idx"><span data-i18n="retouching.eyebrow">Retouching</span> / 006</span><h2 style="margin-top:0.7rem;" data-i18n="service1.title">Retouching &amp; Post-Production</h2><p class="desc campaigns-desc" data-i18n="service1.desc">Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.</p></div>
+    <div class="section-head-left reveal">
+      <span class="eyebrow eyebrow-idx"><span data-i18n="service1.eyebrow">Post-Production</span> / 006</span>
+      <div class="section-icon-wrap">
+        <img class="section-icon" src="images/site/section-icons/icon-r.png" alt="">
+        <h2 data-i18n="service1.title">Retouching</h2>
+      </div>
+      <span class="desc" data-i18n="service1.note">Beauty, fashion &amp; product.</span>
     </div>
+    <p class="desc campaigns-desc" data-i18n="service1.desc">Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.</p>
   </div>
 
   <div class="campaigns-pin" id="retouchingPin">
@@ -899,9 +932,15 @@
 <!-- E-COMMERCE PROJECTS -->
 <section id="ecommerce">
   <div class="wrap">
-    <div class="section-head reveal">
-      <div><span class="eyebrow eyebrow-idx"><span data-i18n="ecommerce.eyebrow">E-Commerce</span> / 007</span><h2 style="margin-top:0.7rem;" data-i18n="service4.title">E-Commerce &amp; Catalog</h2><p class="desc campaigns-desc" data-i18n="service4.desc">High-volume, consistent product and model imagery built for online retail, without losing quality control.</p></div>
+    <div class="section-head-left reveal">
+      <span class="eyebrow eyebrow-idx"><span data-i18n="service4.eyebrow">Catalog</span> / 007</span>
+      <div class="section-icon-wrap">
+        <img class="section-icon" src="images/site/section-icons/icon-e.png" alt="">
+        <h2 data-i18n="service4.title">E-Commerce</h2>
+      </div>
+      <span class="desc" data-i18n="service4.note">Product &amp; model imagery.</span>
     </div>
+    <p class="desc campaigns-desc" data-i18n="service4.desc">High-volume, consistent product and model imagery built for online retail, without losing quality control.</p>
   </div>
 
   <div class="campaigns-pin" id="ecommercePin">
@@ -1042,17 +1081,21 @@
 
     'services.eyebrow': {en:'What We Do', es:'Qué Hacemos'},
     'retouching.eyebrow': {en:'Retouching', es:'Retoque'},
+    'service1.eyebrow': {en:'Post-Production', es:'Postproducción'},
     'retouching.hint': {en:'Hover to see the before.', es:'Pasa el mouse para ver el antes.'},
     'ba.before': {en:'Before', es:'Antes'},
     'ba.after': {en:'After', es:'Después'},
     'ecommerce.eyebrow': {en:'E-Commerce', es:'E-Commerce'},
-    'service1.title': {en:'Retouching & Post-Production', es:'Retoque y Postproducción'},
+    'service1.title': {en:'Retouching', es:'Retoque'},
+    'service1.note': {en:'Beauty, fashion & product.', es:'Belleza, moda y producto.'},
     'service1.desc': {en:'Beauty, fashion, and product retouching to editorial standard — color grading and finishing that stays true to brand identity.', es:'Retoque de belleza, moda y producto con estándar editorial — corrección de color y acabado fiel a la identidad de marca.'},
     'service2.title': {en:'Photography & Production', es:'Fotografía y Producción'},
     'service2.desc': {en:'On-set direction and full crew management, from casting to final capture.', es:'Dirección en set y manejo de todo el equipo, desde el casting hasta la captura final.'},
     'service3.title': {en:'Creative Direction', es:'Dirección Creativa'},
     'service3.desc': {en:'Concept, styling, and art direction that carries a campaign from brief to finished asset.', es:'Concepto, styling y dirección de arte que llevan una campaña del brief al asset terminado.'},
-    'service4.title': {en:'E-Commerce & Catalog', es:'E-Commerce y Catálogo'},
+    'service4.eyebrow': {en:'Catalog', es:'Catálogo'},
+    'service4.title': {en:'E-Commerce', es:'E-Commerce'},
+    'service4.note': {en:'Product & model imagery.', es:'Imágenes de producto y modelo.'},
     'service4.desc': {en:'High-volume, consistent product and model imagery built for online retail, without losing quality control.', es:'Imágenes de producto y modelo de alto volumen y consistentes, pensadas para retail online, sin perder control de calidad.'},
 
     'services.h2': {en:'Services', es:'Servicios'},
@@ -1086,13 +1129,15 @@
     'process4.title': {en:'Retouch & Deliver', es:'Retoque y Entrega'},
     'process4.desc': {en:'Post-production and final asset delivery in the formats the campaign needs — print, digital, or e-commerce ready.', es:'Postproducción y entrega final en los formatos que la campaña necesita — listo para impresión, digital o e-commerce.'},
 
-    'editorial.eyebrow': {en:'Editorial', es:'Editorial'},
-    'editorial.h2': {en:'Stories made to be opened.', es:'Historias hechas para abrirse.'},
+    'editorial.eyebrow': {en:'The Archive', es:'El Archivo'},
+    'editorial.h2': {en:'Editorial', es:'Editorial'},
+    'editorial.note': {en:'Stories made to be opened.', es:'Historias hechas para abrirse.'},
     'editorial.lead': {en:'Instead of a conventional grid, the editorial archive is presented as a shelf of publications fanned out for browsing. Click a cover to bring it forward.', es:'En lugar de una grilla convencional, el archivo editorial se presenta como un estante de publicaciones abiertas en abanico para explorar. Haz clic en una portada para traerla al frente.'},
     'editorial.hint': {en:'Click the centered cover to open the project', es:'Haz clic en la portada centrada para abrir el proyecto'},
 
-    'campaigns.eyebrow': {en:'Campaigns', es:'Campañas'},
-    'campaigns.h2': {en:'Brand work, shot and produced.', es:'Trabajo de marca, fotografiado y producido.'},
+    'campaigns.eyebrow': {en:'Brand Work', es:'Trabajo de Marca'},
+    'campaigns.h2': {en:'Campaigns', es:'Campañas'},
+    'campaigns.note': {en:'Shot and produced.', es:'Fotografiado y producido.'},
     'campaigns.desc': {en:'A selection of commercial campaigns across footwear, fashion, and lifestyle brands.', es:'Una selección de campañas comerciales de marcas de calzado, moda y lifestyle.'},
 
     'contact.eyebrow': {en:'Start a Project', es:'Inicia un Proyecto'},
@@ -1188,8 +1233,24 @@
   const heroFrames = [];
   for(let i = 1; i <= HERO_FRAME_COUNT; i++){
     const img = new Image();
-    img.src = `images/site/hero-sequence/frame-${String(i).padStart(2,'0')}.jpg`;
+    img.src = `images/site/hero-sequence/frame-${String(i).padStart(2,'0')}.png`;
     heroFrames.push(img);
+  }
+
+  // Cursor-follow: once the logo is fully assembled and resting, it turns gently left/right
+  // toward the mouse instead of sitting static — a second, much shorter frame sequence (same
+  // chrome logo, same camera, just the assembled word rotated -12deg..+12deg around its own
+  // vertical axis). Preloaded the same way as the assembly frames.
+  const LOOK_FRAME_COUNT = 15;
+  const lookFrames = [];
+  for(let i = 1; i <= LOOK_FRAME_COUNT; i++){
+    const img = new Image();
+    img.src = `images/site/hero-sequence/look-around/frame-${String(i).padStart(2,'0')}.png`;
+    lookFrames.push(img);
+  }
+  function lookFrameAt(i){
+    const idx = Number.isFinite(i) ? Math.min(LOOK_FRAME_COUNT - 1, Math.max(0, i)) : Math.floor(LOOK_FRAME_COUNT / 2);
+    return lookFrames[idx];
   }
 
   // Guards the frame lookup: a non-finite index (a rAF callback invoked without its timestamp
@@ -1221,6 +1282,13 @@
   // blank/scattered first frame (looked like a broken page). Scroll only takes over afterward.
   let introDone = false;
 
+  // Tracks which assembly frame is actually on screen right now, independent of how it got set
+  // (scroll-driven update() vs the load-in playIntro()) — heroAssembledAndVisible() below needs
+  // this rather than recomputing progress from scroll position, since right after the intro
+  // finishes (before any scroll has happened) the logo is already sitting on frame 20 while a
+  // scroll-position-based progress calculation would still read 0 (scattered).
+  let currentHeroFrameIdx = 0;
+
   function update(){
     if(!introDone) return; // scroll doesn't drive the logo until the load-in intro has finished
     const rect = heroPin.getBoundingClientRect();
@@ -1229,6 +1297,7 @@
     const progress = total > 0 ? scrolled / total : 0;
 
     const frameIdx = Math.min(HERO_FRAME_COUNT - 1, Math.round(progress * (HERO_FRAME_COUNT - 1)));
+    currentHeroFrameIdx = frameIdx;
     const frameSrc = heroFrameAt(frameIdx).src;
     if(logoFrameImg.src !== frameSrc) logoFrameImg.src = frameSrc;
 
@@ -1245,6 +1314,7 @@
       const elapsed = Number.isFinite(now) ? now - start : 0;
       const t = Math.min(1, Math.max(0, elapsed / HERO_INTRO_MS));
       const frameIdx = Math.min(HERO_FRAME_COUNT - 1, Math.round(t * (HERO_FRAME_COUNT - 1)));
+      currentHeroFrameIdx = frameIdx;
       const frameSrc = heroFrameAt(frameIdx).src;
       if(logoFrameImg.src !== frameSrc) logoFrameImg.src = frameSrc;
       if(t < 1){
@@ -1260,6 +1330,36 @@
     requestAnimationFrame(step);
   }
 
+  // The logo only follows the cursor once it's fully assembled (progress===1) and its stage is
+  // actually on screen — otherwise scrolling mid-assembly or scrolling the hero away entirely
+  // would fight with this for control of logoFrameImg.src. update() (scroll) always wins once it
+  // runs again, since it sets .src unconditionally whenever progress < 1.
+  function heroAssembledAndVisible(){
+    if(!introDone) return false;
+    if(currentHeroFrameIdx !== HERO_FRAME_COUNT - 1) return false;
+    const stageRect = heroStage.getBoundingClientRect();
+    return stageRect.bottom > 0 && stageRect.top < window.innerHeight;
+  }
+
+  let lookTicking = false;
+  window.addEventListener('mousemove', (e) => {
+    if(lookTicking) return;
+    lookTicking = true;
+    requestAnimationFrame(() => {
+      lookTicking = false;
+      if(!heroAssembledAndVisible()) return;
+      const stageRect = heroStage.getBoundingClientRect();
+      const relX = clamp((e.clientX - stageRect.left) / stageRect.width, 0, 1);
+      const idx = Math.round(relX * (LOOK_FRAME_COUNT - 1));
+      const frameSrc = lookFrameAt(idx).src;
+      if(logoFrameImg.src !== frameSrc) logoFrameImg.src = frameSrc;
+    });
+  });
+  window.addEventListener('mouseleave', () => {
+    if(!heroAssembledAndVisible()) return;
+    logoFrameImg.src = lookFrameAt(Math.floor(LOOK_FRAME_COUNT / 2)).src; // back to dead-center
+  });
+
   let ticking = false;
   window.addEventListener('scroll', () => {
     if(!ticking){
@@ -1268,7 +1368,11 @@
     }
   });
   window.addEventListener('resize', () => { sizeHeroPin(); update(); });
-  logoFrameImg.addEventListener('load', () => { sizeHeroPin(); update(); });
+  // Guarded: without the heroAssembledAndVisible() check, this fires on every frame swap —
+  // including the ones the mousemove cursor-follow handler makes below — and immediately
+  // fights back to whatever the scroll position implies, undoing the look-around frame the
+  // instant it loads. Only let it resync from scroll when the cursor isn't the one driving.
+  logoFrameImg.addEventListener('load', () => { sizeHeroPin(); if(!heroAssembledAndVisible()) update(); });
   sizeHeroPin();
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

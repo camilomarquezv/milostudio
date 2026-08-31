@@ -5,3 +5,9 @@
 
 # Local design concept, not served
 milo-brutalist-concept.html
+
+# Production planning notes (client shoots, not site content)
+produccion/
+
+# Local preview scratch file, not site content
+test-hero-grid/
