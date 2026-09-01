@@ -385,6 +385,16 @@
   .station-head h2 {
     font-size: 1.7rem;
   }
+  .station-time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    color: var(--ink-soft);
+    background: var(--paper-dim);
+    border: 1px solid var(--line);
+    border-radius: 0;
+    padding: 3px 10px;
+  }
   .station-people {
     font-size: 0.92rem;
     color: var(--ink-soft);
@@ -1037,7 +1047,8 @@
     <div class="notes">
       <h3>Notas importantes</h3>
       <ul>
-        <li><b>Cada producto de rostro se aplica y fotografía por separado</b> — piel limpia entre uno y otro, nunca varios juntos (si es base, solo base; si es gel de cejas, solo eso). La <b>excepción es Fijador Resist</b>, al final del día: ahí sí se arma el look completo (gel de cejas + base + la mayor cantidad de productos posible) porque es el que más necesita encima para fijarlo — es el cambio más complejo del día, no el de la mañana. Para esa toma se cambia el fondo a un filtro/gel rojo (solo la luz de fondo, no el esquema general).</li>
+        <li><b>Orden de producción confirmado por el cliente</b>: Corrector → Base Mate Natural → (en paralelo, Barras TQM en brazo) → Rubor Compacto → Bálsamo → Sombras Líquidas → Sombras Individuales → se limpia el maquillaje → Base Resist PRO (con sus propios swatches) → esmaltes → Gel Cejas → Fijador Resist. Los primeros 6 productos de rostro forman la fase "base natural": se construyen sobre la misma cara, uno tras otro, cada uno con su propia foto — pero <b>sin limpiar entre ellos</b>, porque son complementarios. Recién antes de Base Resist PRO se limpia por completo, porque esa sí es una línea de base distinta. Gel Cejas va sobre el look de Base Resist sin limpiar de nuevo, y Fijador Resist cierra el día retocando ese mismo look (no lo arma desde cero) — sigue siendo el cambio más complejo por la cantidad de producto encima. Para esa toma se cambia el fondo a un filtro/gel rojo (solo la luz de fondo, no el esquema general).</li>
+        <li><b>Rubor Compacto</b> se agrega como producto nuevo con modelo — el cliente originalmente solo pedía fotos de empaque (abierto/cerrado). Cantidad de fotos con modelo estimada, confirmar en set.</li>
         <li><b>Sombras Individuales</b>: falta 1 unidad del tono Chill y 2 unidades de Mi Mood — verificar disponibilidad antes del 3 de septiembre.</li>
         <li>Colores fuertes de sombras individuales se aplican sobre el modelo masculino (Jose Alvarez).</li>
         <li>Bálsamo Hidratante en tono cereza/chocolate: modelo masculino. Gel Cejas: modelo masculino en tono transparente, modelo femenino a tono.</li>
@@ -1046,10 +1057,10 @@
         <li>Antes del bloque de manos de producto, cada manicurista aplica otra <b>base nude</b> — Wendy en María Camila Contreras (Set A), su asistente en Jose Alvarez (Set B) — punto de partida parejo para cada cambio de esmalte.</li>
         <li>Orden de esmaltes en el bloque de manos: <b>Pegante Salvauñas + Esmalte Rápido Secado primero</b> (con la uña más limpia del día, recién con la base nude — Salvauñas necesita el antes/después de una uña partida), luego Efecto Gel Jelly + Brillo Elixir.</li>
         <li>El bloque de manos de producto (Pegante Salvauñas, Esmalte Rápido, Gel Jelly) va después del de rostro/ojos/labios, a partir de la 1:50 pm.</li>
-        <li>Jose Alvarez solo entra en cámara desde <b>Gel Cejas Bajo Control</b> — puede llegar después de que las 3 modelos de rostro terminen sus bases, su primer producto arranca a las 9:40 am, no necesita estar desde temprano.</li>
-        <li>Horario calculado de forma objetiva: ~25 min de aplicación + fotos a 5 min cada una por producto, ~30 min por mano en el bloque de manicura, look completo (el más largo del día) antes de Fijador Resist — sin colchón artificial. El margen real está en que cada bloque ya incluye tiempo de foto; si algo se atrasa, se ajusta en set.</li>
-        <li>Almuerzo a partir de las 12:10 pm (no antes, como es costumbre en Colombia) — el equipo de fotografía y maquillaje come primero por haber llegado más temprano; el equipo de manicura come justo después.</li>
-        <li><b>Santiago</b> (L'Oréal) dirige la campaña "splash" de Fijador Resist — solo se necesita para el cierre del día, llega a las 3:45 pm, justo antes de armar el look completo.</li>
+        <li>Jose Alvarez y María Camila Contreras <b>llegan temprano (7:30 am)</b> para arrancar el día con Barras TQM en brazo, en paralelo con la fase "base natural" de las modelos de rostro — luego Jose pasa a Bálsamo, Sombras Líquidas y Sombras Individuales, y se une de nuevo al bloque de manos por la tarde.</li>
+        <li>Horario calculado de forma objetiva: ~20–30 min de aplicación por producto en capas simples, hasta 30 min en los cambios que arrancan de piel limpia (Corrector, Base Resist PRO), ~30 min por mano en el bloque de manicura, retoque de look antes de Fijador Resist — sin colchón artificial. El margen real está en que cada bloque ya incluye tiempo de foto; si algo se atrasa, se ajusta en set.</li>
+        <li>Almuerzo a partir del mediodía (no antes, como es costumbre en Colombia) — el equipo de fotografía y maquillaje come primero por haber llegado más temprano; el equipo de manicura come justo después.</li>
+        <li><b>Santiago</b> (L'Oréal) dirige la campaña "splash" de Fijador Resist — solo se necesita para el cierre del día, llega a las 4:15 pm, justo antes de retocar el look.</li>
       </ul>
     </div>
 
@@ -1251,41 +1262,53 @@
   // tienen 2+ modelos disponibles, así que la gama de tono de piel queda cubierta sin
   // multiplicar las cantidades del brief original.
   // Tiempos base usados para armar este horario (pedidos por el cliente):
-  // maquillaje 30–60 min (el más complejo, rostro completo, al tope del rango); swatch en brazo
-  // ~5 min por producto antes de la cara completa (para confirmar tono); uñas 30 min por mano
-  // con una manicurista dedicada a cada mano; fotografía ~5 min por toma una vez el modelo está
-  // listo. Sin bloques de revisión de fotos — se aprueban en vivo con el cliente mientras se
-  // Cada producto de rostro se aplica y fotografía POR SEPARADO — piel limpia entre uno y otro,
-  // nunca varios juntos (si es base, solo base; si es corrector, solo corrector). La EXCEPCIÓN es
-  // Fijador Resist al final del día: ahí sí se arma el look completo (gel de cejas + base + la
-  // mayor cantidad de productos posible) porque es el que más productos necesita encima para
-  // fijarlos — es el cambio más complejo del día, no el de la mañana. Para esa toma se cambia el
-  // fondo a un filtro/gel rojo (solo la luz de fondo, no el esquema general). Base Resist PRO
-  // sigue secando en ~5 min (confirmado por el cliente).
+  // maquillaje 20–30 min por producto en capas simples, hasta 30–60 min en los cambios completos
+  // (Corrector/Base Resist arrancando de piel limpia, o el look completo antes de Fijador); swatch
+  // en brazo ~5–10 min para confirmar tono; uñas 30 min por mano con una manicurista dedicada a
+  // cada mano; fotografía ~5 min por toma una vez el modelo está listo. Sin bloques de revisión de
+  // fotos — se aprueban en vivo con el cliente mientras se dispara.
+  //
+  // Orden de producción confirmado por el cliente: Corrector → Base Mate Natural → (en paralelo,
+  // Barras TQM en brazo) → Rubor Compacto → Bálsamo → Sombras Líquidas → Sombras Individuales.
+  // Esos 6 productos de rostro forman la fase "base natural": se construyen SOBRE LA MISMA CARA,
+  // uno tras otro, sin limpiar entre ellos — cada uno tiene su propia foto, pero no hace falta
+  // piel limpia porque son complementarios (corrector, base, rubor, labios, ojos), no compiten
+  // entre sí. Recién ahí se limpia el maquillaje por completo y se pasa a Base Resist PRO —esa
+  // sí es una línea de base distinta (compite con Base Mate Natural) y necesita piel limpia y
+  // swatch propio. Luego el bloque de manos, Gel Cejas (sobre el look de Base Resist, sin limpiar
+  // de nuevo) y por último Fijador Resist: no se arma un look desde cero, se retoca el de Base
+  // Resist + Gel Cejas que ya está puesto — pero sigue siendo el cambio más complejo del día por
+  // la cantidad de producto encima. Para esa toma se cambia el fondo a un filtro/gel rojo (solo
+  // la luz de fondo, no el esquema general). Base Resist PRO sigue secando en ~5 min (confirmado
+  // por el cliente).
   var dia1Schedule = [
     { time: "7:00 – 7:30 am", desc: "Montaje — una sola luz para los dos sets en todo el día; se deja lista la posición del filtro/gel rojo para el fondo, se usa solo al final en Fijador Resist" },
-    { time: "7:30 – 7:40 am", desc: "Swatch en brazo — Corrector y Base Mate Natural en Isabella (Set A) y Brenda (Set B), para confirmar tono antes de la primera aplicación" },
-    { time: "7:40 – 8:10 am", desc: "① Base Resist PRO — Isabella (Set A) y Brenda (Set B), solo este producto · Al mismo tiempo, manicure nude básica: Wendy a Isabella y su asistente a Brenda" },
-    { time: "8:10 – 8:40 am", desc: "② Corrector — Isabella (Set A) · ① Base Resist PRO — Mitchelli (Set B, recién llega), con manicure nude básica en paralelo" },
-    { time: "8:40 – 9:10 am", desc: "② Corrector — Brenda (Set A) · ② Corrector — Mitchelli (Set B)" },
-    { time: "9:10 – 9:40 am", desc: "③ Base Mate Natural — Isabella (Set A) y Brenda (Set B); se cierra su producto en mano de ① y ② (uñas ya secas)" },
-    { time: "9:40 – 10:10 am", desc: "③ Base Mate Natural — Mitchelli (Set A); cierra su producto en mano · ④ Gel Cejas transparente — Jose Alvarez (Set B, recién llega)" },
-    { time: "10:10 – 10:40 am", desc: "④ Gel Cejas a tono — Brenda (Set A) · ④ Gel Cejas a tono — Mitchelli (Set B)" },
-    { time: "10:40 – 11:10 am", desc: "⑤ Bálsamo a tono — Brenda (Set A) · ⑤ Bálsamo a tono — Mitchelli (Set B) — ambas terminan su parte de rostro por hoy, vuelven solo para Fijador Resist" },
-    { time: "11:10 – 11:40 am", desc: "④ Gel Cejas a tono — Isabella (Set A) · ⑤ Bálsamo cereza/chocolate — Jose (Set B)" },
-    { time: "11:40 am – 12:10 pm", desc: "⑤ Bálsamo a tono — Isabella (Set A) — último producto antes de sombras" },
-    { time: "12:10 – 12:50 pm", desc: "Almuerzo — el equipo de fotografía y maquillaje (llegó más temprano) come primero; el equipo de manicura come justo después" },
-    { time: "12:50 – 1:20 pm", desc: "⑥ Sombras Líquidas — Jose (Set A) e Isabella (Set B), la misma toma en paralelo" },
-    { time: "1:20 – 1:50 pm", desc: "⑦ Sombras Individuales — tonos fuertes en Jose (Set A), resto en Isabella (Set B) — ambos terminan su parte de rostro/ojos por hoy" },
+    { time: "7:30 – 7:40 am", desc: "Swatch en brazo — Corrector en Isabella (Set A) y Brenda (Set B), primer producto del día" },
+    { time: "7:40 – 8:10 am", desc: "① Corrector — Isabella (Will) y Brenda (Asistente), se aplica y fotografía · en paralelo: ③ Barras TQM en brazo — María Camila y Jose Alvarez · manicure nude básica: Wendy a Isabella y su asistente a Brenda" },
+    { time: "8:10 – 8:30 am", desc: "② Base Mate Natural — Isabella y Brenda, sobre el corrector ya puesto (misma cara, sin limpiar entre uno y otro)" },
+    { time: "8:30 – 9:00 am", desc: "① Corrector — Mitchelli (Will, recién llega, manicure nude en paralelo) · al mismo tiempo, ④ Rubor Compacto — Isabella (Asistente), sobre la base ya puesta" },
+    { time: "9:00 – 9:20 am", desc: "② Base Mate Natural — Mitchelli (Will) · ④ Rubor Compacto — Brenda (Asistente)" },
+    { time: "9:20 – 9:40 am", desc: "④ Rubor Compacto — Mitchelli (Will) · ⑤ Bálsamo a tono — Isabella (Asistente)" },
+    { time: "9:40 – 10:00 am", desc: "⑤ Bálsamo a tono — Brenda (Will) · ⑤ Bálsamo cereza/chocolate — Jose Alvarez (Asistente, ya libre de Barras TQM)" },
+    { time: "10:00 – 10:20 am", desc: "⑤ Bálsamo a tono — Mitchelli — Brenda y Mitchelli terminan la fase \"base natural\" por hoy, vuelven solo para Fijador Resist" },
+    { time: "10:20 – 10:40 am", desc: "⑥ Sombras Líquidas — Jose (Set A) e Isabella (Set B), la misma toma en paralelo" },
+    { time: "10:40 – 11:00 am", desc: "⑦ Sombras Individuales — tonos fuertes en Jose (Set A), resto en Isabella (Set B) — ambos terminan su parte de rostro/ojos por hoy; Isabella también cierra la fase \"base natural\"" },
+    { time: "11:00 – 11:30 am", desc: "Se limpia el maquillaje de \"base natural\" — Isabella y Brenda (Base Resist PRO es una línea de base distinta, no se mezcla con Corrector/Base Mate)" },
+    { time: "11:30 am – 12:00 pm", desc: "Se limpia el maquillaje de Mitchelli — las 3 modelos de rostro quedan listas para Base Resist PRO" },
+    { time: "12:00 – 12:40 pm", desc: "Almuerzo — el equipo de fotografía y maquillaje (llegó más temprano) come primero; el equipo de manicura come justo después" },
+    { time: "12:40 – 12:50 pm", desc: "Swatch en brazo — Base Resist PRO en Isabella y Brenda, se confirma tono de nuevo sobre piel limpia" },
+    { time: "12:50 – 1:20 pm", desc: "⑧ Base Resist PRO — Isabella y Brenda" },
+    { time: "1:20 – 1:50 pm", desc: "⑧ Base Resist PRO — Mitchelli" },
     { time: "1:50 – 2:20 pm", desc: "Base nude — María Camila en Set A y Jose en Set B, una manicurista por mano en paralelo" },
-    { time: "2:20 – 2:35 pm", desc: "Fotos ⑧ Barras TQM en brazo" },
-    { time: "2:35 – 3:05 pm", desc: "Cambio de esmalte a ⑨ Pegante Salvauñas + Esmalte Rápido Secado, en paralelo — se dispara con la uña más limpia del bloque de manos" },
-    { time: "3:05 – 3:20 pm", desc: "Fotos Pegante Salvauñas (antes/después uña partida) + Esmalte Rápido Secado" },
-    { time: "3:20 – 3:50 pm", desc: "Cambio de esmalte a ⑩ Efecto Gel Jelly + Brillo Elixir" },
-    { time: "3:50 – 4:05 pm", desc: "Fotos Gel Jelly + Brillo Elixir" },
-    { time: "4:05 – 5:00 pm", desc: "⑪ Fijador Resist — el cambio más complejo del día: se arma el LOOK COMPLETO en Isabella, Brenda y Mitchelli (gel de cejas + base + la mayor cantidad de productos posible) y Fijador se aplica al final para sellarlo. Se cambia el fondo a un filtro/gel rojo. Llega Santiago (L'Oréal) a dirigir esta toma" },
-    { time: "5:00 – 5:30 pm", desc: "Fotos Fijador Resist — claim, acting, aplicador, antes/después, test de resistencia — en las 3 modelos, con el fondo rojo" },
-    { time: "5:30 – 6:00 pm", desc: "Cierre de cámara — confirmar checklist completo" },
+    { time: "2:20 – 2:50 pm", desc: "Cambio de esmalte a ⑨ Pegante Salvauñas + Esmalte Rápido Secado, en paralelo — se dispara con la uña más limpia del bloque de manos" },
+    { time: "2:50 – 3:05 pm", desc: "Fotos Pegante Salvauñas (antes/después uña partida) + Esmalte Rápido Secado" },
+    { time: "3:05 – 3:35 pm", desc: "Cambio de esmalte a ⑩ Efecto Gel Jelly + Brillo Elixir" },
+    { time: "3:35 – 3:50 pm", desc: "Fotos Gel Jelly + Brillo Elixir" },
+    { time: "3:50 – 4:15 pm", desc: "⑪ Gel Cejas transparente — Jose (Set A) · Gel Cejas a tono — Isabella (Set B), sobre el look de Base Resist PRO ya puesto, sin limpiar" },
+    { time: "4:15 – 4:40 pm", desc: "⑪ Gel Cejas a tono — Brenda (Set A) y Mitchelli (Set B)" },
+    { time: "4:40 – 5:15 pm", desc: "⑫ Fijador Resist — retoque del look de Base Resist PRO + Gel Cejas ya armado (no se arma desde cero) y se aplica Fijador para sellarlo — el cambio más complejo del día por la cantidad de producto encima. Se cambia el fondo a un filtro/gel rojo. Llega Santiago (L'Oréal) a dirigir esta toma" },
+    { time: "5:15 – 5:40 pm", desc: "Fotos Fijador Resist — claim, acting, aplicador, antes/después, test de resistencia — en las 3 modelos, con el fondo rojo" },
+    { time: "5:40 – 6:00 pm", desc: "Cierre de cámara — confirmar checklist completo" },
     { time: "6:00 – 7:00 pm", desc: "Desmontaje" }
   ];
 
@@ -1298,34 +1321,23 @@
     { name: "Asistente de Will", role: "Maquillaje", time: "7:00 am" },
     { name: "Isabella Bonnet", role: "Modelo — tono claro", time: "7:00 am" },
     { name: "Brenda Herrera", role: "Modelo — tono medio", time: "7:00 am" },
-    { name: "Mitchelli Sierra", role: "Modelo — tono oscuro", time: "7:50 am", note: "Su primer producto (Base Resist PRO) arranca a las 8:10 am — no necesita estar desde las 7" },
-    { name: "Jose Alvarez", role: "Modelo — ojos, labios y manos", time: "9:15 am", note: "Llega después de que las 3 modelos de rostro terminen sus bases — su primer producto (Gel Cejas transparente) arranca a las 9:40 am, no necesita estar antes" },
+    { name: "Mitchelli Sierra", role: "Modelo — tono oscuro", time: "8:15 am", note: "Su primer producto (Corrector) arranca a las 8:30 am — no necesita estar desde las 7" },
+    { name: "Jose Alvarez", role: "Modelo — ojos, labios y manos", time: "7:30 am", note: "Arranca temprano con Barras TQM en brazo (junto con María Camila) — luego pasa a Bálsamo, Sombras y por último se une de nuevo al bloque de manos" },
     { name: "Wendy", role: "Manicurista principal", time: "7:15 am", note: "Manicure nude básica de Isabella y Mitchelli en paralelo con su maquillaje — el bloque principal (manicure de producto) empieza a la 1:50 pm" },
     { name: "Asistente de Wendy", role: "Manicura", time: "7:15 am", note: "Manicure nude básica de Brenda en paralelo con su maquillaje — libre hasta el bloque principal a la 1:50 pm" },
-    { name: "María Camila Contreras", role: "Modelo — manos", time: "1:30 pm", note: "Su bloque empieza a la 1:50 pm" },
+    { name: "María Camila Contreras", role: "Modelo — manos", time: "7:30 am", note: "Arranca temprano con Barras TQM en brazo (junto con Jose) — luego libre hasta el bloque principal de manos a la 1:50 pm" },
     { name: "Cliente Vogue / L'Oréal", role: "Daniela + practicante", time: "8:00 am", note: "Propuesto — ajustar a lo que prefiera el cliente" },
-    { name: "Santiago", role: "L'Oréal — dirige la campaña Fijador Resist / splash", time: "3:45 pm", note: "Solo se necesita para el cierre del día — llega justo antes de armar el look completo de Fijador Resist" }
+    { name: "Santiago", role: "L'Oréal — dirige la campaña Fijador Resist / splash", time: "4:15 pm", note: "Solo se necesita para el cierre del día — llega justo antes de retocar el look para Fijador Resist" }
   ];
 
   var dia1Products = [
     {
-      key: "base-resist",
-      seq: 1,
-      title: "Base Resist PRO",
-      people: "Set A / Set B: Isabella, Brenda y Mitchelli (rotan)",
-      note: "Confirmado por el cliente: seca en ~5 minutos — antes y después van en la misma sesión, sin dividir el día ni esperar horas. Solo se disparan 3 fotos de producto en mano — una por modelo, con su tono real de piel — el resto de los 16 tonos se generan en Photoshop a partir de esas 3 bases.",
-      items: [
-        { id: "r8", product: "Base Resist PRO", desc: "Producto en mano — 1 foto por modelo", qty: "×3", note: "Isabella, Brenda y Mitchelli, cada una con su tono real. Uñas ya pintadas (manicure nude) antes de esta toma — se ve la mano completa" },
-        { id: "r6", product: "Base Resist PRO", desc: "No transfiere — antes y después", qty: "×4", note: "Se aplica al final de la capa de maquillaje, seca 5 min y se toman las dos en la misma sesión" },
-        { id: "r7", product: "Base Resist PRO", desc: "Aplicación antes y después", qty: "×1" }
-      ]
-    },
-    {
       key: "corrector",
-      seq: 2,
+      seq: 1,
+      time: "7:40 – 9:00 am",
       title: "Corrector Mate Natural",
       people: "Set A / Set B: Isabella, Brenda y Mitchelli (rotan)",
-      note: "Igual que Base Resist PRO: solo 3 fotos de producto en mano — una por modelo, su tono real — el resto de los 10 tonos se generan en Photoshop a partir de esas 3 bases.",
+      note: "Primer producto del día — arranca la fase de \"base natural\" (corrector + base mate + barras TQM + rubor + bálsamo + sombras se construyen sobre la misma cara, sin limpiar entre cada uno). Solo se disparan 3 fotos de producto en mano — una por modelo, su tono real — el resto de los 10 tonos se generan en Photoshop a partir de esas 3 bases.",
       items: [
         { id: "r3b", product: "Corrector Mate Natural", desc: "Producto en mano — 1 foto por modelo", qty: "×3", note: "Isabella, Brenda y Mitchelli, cada una con su tono real. Uñas ya pintadas (manicure nude) antes de esta toma — se ve la mano completa" },
         { id: "r3", product: "Corrector Mate Natural", desc: "En brazo (swatch en piel)", qty: "×1" },
@@ -1335,29 +1347,44 @@
     },
     {
       key: "base-mate",
-      seq: 3,
+      seq: 2,
+      time: "8:10 – 9:20 am",
       title: "Base Mate Natural",
       people: "Set A / Set B: Isabella, Brenda y Mitchelli (rotan)",
+      note: "Va justo después del corrector, sobre la misma cara — cierra la \"base natural\".",
       items: [
         { id: "r1", product: "Base Mate Natural", desc: "En brazo (swatch en piel)", qty: "×1" },
         { id: "r2", product: "Base Mate Natural", desc: "Resultado en rostro", qty: "×3" }
       ]
     },
     {
-      key: "cejas",
-      seq: 4,
-      title: "Gel Cejas Bajo Control",
-      people: "Set A: Jose Alvarez (transparente) · Set B: Isabella, Brenda y Mitchelli (a tono, rotan)",
+      key: "barras-tqm",
+      seq: 3,
+      time: "7:40 – 8:10 am",
+      title: "Barras TQM",
+      people: "Set A: María Camila Contreras · Set B: Jose Alvarez (en paralelo)",
+      note: "Se dispara en brazo con los modelos de manos, en paralelo con la base natural de las modelos de rostro — no requiere esperar a que ellas terminen.",
       items: [
-        { id: "o5", product: "Gel Cejas Bajo Control", desc: "Acting con modelo", qty: "×1" },
-        { id: "o6", product: "Gel Cejas Bajo Control", desc: "Acabado en ceja", qty: "×4" },
-        { id: "o7", product: "Gel Cejas Bajo Control", desc: "Acting con pack", qty: "×2" },
-        { id: "o8", product: "Gel Cejas Bajo Control", desc: "Antes y después / modo de uso", qty: "×6", note: "Modelo masculino en transparente, femenino a tono" }
+        { id: "m1", product: "Barras TQM", desc: "Aplicación / antes / después / resultado en brazo", qty: "×9", note: "9 tonos repartidos entre María Camila y Jose" },
+        { id: "m2", product: "Barras TQM", desc: "Iluminador en brazo, los 9 tonos", qty: "×1" }
+      ]
+    },
+    {
+      key: "rubor",
+      seq: 4,
+      time: "8:30 – 10:00 am",
+      title: "Rubor Compacto",
+      people: "Set A / Set B: Isabella, Brenda y Mitchelli (rotan)",
+      note: "Se agrega con modelo — el cliente originalmente solo pedía fotos de empaque (abierto/cerrado, ver \"Otros días\"). Va sobre la base natural ya puesta, sin limpiar. Cantidad de fotos estimada, confirmar en set.",
+      items: [
+        { id: "rc1", product: "Rubor Compacto", desc: "En brazo / mejilla (swatch en piel)", qty: "×1" },
+        { id: "rc2", product: "Rubor Compacto", desc: "Resultado en rostro", qty: "×3" }
       ]
     },
     {
       key: "balsamo",
       seq: 5,
+      time: "9:20 – 10:20 am",
       title: "Bálsamo Hidratante / Kiss My Lips",
       people: "Set A: Jose Alvarez (cereza/chocolate) · Set B: Isabella, Brenda y Mitchelli (mora/fresa/uva, rotan)",
       items: [
@@ -1368,6 +1395,7 @@
     {
       key: "sombras-liquidas",
       seq: 6,
+      time: "10:20 – 10:40 am",
       title: "Sombras Líquidas",
       people: "Set A: Jose Alvarez · Set B: Isabella Bonnet",
       note: "4 tonos repartidos entre los dos para tener rango de piel, no los 4 en la misma modelo.",
@@ -1379,26 +1407,32 @@
     {
       key: "sombras-individuales",
       seq: 7,
+      time: "10:40 – 11:00 am",
       title: "Sombras Individuales",
       people: "Set A: Jose Alvarez (tonos fuertes) · Set B: Isabella Bonnet (resto)",
+      note: "Última parada de la fase de \"base natural\" — después de esto se limpia el maquillaje por completo antes de pasar a Base Resist PRO.",
       items: [
         { id: "o3", product: "Sombras Individuales", desc: "Swatch en ojo", qty: "×12", note: "Colores fuertes → Jose Alvarez, el resto → Isabella Bonnet" },
         { id: "o4", product: "Sombras Individuales", desc: "Composición final", qty: "×1" }
       ]
     },
     {
-      key: "barras-tqm",
+      key: "base-resist",
       seq: 8,
-      title: "Barras TQM",
-      people: "Set A: María Camila Contreras · Set B: Jose Alvarez (en paralelo)",
+      time: "12:40 – 1:50 pm",
+      title: "Base Resist PRO",
+      people: "Set A / Set B: Isabella, Brenda y Mitchelli (rotan)",
+      note: "Se limpia por completo el maquillaje de la fase \"base natural\" antes de este producto — es una línea de base distinta, no se mezcla con Corrector/Base Mate. Se hacen swatches en brazo de nuevo, como al inicio del día. Confirmado por el cliente: seca en ~5 minutos — antes y después van en la misma sesión. Solo se disparan 3 fotos de producto en mano — una por modelo, con su tono real de piel — el resto de los 16 tonos se generan en Photoshop a partir de esas 3 bases.",
       items: [
-        { id: "m1", product: "Barras TQM", desc: "Aplicación / antes / después / resultado en brazo", qty: "×9", note: "9 tonos repartidos entre María Camila y Jose" },
-        { id: "m2", product: "Barras TQM", desc: "Iluminador en brazo, los 9 tonos", qty: "×1" }
+        { id: "r13", product: "Base Resist PRO", desc: "Producto en mano — 1 foto por modelo", qty: "×3", note: "Isabella, Brenda y Mitchelli, cada una con su tono real. Uñas ya pintadas (manicure nude) antes de esta toma — se ve la mano completa" },
+        { id: "r6", product: "Base Resist PRO", desc: "No transfiere — antes y después", qty: "×4", note: "Se aplica al final de la capa de maquillaje, seca 5 min y se toman las dos en la misma sesión" },
+        { id: "r7", product: "Base Resist PRO", desc: "Aplicación antes y después", qty: "×1" }
       ]
     },
     {
       key: "esmalte-rapido",
       seq: 9,
+      time: "2:20 – 3:05 pm",
       title: "Esmalte Rápido Secado + Pegante Salvauñas",
       people: "Set A: María Camila Contreras · Set B: Jose Alvarez (en paralelo)",
       note: "Va primero en el bloque de manos, con la uña más limpia del día — Pegante Salvauñas necesita el antes/después de una uña partida, se ve mejor antes de varios cambios de esmalte.",
@@ -1412,6 +1446,7 @@
     {
       key: "gel-jelly",
       seq: 10,
+      time: "3:05 – 3:50 pm",
       title: "Efecto Gel Jelly + Brillo Elixir",
       people: "Set A: María Camila Contreras · Set B: Jose Alvarez (en paralelo)",
       items: [
@@ -1421,11 +1456,26 @@
       ]
     },
     {
-      key: "fijador",
+      key: "cejas",
       seq: 11,
+      time: "3:50 – 4:40 pm",
+      title: "Gel Cejas Bajo Control",
+      people: "Set A: Jose Alvarez (transparente) · Set B: Isabella, Brenda y Mitchelli (a tono, rotan)",
+      note: "Se aplica sobre el look de Base Resist PRO ya puesto, sin limpiar de nuevo.",
+      items: [
+        { id: "o5", product: "Gel Cejas Bajo Control", desc: "Acting con modelo", qty: "×1" },
+        { id: "o6", product: "Gel Cejas Bajo Control", desc: "Acabado en ceja", qty: "×4" },
+        { id: "o7", product: "Gel Cejas Bajo Control", desc: "Acting con pack", qty: "×2" },
+        { id: "o8", product: "Gel Cejas Bajo Control", desc: "Antes y después / modo de uso", qty: "×6", note: "Modelo masculino en transparente, femenino a tono" }
+      ]
+    },
+    {
+      key: "fijador",
+      seq: 12,
+      time: "4:40 – 5:40 pm",
       title: "Fijador Resist",
       people: "Set A / Set B: Isabella, Brenda y Mitchelli (rotan)",
-      note: "Es el cambio más complejo del día, no el de la mañana: aquí sí se arma el look completo (gel de cejas + base + la mayor cantidad de productos posible) antes de aplicar el fijador. Fondo con filtro/gel rojo solo para esta toma (no cambia el esquema de luz). El torture test necesita tiempo de espera — si no alcanza a resolverse en su bloque, se revisa en el colchón final.",
+      note: "Cierre del día: retoque del look de Base Resist PRO + Gel Cejas ya armado (no se arma desde cero) y se aplica Fijador para sellarlo — el que más productos lleva encima, el cambio más complejo del día. Fondo con filtro/gel rojo solo para esta toma (no cambia el esquema de luz). El torture test necesita tiempo de espera — si no alcanza a resolverse en su bloque, se revisa en el colchón final.",
       items: [
         { id: "r8", product: "Fijador Resist", desc: "Claim principal en rostro — \"El clima cambia, tu maquillaje no\"", qty: "×1" },
         { id: "r9", product: "Fijador Resist", desc: "Claims de uso (acting)", qty: "×2" },
@@ -1444,52 +1494,62 @@
       initials: "W",
       team: "maquillador",
       role: "Will",
-      focus: "Isabella → Mitchelli, un producto a la vez → look completo + Fijador Resist (las 3, al final)",
+      focus: "Isabella → Mitchelli, producto por producto de la fase \"base natural\" → look completo + Fijador Resist (las 3, al final)",
       schedule: [
         { time: "7:00 – 7:30 am", desc: "Montaje — una sola luz para todo el día; se deja lista la posición del filtro rojo para el fondo, se usa solo al final" },
-        { time: "7:30 – 7:40 am", desc: "Swatch en brazo — Corrector y Base Mate en Isabella Bonnet, para confirmar tono" },
-        { time: "7:40 – 8:10 am", desc: "① Base Resist PRO — Isabella Bonnet, solo este producto" },
-        { time: "8:10 – 8:40 am", desc: "② Corrector — Isabella Bonnet" },
-        { time: "8:40 – 9:10 am", desc: "Apoya a la asistente con Mitchelli mientras Isabella descansa (foto de Base Mate se acerca)" },
-        { time: "9:10 – 9:40 am", desc: "③ Base Mate — Isabella Bonnet; se cierra su producto en mano de ① y ②" },
-        { time: "9:40 – 10:10 am", desc: "③ Base Mate — Mitchelli Sierra; cierra su producto en mano" },
-        { time: "10:10 – 10:40 am", desc: "④ Gel Cejas a tono — Brenda Herrera" },
-        { time: "10:40 – 11:10 am", desc: "⑤ Bálsamo a tono — Brenda Herrera — termina su parte de rostro por hoy" },
-        { time: "11:10 – 11:40 am", desc: "④ Gel Cejas a tono — Isabella Bonnet" },
-        { time: "11:40 am – 12:10 pm", desc: "⑤ Bálsamo a tono — Isabella Bonnet — último producto antes de sombras" },
-        { time: "12:10 – 12:50 pm", desc: "Almuerzo — el equipo de fotografía y maquillaje come primero" },
-        { time: "12:50 – 1:20 pm", desc: "⑥ Sombras Líquidas — Isabella Bonnet (con Jose Alvarez en paralelo)" },
-        { time: "1:20 – 1:50 pm", desc: "⑦ Sombras Individuales, resto de tonos — Isabella Bonnet; termina su parte de rostro/ojos por hoy" },
-        { time: "1:50 – 4:05 pm", desc: "Libre durante el bloque de manos — disponible para retoques" },
-        { time: "4:05 – 5:00 pm", desc: "Look completo para Fijador Resist — se arma en Isabella, Brenda y Mitchelli (gel de cejas + base + la mayor cantidad de productos posible), el cambio más complejo del día. Fondo cambia a filtro rojo" },
-        { time: "5:00 – 5:30 pm", desc: "Fotos Fijador Resist en las 3 modelos" },
-        { time: "5:30 – 6:00 pm", desc: "Cierre de cámara" }
+        { time: "7:30 – 7:40 am", desc: "Swatch en brazo — Corrector en Isabella Bonnet, para confirmar tono" },
+        { time: "7:40 – 8:10 am", desc: "① Corrector — Isabella Bonnet" },
+        { time: "8:10 – 8:30 am", desc: "② Base Mate Natural — Isabella Bonnet, sobre el corrector ya puesto" },
+        { time: "8:30 – 9:00 am", desc: "① Corrector — Mitchelli Sierra, recién llega" },
+        { time: "9:00 – 9:20 am", desc: "② Base Mate Natural — Mitchelli Sierra" },
+        { time: "9:20 – 9:40 am", desc: "④ Rubor Compacto — Mitchelli Sierra" },
+        { time: "9:40 – 10:00 am", desc: "⑤ Bálsamo a tono — Brenda Herrera" },
+        { time: "10:00 – 10:20 am", desc: "⑤ Bálsamo a tono — Mitchelli Sierra — Brenda y Mitchelli terminan su parte de rostro por hoy" },
+        { time: "10:20 – 10:40 am", desc: "⑥ Sombras Líquidas — Isabella Bonnet (con Jose Alvarez en paralelo, lo hace la asistente)" },
+        { time: "10:40 – 11:00 am", desc: "⑦ Sombras Individuales, resto de tonos — Isabella Bonnet; termina su parte de rostro/ojos por hoy" },
+        { time: "11:00 – 11:30 am", desc: "Ayuda a limpiar el maquillaje de \"base natural\" en Isabella y Brenda" },
+        { time: "11:30 am – 12:00 pm", desc: "Ayuda a limpiar el maquillaje de Mitchelli — las 3 quedan listas para Base Resist PRO" },
+        { time: "12:00 – 12:40 pm", desc: "Almuerzo — el equipo de fotografía y maquillaje come primero" },
+        { time: "12:40 – 12:50 pm", desc: "Swatch en brazo — Base Resist PRO en Isabella Bonnet, sobre piel limpia" },
+        { time: "12:50 – 1:20 pm", desc: "⑧ Base Resist PRO — Isabella Bonnet" },
+        { time: "1:20 – 1:50 pm", desc: "Apoya con ⑧ Base Resist PRO de Mitchelli Sierra" },
+        { time: "1:50 – 3:50 pm", desc: "Libre durante el bloque de manos — disponible para retoques" },
+        { time: "3:50 – 4:15 pm", desc: "⑪ Gel Cejas a tono — Isabella Bonnet, sobre el look de Base Resist PRO ya puesto" },
+        { time: "4:15 – 4:40 pm", desc: "Apoya con ⑪ Gel Cejas de Brenda y Mitchelli" },
+        { time: "4:40 – 5:15 pm", desc: "Look completo para Fijador Resist — retoque en Isabella, Brenda y Mitchelli, el cambio más complejo del día. Fondo cambia a filtro rojo" },
+        { time: "5:15 – 5:40 pm", desc: "Fotos Fijador Resist en las 3 modelos" },
+        { time: "5:40 – 6:00 pm", desc: "Cierre de cámara" }
       ]
     },
     {
       initials: "AW",
       team: "maquillador",
       role: "Asistente de Will",
-      focus: "Brenda y Mitchelli, un producto a la vez → Jose (ojos/cejas/labios) → look completo + Fijador Resist (con Will, al final)",
+      focus: "Brenda, producto por producto → apoyo con Mitchelli y Jose → look completo + Fijador Resist (con Will, al final)",
       schedule: [
         { time: "7:00 – 7:30 am", desc: "Montaje" },
-        { time: "7:30 – 7:40 am", desc: "Swatch en brazo — Corrector y Base Mate en Brenda Herrera, en paralelo con Will" },
-        { time: "7:40 – 8:10 am", desc: "① Base Resist PRO — Brenda Herrera, solo este producto (en paralelo con Isabella)" },
-        { time: "8:10 – 8:40 am", desc: "① Base Resist PRO — Mitchelli Sierra, recién llega" },
-        { time: "8:40 – 9:10 am", desc: "② Corrector — Brenda Herrera · ② Corrector — Mitchelli Sierra (se alternan)" },
-        { time: "9:10 – 9:40 am", desc: "Prepara a Brenda para Base Mate mientras Isabella cierra fotos en el otro set" },
-        { time: "9:40 – 10:10 am", desc: "④ Gel Cejas transparente — Jose Alvarez (recién llega)" },
-        { time: "10:10 – 10:40 am", desc: "④ Gel Cejas a tono — Mitchelli Sierra (en paralelo con Brenda en el otro set)" },
-        { time: "10:40 – 11:10 am", desc: "⑤ Bálsamo a tono — Mitchelli Sierra — termina su parte de rostro por hoy" },
-        { time: "11:10 – 11:40 am", desc: "⑤ Bálsamo cereza/chocolate — Jose Alvarez" },
-        { time: "11:40 am – 12:10 pm", desc: "Libre — apoyo general antes del almuerzo" },
-        { time: "12:10 – 12:50 pm", desc: "Almuerzo — el equipo de fotografía y maquillaje come primero" },
-        { time: "12:50 – 1:20 pm", desc: "⑥ Sombras Líquidas — Jose Alvarez (con Isabella en paralelo)" },
-        { time: "1:20 – 1:50 pm", desc: "⑦ Sombras Individuales, tonos fuertes — Jose Alvarez; termina su parte de rostro/ojos por hoy" },
-        { time: "1:50 – 4:05 pm", desc: "Libre durante el bloque de manos — disponible para retoques" },
-        { time: "4:05 – 5:00 pm", desc: "Look completo para Fijador Resist — apoya a Will en Isabella, Brenda y Mitchelli, el cambio más complejo del día. Fondo cambia a filtro rojo" },
-        { time: "5:00 – 5:30 pm", desc: "Fotos Fijador Resist en las 3 modelos" },
-        { time: "5:30 – 6:00 pm", desc: "Cierre de cámara" }
+        { time: "7:30 – 7:40 am", desc: "Swatch en brazo — Corrector en Brenda Herrera, en paralelo con Will" },
+        { time: "7:40 – 8:10 am", desc: "① Corrector — Brenda Herrera (en paralelo con Isabella)" },
+        { time: "8:10 – 8:30 am", desc: "② Base Mate Natural — Brenda Herrera" },
+        { time: "8:30 – 9:00 am", desc: "④ Rubor Compacto — Isabella Bonnet, mientras Will hace el corrector de Mitchelli en el otro set" },
+        { time: "9:00 – 9:20 am", desc: "④ Rubor Compacto — Brenda Herrera" },
+        { time: "9:20 – 9:40 am", desc: "⑤ Bálsamo a tono — Isabella Bonnet" },
+        { time: "9:40 – 10:00 am", desc: "⑤ Bálsamo cereza/chocolate — Jose Alvarez (ya libre de Barras TQM)" },
+        { time: "10:00 – 10:20 am", desc: "Libre / prepara el siguiente bloque — Mitchelli termina su bálsamo con Will en el otro set" },
+        { time: "10:20 – 10:40 am", desc: "⑥ Sombras Líquidas — Jose Alvarez (con Isabella en paralelo, la hace Will)" },
+        { time: "10:40 – 11:00 am", desc: "⑦ Sombras Individuales, tonos fuertes — Jose Alvarez; termina su parte de rostro/ojos por hoy" },
+        { time: "11:00 – 11:30 am", desc: "Ayuda a limpiar el maquillaje de \"base natural\" en Isabella y Brenda" },
+        { time: "11:30 am – 12:00 pm", desc: "Ayuda a limpiar el maquillaje de Mitchelli — las 3 quedan listas para Base Resist PRO" },
+        { time: "12:00 – 12:40 pm", desc: "Almuerzo — el equipo de fotografía y maquillaje come primero" },
+        { time: "12:40 – 12:50 pm", desc: "Swatch en brazo — Base Resist PRO en Brenda Herrera, sobre piel limpia" },
+        { time: "12:50 – 1:20 pm", desc: "⑧ Base Resist PRO — Brenda Herrera" },
+        { time: "1:20 – 1:50 pm", desc: "Libre / apoyo general — solo falta Mitchelli, la termina Will sola" },
+        { time: "1:50 – 3:50 pm", desc: "Libre durante el bloque de manos — disponible para retoques" },
+        { time: "3:50 – 4:15 pm", desc: "⑪ Gel Cejas transparente — Jose Alvarez, sobre el look de Base Resist PRO ya puesto" },
+        { time: "4:15 – 4:40 pm", desc: "⑪ Gel Cejas a tono — Brenda Herrera (en paralelo, Will hace Mitchelli)" },
+        { time: "4:40 – 5:15 pm", desc: "Look completo para Fijador Resist — apoya a Will en Isabella, Brenda y Mitchelli, el cambio más complejo del día. Fondo cambia a filtro rojo" },
+        { time: "5:15 – 5:40 pm", desc: "Fotos Fijador Resist en las 3 modelos" },
+        { time: "5:40 – 6:00 pm", desc: "Cierre de cámara" }
       ]
     },
     {
@@ -1500,15 +1560,15 @@
       schedule: [
         { time: "7:15 am", desc: "Llamado — arranca temprano para hacer manicure nude básica en paralelo con el maquillaje" },
         { time: "7:40 – 8:00 am", desc: "Manicure nude básica — Isabella Bonnet (20 min, en paralelo con el arranque de su maquillaje de rostro)" },
-        { time: "8:00 – 8:20 am", desc: "Manicure nude básica — Mitchelli Sierra (20 min, recién llega)" },
-        { time: "8:20 am – 1:50 pm", desc: "Libre — uñas de Isabella y Mitchelli secando (listas mucho antes de sus fotos de producto en mano); prepara el kit de esmaltes y tonos para el bloque principal; almuerza junto con el equipo de manicura, justo después de fotografía y maquillaje" },
+        { time: "8:00 – 8:30 am", desc: "Libre — uñas de Isabella secando; prepara el kit de esmaltes" },
+        { time: "8:30 – 8:50 am", desc: "Manicure nude básica — Mitchelli Sierra (20 min, en paralelo con el arranque de su maquillaje de rostro)" },
+        { time: "8:50 am – 1:50 pm", desc: "Libre — uñas de Isabella y Mitchelli secando (listas mucho antes de sus fotos de producto en mano); prepara el kit de esmaltes y tonos para el bloque principal; almuerza junto con el equipo de manicura, justo después de fotografía y maquillaje" },
         { time: "1:50 – 2:20 pm", desc: "Base nude — María Camila Contreras (en paralelo con la asistente en Jose)" },
-        { time: "2:20 – 2:35 pm", desc: "Fotos Barras TQM en brazo" },
-        { time: "2:35 – 3:05 pm", desc: "Cambio de esmalte — Pegante Salvauñas + Esmalte Rápido Secado (uña más limpia del bloque de manos)" },
-        { time: "3:05 – 3:20 pm", desc: "Fotos Salvauñas (antes/después uña partida) + Esmalte Rápido" },
-        { time: "3:20 – 3:50 pm", desc: "Cambio de esmalte — Efecto Gel Jelly" },
-        { time: "3:50 – 4:05 pm", desc: "Fotos Gel Jelly + Brillo Elixir" },
-        { time: "4:05 – 6:00 pm", desc: "Retoques de manos" }
+        { time: "2:20 – 2:50 pm", desc: "Cambio de esmalte — Pegante Salvauñas + Esmalte Rápido Secado (uña más limpia del bloque de manos)" },
+        { time: "2:50 – 3:05 pm", desc: "Fotos Salvauñas (antes/después uña partida) + Esmalte Rápido" },
+        { time: "3:05 – 3:35 pm", desc: "Cambio de esmalte — Efecto Gel Jelly" },
+        { time: "3:35 – 3:50 pm", desc: "Fotos Gel Jelly + Brillo Elixir" },
+        { time: "3:50 – 6:00 pm", desc: "Retoques de manos" }
       ]
     },
     {
@@ -1519,16 +1579,15 @@
       schedule: [
         { time: "7:15 am", desc: "Llamado — arranca temprano para hacer manicure nude básica en paralelo con el maquillaje" },
         { time: "7:40 – 8:00 am", desc: "Manicure nude básica — Brenda Herrera (20 min, en paralelo con el arranque de su maquillaje de rostro)" },
-        { time: "8:00 am – 12:10 pm", desc: "Uñas de Brenda secando (listas mucho antes de su foto de producto en mano) — luego libre / apoyo general, Jose está ocupado como modelo de cara hasta la 1:50 pm" },
-        { time: "12:10 – 12:50 pm", desc: "Almuerzo — justo después del equipo de fotografía y maquillaje" },
-        { time: "12:50 – 1:50 pm", desc: "Libre / apoyo general" },
+        { time: "8:00 am – 12:00 pm", desc: "Uñas de Brenda secando (listas mucho antes de su foto de producto en mano) — luego libre / apoyo general, Jose está ocupado con Barras TQM y luego como modelo de cara hasta la 1:50 pm" },
+        { time: "12:00 – 12:40 pm", desc: "Almuerzo — justo después del equipo de fotografía y maquillaje" },
+        { time: "12:40 – 1:50 pm", desc: "Libre / apoyo general" },
         { time: "1:50 – 2:20 pm", desc: "Base nude — Jose Alvarez (en paralelo con Wendy en María Camila)" },
-        { time: "2:20 – 2:35 pm", desc: "Fotos Barras TQM en brazo" },
-        { time: "2:35 – 3:05 pm", desc: "Cambio de esmalte — Pegante Salvauñas + Esmalte Rápido Secado (uña más limpia del bloque de manos)" },
-        { time: "3:05 – 3:20 pm", desc: "Fotos Salvauñas (antes/después uña partida) + Esmalte Rápido" },
-        { time: "3:20 – 3:50 pm", desc: "Cambio de esmalte — Efecto Gel Jelly" },
-        { time: "3:50 – 4:05 pm", desc: "Fotos Gel Jelly + Brillo Elixir" },
-        { time: "4:05 – 6:00 pm", desc: "Retoques de manos" }
+        { time: "2:20 – 2:50 pm", desc: "Cambio de esmalte — Pegante Salvauñas + Esmalte Rápido Secado (uña más limpia del bloque de manos)" },
+        { time: "2:50 – 3:05 pm", desc: "Fotos Salvauñas (antes/después uña partida) + Esmalte Rápido" },
+        { time: "3:05 – 3:35 pm", desc: "Cambio de esmalte — Efecto Gel Jelly" },
+        { time: "3:35 – 3:50 pm", desc: "Fotos Gel Jelly + Brillo Elixir" },
+        { time: "3:50 – 6:00 pm", desc: "Retoques de manos" }
       ]
     }
   ];
@@ -1802,13 +1861,18 @@
   var HEX_CORRECTOR = { "Natural": "#e9cfbf", "Trigo": "#f0ccad", "Arena": "#ecc1a4", "Avellana": "#f0c6a3", "Champán": "#dfbd9f", "Bronce": "#f1bc9b", "Canela": "#e4ac80", "Miel": "#d49d7c", "Desierto": "#d4a57f", "Caramelo": "#b3704d" };
   var HEX_BASE_RESIST = { "Crema": "#efd4bc", "Avena": "#edcbae", "Porcelana": "#e2bc96", "Vainilla": "#dbb089", "Pétalo": "#d8a67d", "Trigo": "#ddb38a", "Caramelo": "#dbaa86", "Natural": "#ddac83", "Avellana": "#dda976", "Glamour": "#d8a16f", "Sensual": "#d89e6f", "Capuccino": "#d8a16f", "Nuez": "#c18e67", "Miel": "#c98c5d", "Bronce": "#bf8a5e", "Canela": "#aa7750" };
   var HEX_GEL_JELLY = { "Arena Rosa": "#ffbe92", "Medusa Costera": "#f99c95", "Agua Salada": "#e1626a", "Sombra de Palma": "#c3dee2", "Tierra Caliente": "#6a825a", "Coralina": "#a34930" };
+  // Estimados a ojo del swatch del pptx del cliente (slide "Rubor Compacto") — el cliente aún
+  // no confirma nombres ("Arte del pack pendiente"), así que los tonos siguen como Tono 1..5,
+  // solo se agrega el color de referencia.
+  var HEX_RUBOR = { "Tono 1": "#c17a55", "Tono 2": "#d68798", "Tono 3": "#c14a72", "Tono 4": "#d97d6c", "Tono 5": "#e3a99b" };
 
   var TONE_HEX = {
     "Base Mate Natural": HEX_BASE_MATE,
     "Corrector Mate Natural": HEX_CORRECTOR,
     "Base Resist PRO": HEX_BASE_RESIST,
     "Efecto Gel Jelly": HEX_GEL_JELLY,
-    "Efecto Gel Jelly + Brillo Elixir": HEX_GEL_JELLY
+    "Efecto Gel Jelly + Brillo Elixir": HEX_GEL_JELLY,
+    "Rubor Compacto": HEX_RUBOR
   };
 
   function makeToneChecklist(productName) {
@@ -2121,6 +2185,12 @@
     badge.className = "station-badge";
     badge.textContent = "Producto " + prod.seq + " / " + dia1Products.length;
     eyebrowRow.appendChild(badge);
+    if (prod.time) {
+      var timeChip = document.createElement("span");
+      timeChip.className = "station-time";
+      timeChip.textContent = prod.time;
+      eyebrowRow.appendChild(timeChip);
+    }
     sHead.appendChild(eyebrowRow);
 
     var sTitle = document.createElement("h2");
