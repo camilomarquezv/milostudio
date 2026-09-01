@@ -1,0 +1,7 @@
+# Netlify response headers.
+
+# Client shoot plans are served so they can be opened from a link, but must never be
+# indexed. Sent as a header as well as the page's own meta tag, so the rule still applies
+# to anything served from here that is not HTML (a PDF, for instance).
+/produccion/*
+  X-Robots-Tag: noindex, nofollow, noarchive, noimageindex

@@ -6,8 +6,12 @@
 # Local design concept, not served
 milo-brutalist-concept.html
 
-# Production planning notes (client shoots, not site content)
-produccion/
+# Production planning notes (client shoots). Only the shoot-plan page is served; the
+# printable PDF and the source notes stay local.
+produccion/*
+!produccion/vogue-loreal/
+produccion/vogue-loreal/*
+!produccion/vogue-loreal/plan-rodaje-vogue.html
 
 # Local preview scratch file, not site content
 test-hero-grid/
