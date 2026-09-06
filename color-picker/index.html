@@ -1,0 +1,1232 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Color Picker</title>
+<style>
+  :root{
+    --bg:#f2f3f5; --card:#ffffff; --ink:#14161a; --muted:#666d7a;
+    --line:#e3e5ea; --line-strong:#c7cad1; --accent:#14161a; --accent-ink:#ffffff;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0c0d10; --card:#17181c; --ink:#f3f4f6; --muted:#9aa0ac;
+      --line:#2a2c31; --line-strong:#3c3f46; --accent:#f3f4f6; --accent-ink:#0c0d10;
+    }
+  }
+  *{ box-sizing:border-box; min-width:0; }
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  .mono{ font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  .wrap{ max-width:1080px; margin:0 auto; padding:32px 20px 60px; }
+  header{ margin-bottom:28px; }
+  header .brand{ display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+  header .brand-logo{ width:28px; height:auto; flex-shrink:0; color:var(--ink); }
+  header h1{ font-size:28px; margin:0; letter-spacing:-0.02em; }
+  header p.sub{ margin:0; color:var(--muted); font-size:15px; max-width:56ch; }
+
+  .bw-toggle{
+    font:inherit; font-size:12px; font-weight:700; letter-spacing:.02em;
+    padding:5px 11px; border-radius:999px; border:1px solid var(--line-strong);
+    background:var(--card); color:var(--ink); cursor:pointer;
+  }
+  .bw-toggle.active{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
+  html.bw-mode{ filter:grayscale(1); }
+
+  main.grid{ display:grid; grid-template-columns:1fr; gap:20px; }
+  @media (min-width:880px){
+    main.grid{ grid-template-columns:1fr 1fr; align-items:start; }
+  }
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:18px;
+    padding:22px; box-shadow:0 1px 2px rgba(0,0,0,.04);
+  }
+  .card h2{ font-size:14px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 16px; }
+  .card h3{ font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:20px 0 10px; }
+
+  .btn{
+    font:inherit; font-weight:600; font-size:14px; padding:11px 20px; border-radius:999px;
+    border:1px solid transparent; cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn.primary{ background:var(--accent); color:var(--accent-ink); width:100%; justify-content:center; }
+  .btn.primary:disabled{ opacity:.45; cursor:not-allowed; }
+  .btn.secondary{ background:transparent; border-color:var(--line-strong); color:var(--ink); }
+
+  .note{ font-size:13px; color:var(--muted); margin:10px 2px 0; line-height:1.5; }
+
+  .hsb-picker:not([hidden]){ display:flex; gap:10px; margin-top:16px; }
+  .sb-field{
+    position:relative; flex:1; aspect-ratio:1/1; border-radius:12px; overflow:hidden;
+    cursor:crosshair; border:1px solid var(--line-strong);
+    background:
+      linear-gradient(to top, #000, rgba(0,0,0,0)),
+      linear-gradient(to right, #fff, rgba(255,255,255,0)),
+      hsl(0,100%,50%);
+    touch-action:none;
+  }
+  .sb-cursor{
+    position:absolute; width:16px; height:16px; border-radius:50%;
+    border:2px solid #fff; box-shadow:0 0 0 1px rgba(0,0,0,.5), 0 1px 3px rgba(0,0,0,.5);
+    transform:translate(-50%,-50%); pointer-events:none;
+  }
+  .hue-slider{
+    position:relative; width:26px; border-radius:12px; overflow:hidden;
+    cursor:pointer; border:1px solid var(--line-strong); touch-action:none;
+    background:linear-gradient(to bottom,
+      #f00 0%, #f0f 17%, #00f 33%, #0ff 50%, #0f0 67%, #ff0 83%, #f00 100%);
+  }
+  .hue-cursor{
+    position:absolute; left:-3px; right:-3px; height:6px; border-radius:3px;
+    border:2px solid #fff; box-shadow:0 0 0 1px rgba(0,0,0,.5);
+    transform:translateY(-50%); pointer-events:none;
+  }
+
+  .divider{ text-align:center; color:var(--muted); font-size:12px; margin:18px 0; position:relative; }
+  .divider::before,.divider::after{ content:""; position:absolute; top:50%; width:42%; height:1px; background:var(--line); }
+  .divider::before{ left:0; } .divider::after{ right:0; }
+
+  .drop-zone{
+    border:1.5px dashed var(--line-strong); border-radius:14px; padding:22px; text-align:center;
+  }
+  .drop-zone.drag{ border-color:var(--ink); background:var(--bg); }
+  .drop-zone p{ margin:0 0 12px; color:var(--muted); font-size:13px; }
+
+  .canvas-wrap{ position:relative; margin-top:14px; }
+  .canvas-wrap .canvas-head{ display:flex; justify-content:flex-end; margin-bottom:8px; }
+  .canvas-wrap .canvas-head button{
+    background:none; border:none; color:var(--muted); font-size:13px; cursor:pointer; text-decoration:underline;
+  }
+  #sampleCanvas{
+    max-width:100%; width:100%; height:auto; display:block; border-radius:12px;
+    touch-action:none; cursor:crosshair; border:1px solid var(--line);
+  }
+  #loupeCanvas{
+    position:absolute; top:36px; right:10px; width:96px; height:96px;
+    border-radius:50%; border:2px solid var(--card); box-shadow:0 2px 8px rgba(0,0,0,.35);
+    pointer-events:none; background:var(--bg);
+  }
+  .canvas-wrap .hint{ font-size:12px; color:var(--muted); margin:10px 2px 0; }
+
+  .result-top{ display:flex; gap:16px; align-items:flex-start; }
+  .big-swatch{
+    width:96px; height:96px; border-radius:16px; border:1px solid var(--line);
+    flex-shrink:0; box-shadow:inset 0 0 0 1px rgba(0,0,0,.04);
+  }
+  .values{ flex:1; display:flex; flex-direction:column; gap:8px; min-width:0; }
+  .value-row{ display:flex; align-items:center; gap:8px; }
+  .value-row .k{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); width:32px; flex-shrink:0; }
+  .value-row .v{ font-size:14px; font-weight:700; flex:1; }
+  button.copy{
+    font:inherit; font-size:12px; background:none; border:1px solid var(--line-strong);
+    border-radius:8px; padding:4px 9px; color:var(--muted); cursor:pointer; flex-shrink:0;
+  }
+  button.copy:hover{ color:var(--ink); border-color:var(--ink); }
+
+  .channel-row{ display:flex; gap:10px; margin:2px 0; }
+  .channel-col{ display:flex; flex-direction:column; gap:6px; flex:1; }
+  .channel-col label{ font-size:12px; color:var(--muted); }
+  .channel-col input{
+    font:inherit; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    padding:10px 12px; border-radius:10px; border:1px solid var(--line-strong);
+    background:var(--bg); color:var(--ink); width:100%; -moz-appearance:textfield;
+  }
+  .channel-col button.copy{ width:100%; justify-content:center; }
+
+  .fine-tune-toggle{
+    background:none; border:none; color:var(--muted); font-size:12px; cursor:pointer;
+    padding:8px 2px 0; text-align:left;
+  }
+  .fine-tune-toggle:hover{ color:var(--ink); }
+  .fine-tune-panel:not([hidden]){ display:flex; gap:20px; justify-content:center; margin-top:10px; }
+  #imageUploadWrap:not([hidden]){ margin-top:10px; }
+  .fine-tune-col{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .fine-tune-col label{ font-size:11px; font-weight:700; color:var(--muted); }
+  .fine-slider-track{
+    position:relative; width:32px; height:160px; border-radius:12px;
+    border:1px solid var(--line-strong); cursor:pointer; touch-action:none; overflow:hidden;
+  }
+  .fine-slider-cursor{
+    position:absolute; left:-3px; right:-3px; height:6px; border-radius:3px;
+    border:2px solid #fff; box-shadow:0 0 0 1px rgba(0,0,0,.5);
+    transform:translateY(-50%); pointer-events:none;
+  }
+
+  .family-block{ display:flex; gap:16px; align-items:center; margin-top:22px; padding-top:20px; border-top:1px solid var(--line); }
+  .family-icon-wrap{ position:relative; width:64px; height:64px; flex-shrink:0; cursor:help; }
+  .family-icon{ width:100%; height:100%; }
+  .family-icon svg{ width:100%; height:100%; }
+  .family-text{ min-width:0; }
+  .family-label{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .family-name{ font-size:20px; font-weight:700; letter-spacing:-0.01em; }
+  .specific-name{ font-size:14px; color:var(--muted); margin-top:2px; }
+
+  .icon-tooltip{
+    position:absolute; top:calc(100% + 10px); left:0; z-index:20;
+    width:240px; max-width:min(70vw, 280px);
+    background:var(--ink); color:var(--bg);
+    font-size:12px; line-height:1.5; font-style:italic;
+    padding:10px 12px; border-radius:10px;
+    opacity:0; visibility:hidden; transform:translateY(-4px); pointer-events:none;
+    transition:opacity .15s ease, transform .15s ease;
+  }
+  .icon-tooltip a{ color:var(--bg); }
+  .family-icon-wrap:hover .icon-tooltip,
+  .family-icon-wrap:focus .icon-tooltip,
+  .family-icon-wrap:focus-within .icon-tooltip{
+    opacity:1; visibility:visible; transform:translateY(0); pointer-events:auto;
+  }
+
+  .collapsible{ margin-top:20px; padding-top:18px; border-top:1px solid var(--line); }
+  .collapsible-head{
+    display:flex; align-items:center; gap:8px; width:100%;
+    background:none; border:none; padding:0; margin:0; font:inherit; color:inherit;
+    text-align:left; cursor:pointer;
+  }
+  .collapsible-head .family-label{ margin:0; }
+  .collapsible-arrow{ margin-left:auto; color:var(--muted); font-size:12px; }
+  .collapsible-head:hover .collapsible-arrow{ color:var(--ink); }
+  .collapsible-body:not([hidden]){ margin-top:12px; }
+  .approx-badge{
+    font-size:10px; text-transform:uppercase; letter-spacing:.04em; font-weight:700;
+    color:#8a5a00; background:#fdf0d5; border:1px solid #e8c98a; border-radius:999px; padding:2px 8px;
+  }
+  @media (prefers-color-scheme: dark){
+    .approx-badge{ color:#f3cf7a; background:#3a2f10; border-color:#5c4a1c; }
+  }
+  .pantone-row{ display:flex; align-items:center; gap:12px; }
+  .pantone-swatch{ width:48px; height:48px; border-radius:10px; border:1px solid var(--line); flex-shrink:0; }
+  .pantone-text{ flex:1; min-width:0; }
+  .pantone-code{ font-weight:700; font-size:15px; }
+  .pantone-name{ font-size:13px; color:var(--muted); }
+  .pantone-match{ font-size:11px; margin-top:3px; font-weight:600; }
+  .pantone-match.near{ color:#2f7d3f; }
+  .pantone-match.far{ color:#b8590a; }
+  @media (prefers-color-scheme: dark){
+    .pantone-match.near{ color:#6fcf85; }
+    .pantone-match.far{ color:#e8985a; }
+  }
+  .pantone-note{ font-size:11px; color:var(--muted); line-height:1.5; margin:10px 2px 0; }
+
+  .compare-row{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .compare-clear{
+    background:none; border:none; color:var(--muted); font-size:12px; cursor:pointer;
+    text-decoration:underline; margin-left:auto; padding:0;
+  }
+  .compare-clear:hover{ color:var(--ink); }
+  .swatch-tray{ display:flex; flex-wrap:wrap; gap:14px; margin-top:14px; }
+  .swatch-chip{ position:relative; display:flex; flex-direction:column; align-items:center; gap:5px; }
+  .swatch-color{
+    width:52px; height:52px; border-radius:10px; border:1px solid var(--line); cursor:pointer; padding:0;
+  }
+  .swatch-hex{ font-size:10px; color:var(--muted); font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  .swatch-remove{
+    position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%;
+    background:var(--card); border:1px solid var(--line-strong); color:var(--muted);
+    font-size:11px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0;
+  }
+  .swatch-remove:hover{ color:var(--ink); border-color:var(--ink); }
+  .compare-empty{ font-size:12px; color:var(--muted); font-style:italic; margin:12px 2px 0; }
+
+  .harmony-group{ margin-top:14px; }
+  .harmony-group:first-child{ margin-top:0; }
+  .harmony-label{ font-size:11px; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:.04em; }
+  .harmony-row{ display:flex; border-radius:10px; overflow:hidden; border:1px solid var(--line); }
+  .harmony-swatch{ flex:1; height:48px; cursor:pointer; border:none; padding:0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg class="brand-logo" viewBox="0 0 246.28 199.17" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path fill="currentColor" fill-rule="evenodd" d="M104.46,64.8c5.56,13.04,10.8,25.63,16.35,38.67,2.58,6.11,5.19,12.97,7.77,19.08,1.97,4.53,3.75,9.25,9.21,10.39,6.79,1.42,9.45-8.1,8.24-15.12-1.45-9.86-3.18-19.67-4.64-29.52-2.92-14.93-4.65-47.14,27.6-57.01,14.27-4.37,24.83-2.96,33.14,4.06,12.12,10.24,12.5,35.22,12.5,57.34.06,7.12.13,14.23.19,21.35.03,7.81.06,15.62.1,23.43,0,5.95.2,11.67-1.26,16.34-1.19,3.82-3.06,6.72-5.33,9.45-3.84,4.63-13.8,7.67-22.19,5.1-10.46-3.2-16.5-12.68-12.98-29.15,1.77-8.3,16.73-53.18,22.48-72.97,2.63-8.35,6-24.51-3-27.11-6.45-1.69-11.35,4.78-14.92,15.87-1.49,4.79-2.97,9.57-4.46,14.36-5.56,17.76-11.11,35.52-16.67,53.28-3.08,9.51-5.45,19.54-9.21,28.44-3.12,7.4-9.18,20.14-21.32,18.14-11.16-1.84-15.48-11-20.31-19.07-5.69-9.52-10.97-19.99-16.14-29.89-17.22-32.99-17.4-40.1-14.23-61.09,5.88-30.7-37.46-23.91-27.25,7.59,2.65,8.18,6.09,16.41,9.42,24.06,4.36,10.55,8.72,21.1,13.08,31.65,2.13,4.92,4.52,9.87,6.2,15.12,4.62,14.35,1.36,27.56-11.63,30.99-2.59.68-6.91,1.06-10.08.47-13.28-2.46-22.07-11.69-22.2-34.37-.16-26.06-4.26-61.05,3.72-85.23,13.8-28.9,42.32-23.96,55.56-7.04,6.84,8.75,11.28,20.35,12.24,22.42Z"/>
+      </svg>
+      <h1>Color Picker</h1>
+      <button type="button" id="toggleBw" class="bw-toggle">B/N</button>
+    </div>
+    <p class="sub">Apunta a un color en pantalla, sube una foto o escribe un valor — te digo su familia, su nombre y sus códigos HEX/RGB/HSL.</p>
+  </header>
+
+  <main class="grid">
+    <section class="card">
+      <h2>1 · Elige un color</h2>
+      <button id="eyedropperBtn" class="btn primary">🎯 Elegir color en la pantalla</button>
+      <p id="eyedropperNote" class="note" hidden>Tu navegador no soporta selección directa de pantalla (EyeDropper). Funciona en Chrome/Edge de escritorio y Android. Usa la imagen o los campos manuales abajo.</p>
+
+      <button type="button" id="toggleVisualPicker" class="fine-tune-toggle">Ocultar selector visual ▴</button>
+      <div id="hsbPicker" class="hsb-picker">
+        <div id="satBrightField" class="sb-field"><div id="sbCursor" class="sb-cursor"></div></div>
+        <div id="hueSlider" class="hue-slider"><div id="hueCursor" class="hue-cursor"></div></div>
+      </div>
+
+      <div class="divider">o</div>
+
+      <button type="button" id="toggleImageUpload" class="fine-tune-toggle">Subir imagen ▾</button>
+      <div id="imageUploadWrap" hidden>
+        <div id="dropZone" class="drop-zone">
+          <p>Arrastra una imagen aquí, pégala con Cmd/Ctrl+V, o:</p>
+          <button type="button" id="uploadBtn" class="btn secondary">Subir imagen / foto</button>
+          <input id="imageFileInput" type="file" accept="image/*" hidden>
+        </div>
+        <div id="canvasWrap" class="canvas-wrap" hidden>
+          <div class="canvas-head"><button type="button" id="clearImageBtn">Quitar imagen</button></div>
+          <canvas id="sampleCanvas"></canvas>
+          <canvas id="loupeCanvas" width="110" height="110"></canvas>
+          <p class="hint">Mueve el cursor o el dedo sobre la imagen para apuntar; haz clic o toca para fijar el color.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" aria-live="polite">
+      <h2>2 · Resultado</h2>
+      <div class="result-top">
+        <div id="bigSwatch" class="big-swatch"></div>
+        <div class="values">
+          <div class="value-row"><span class="k">HEX</span><span id="outHex" class="v mono"></span><button class="copy" data-copy="hex">Copiar</button></div>
+          <div class="channel-row">
+            <div class="channel-col">
+              <label for="rInput">R</label>
+              <input id="rInput" type="number" min="0" max="255">
+              <button class="copy" data-copy="r">Copiar</button>
+            </div>
+            <div class="channel-col">
+              <label for="gInput">G</label>
+              <input id="gInput" type="number" min="0" max="255">
+              <button class="copy" data-copy="g">Copiar</button>
+            </div>
+            <div class="channel-col">
+              <label for="bInput">B</label>
+              <input id="bInput" type="number" min="0" max="255">
+              <button class="copy" data-copy="b">Copiar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="family-block">
+        <div class="family-icon-wrap" tabindex="0">
+          <div id="familyIcon" class="family-icon"></div>
+          <div class="icon-tooltip">Triángulo a la izquierda = rojo, diagonal = amarillo, triángulo a la derecha = azul; el resto combina estas tres marcas. Contorno = tono claro, blanco sobre negro = tono oscuro. Concepto inspirado en <a href="https://www.coloradd.net/es/el-codigo-coloradd/" target="_blank" rel="noopener">ColorADD</a>.</div>
+        </div>
+        <div class="family-text">
+          <div class="family-label">Familia</div>
+          <div id="outFamily" class="family-name"></div>
+          <div id="outName" class="specific-name"></div>
+        </div>
+      </div>
+
+      <button type="button" id="toggleHsl" class="fine-tune-toggle">Ocultar HSL ▴</button>
+      <div id="hslWrap">
+        <div class="channel-row">
+          <div class="channel-col">
+            <label for="hInput">H</label>
+            <input id="hInput" type="number" min="0" max="360">
+            <button class="copy" data-copy="h">Copiar</button>
+          </div>
+          <div class="channel-col">
+            <label for="sInput">S</label>
+            <input id="sInput" type="number" min="0" max="100">
+            <button class="copy" data-copy="s">Copiar</button>
+          </div>
+          <div class="channel-col">
+            <label for="lInput">L</label>
+            <input id="lInput" type="number" min="0" max="100">
+            <button class="copy" data-copy="l">Copiar</button>
+          </div>
+        </div>
+
+        <button type="button" id="toggleFineTune" class="fine-tune-toggle">Ajuste preciso de S y L ▾</button>
+        <div id="fineTunePanel" class="fine-tune-panel" hidden>
+          <div class="fine-tune-col">
+            <label>S</label>
+            <div id="satSlider" class="fine-slider-track"><div id="satCursor" class="fine-slider-cursor"></div></div>
+          </div>
+          <div class="fine-tune-col">
+            <label>L</label>
+            <div id="lightSlider" class="fine-slider-track"><div id="lightCursor" class="fine-slider-cursor"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="collapsible">
+        <button type="button" id="toggleCompare" class="collapsible-head">
+          <span class="family-label">Comparar colores</span>
+          <span class="collapsible-arrow">▾</span>
+        </button>
+        <div id="compareBody" class="collapsible-body" hidden>
+          <div class="compare-row">
+            <button type="button" id="addSwatchBtn" class="btn secondary">+ Agregar color actual</button>
+            <button type="button" id="clearSwatchesBtn" class="compare-clear" hidden>Vaciar todo</button>
+          </div>
+          <div id="swatchTray" class="swatch-tray"></div>
+          <p id="swatchEmpty" class="compare-empty">Aún no has agregado ningún color. Usa "Agregar color actual" para ir guardando swatches y compararlos lado a lado.</p>
+        </div>
+      </div>
+
+      <div class="collapsible">
+        <button type="button" id="togglePantone" class="collapsible-head">
+          <span class="family-label">Pantone® más cercano</span>
+          <span class="approx-badge">Aproximado</span>
+          <span class="collapsible-arrow">▾</span>
+        </button>
+        <div id="pantoneBody" class="collapsible-body" hidden>
+          <div class="pantone-row">
+            <div id="pantoneSwatch" class="pantone-swatch"></div>
+            <div class="pantone-text">
+              <div id="pantoneCode" class="pantone-code"></div>
+              <div id="pantoneName" class="pantone-name"></div>
+              <div id="pantoneMatch" class="pantone-match"></div>
+            </div>
+            <button class="copy" data-copy="pantone">Copiar</button>
+          </div>
+          <p class="pantone-note">Coincidencia por color más cercano calculada en tu navegador, no una conversión oficial de Pantone LLC. No usar para aprobar producción de impresión — para eso verifica con una guía Pantone física u oficial.</p>
+        </div>
+      </div>
+
+      <div class="collapsible">
+        <button type="button" id="toggleCmyk" class="collapsible-head">
+          <span class="family-label">CMYK</span>
+          <span class="collapsible-arrow">▾</span>
+        </button>
+        <div id="cmykBody" class="collapsible-body" hidden>
+          <div class="channel-row">
+            <div class="channel-col">
+              <label for="cInput">C</label>
+              <input id="cInput" type="text" readonly>
+              <button class="copy" data-copy="c">Copiar</button>
+            </div>
+            <div class="channel-col">
+              <label for="mInput">M</label>
+              <input id="mInput" type="text" readonly>
+              <button class="copy" data-copy="m">Copiar</button>
+            </div>
+            <div class="channel-col">
+              <label for="yInput">Y</label>
+              <input id="yInput" type="text" readonly>
+              <button class="copy" data-copy="y">Copiar</button>
+            </div>
+            <div class="channel-col">
+              <label for="kInput">K</label>
+              <input id="kInput" type="text" readonly>
+              <button class="copy" data-copy="k">Copiar</button>
+            </div>
+          </div>
+          <p class="pantone-note">Aproximado (sin perfil de impresión) — para preprensa real usa el perfil ICC de tu imprenta.</p>
+        </div>
+      </div>
+
+      <div class="collapsible">
+        <button type="button" id="toggleHarmony" class="collapsible-head">
+          <span class="family-label">Esquemas de color</span>
+          <span class="collapsible-arrow">▾</span>
+        </button>
+        <div id="harmonyBody" class="collapsible-body" hidden>
+          <div class="harmony-group">
+            <div class="harmony-label">Complementario</div>
+            <div class="harmony-row" id="harmonyComplementary"></div>
+          </div>
+          <div class="harmony-group">
+            <div class="harmony-label">Análogo</div>
+            <div class="harmony-row" id="harmonyAnalogous"></div>
+          </div>
+          <div class="harmony-group">
+            <div class="harmony-label">Complementario dividido</div>
+            <div class="harmony-row" id="harmonySplit"></div>
+          </div>
+          <div class="harmony-group">
+            <div class="harmony-label">Triádico</div>
+            <div class="harmony-row" id="harmonyTriadic"></div>
+          </div>
+          <div class="harmony-group">
+            <div class="harmony-label">Tetrádico</div>
+            <div class="harmony-row" id="harmonyTetradic"></div>
+          </div>
+          <div class="harmony-group">
+            <div class="harmony-label">Monocromático</div>
+            <div class="harmony-row" id="harmonyMono"></div>
+          </div>
+          <p class="compare-empty">Haz clic en cualquier color del esquema para explorarlo como color actual.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
+
+function hexToRgb(hex){
+  if(!hex) return null;
+  hex = hex.trim().replace(/^#/,'');
+  if(/^[0-9a-fA-F]{3}$/.test(hex)) hex = hex.split('').map(c=>c+c).join('');
+  if(!/^[0-9a-fA-F]{6}$/.test(hex)) return null;
+  return { r: parseInt(hex.slice(0,2),16), g: parseInt(hex.slice(2,4),16), b: parseInt(hex.slice(4,6),16) };
+}
+
+function rgbToHex(r,g,b){
+  return '#' + [r,g,b].map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join('');
+}
+
+function rgbToHsl(r,g,b){
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h,s,l=(max+min)/2;
+  if(max===min){ h=0; s=0; }
+  else{
+    const d=max-min;
+    s = l>0.5 ? d/(2-max-min) : d/(max+min);
+    switch(max){
+      case r: h=(g-b)/d + (g<b?6:0); break;
+      case g: h=(b-r)/d + 2; break;
+      default: h=(r-g)/d + 4;
+    }
+    h*=60;
+  }
+  return { h, s:s*100, l:l*100 };
+}
+
+function rgbToHsb(r,g,b){
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
+  let h;
+  if(d===0) h=0;
+  else if(max===r) h=60*(((g-b)/d)%6);
+  else if(max===g) h=60*((b-r)/d+2);
+  else h=60*((r-g)/d+4);
+  if(h<0) h+=360;
+  const s = max===0 ? 0 : d/max;
+  return { h, s:s*100, b:max*100 };
+}
+
+function hsbToRgb(h,s,v){
+  s/=100; v/=100;
+  const c=v*s, x=c*(1-Math.abs((h/60)%2-1)), m=v-c;
+  let r,g,b;
+  if(h<60){ r=c; g=x; b=0; }
+  else if(h<120){ r=x; g=c; b=0; }
+  else if(h<180){ r=0; g=c; b=x; }
+  else if(h<240){ r=0; g=x; b=c; }
+  else if(h<300){ r=x; g=0; b=c; }
+  else { r=c; g=0; b=x; }
+  return { r:(r+m)*255, g:(g+m)*255, b:(b+m)*255 };
+}
+
+function hslToRgb(h,s,l){
+  s/=100; l/=100;
+  const c=(1-Math.abs(2*l-1))*s, x=c*(1-Math.abs((h/60)%2-1)), m=l-c/2;
+  let r,g,b;
+  if(h<60){ r=c; g=x; b=0; }
+  else if(h<120){ r=x; g=c; b=0; }
+  else if(h<180){ r=0; g=c; b=x; }
+  else if(h<240){ r=0; g=x; b=c; }
+  else if(h<300){ r=x; g=0; b=c; }
+  else { r=c; g=0; b=x; }
+  return { r:(r+m)*255, g:(g+m)*255, b:(b+m)*255 };
+}
+
+function hslToHex(h,s,l){ const c = hslToRgb(h,s,l); return rgbToHex(c.r,c.g,c.b); }
+
+// Naive device-CMYK (no ICC/press profile) — the same approximation almost
+// every online converter uses. Real prepress needs the actual press profile.
+function rgbToCmyk(r,g,b){
+  const rp=r/255, gp=g/255, bp=b/255;
+  const k = 1 - Math.max(rp,gp,bp);
+  if(k>=1) return { c:0, m:0, y:0, k:100 };
+  return {
+    c: (1-rp-k)/(1-k) * 100,
+    m: (1-gp-k)/(1-k) * 100,
+    y: (1-bp-k)/(1-k) * 100,
+    k: k*100,
+  };
+}
+
+function srgbToLinearChannel(c){ c/=255; return c<=0.04045 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); }
+function linearToSrgbChannel(c){ c = c<=0.0031308 ? c*12.92 : 1.055*Math.pow(c,1/2.4)-0.055; return Math.round(clamp(c,0,1)*255); }
+
+function rgbToLab(r,g,b){
+  const lr=srgbToLinearChannel(r), lg=srgbToLinearChannel(g), lb=srgbToLinearChannel(b);
+  const x=(lr*0.4124564+lg*0.3575761+lb*0.1804375)/0.95047;
+  const y=(lr*0.2126729+lg*0.7151522+lb*0.0721750)/1.00000;
+  const z=(lr*0.0193339+lg*0.1191920+lb*0.9503041)/1.08883;
+  const f=t=> t>0.008856 ? Math.cbrt(t) : (7.787*t+16/116);
+  const fx=f(x), fy=f(y), fz=f(z);
+  return { L:116*fy-16, a:500*(fx-fy), b:200*(fy-fz) };
+}
+
+const FAMILIES = {
+  negro:    { key:'negro',    label:'Negro',    neutral:true },
+  blanco:   { key:'blanco',   label:'Blanco',   neutral:true },
+  gris:     { key:'gris',     label:'Gris',     neutral:true },
+  rojo:     { key:'rojo',     label:'Rojo' },
+  naranja:  { key:'naranja',  label:'Naranja' },
+  marron:   { key:'marron',   label:'Marrón' },
+  amarillo: { key:'amarillo', label:'Amarillo' },
+  verde:    { key:'verde',    label:'Verde' },
+  azul:     { key:'azul',     label:'Azul' },
+  purpura:  { key:'purpura',  label:'Púrpura' },
+};
+
+// 7 chromatic families total (matches ColorADD's own set), not 10 — turquoise
+// folds into green/blue at cyan (180°), indigo folds fully into blue, and
+// pink/magenta folds into red, per the user's own read of where those sit.
+// Hue ranges alone can't tell bright yellow (#FFFF00, l=50%) from dark
+// olive (#808000, l=25%) — same hue, 60°. Below l=40 a yellow-ish hue
+// reads as olive/green rather than "yellow", so lightness shifts the bucket.
+function classifyFamily(h,s,l){
+  if(l<=6) return FAMILIES.negro;
+  if(l>=96 && s<=15) return FAMILIES.blanco;
+  if(s<=10) return l<30 ? FAMILIES.negro : (l>=85 ? FAMILIES.blanco : FAMILIES.gris);
+  if(h>=306 || h<15) return FAMILIES.rojo;
+  if(h<45){
+    if(l<48 && s>=20 && s<=72) return FAMILIES.marron;
+    return FAMILIES.naranja;
+  }
+  // A muted/desaturated hue here (khaki, olive) reads as green even at
+  // medium lightness — only a fairly saturated, fairly light hue reads as true yellow.
+  if(h<70) return (l<40 || (s<50 && l<75)) ? FAMILIES.verde : FAMILIES.amarillo;
+  if(h<180) return FAMILIES.verde;
+  if(h<276) return FAMILIES.azul;
+  return FAMILIES.purpura;
+}
+
+// The label alone gets a hue-aware nuance within "rojo" (not a real 10th
+// family — same icon, same dataset, just clearer wording): 345°-15° is true
+// red, 306°-345° leans pink/magenta enough that "Rojo" alone reads wrong
+// (e.g. deep pink, magenta quinacridona), while pure red must stay just "Rojo".
+function familyLabel(fam,h){
+  if(fam.key==='rojo' && h>=306 && h<345) return 'Rojo / Magenta';
+  return fam.label;
+}
+
+function toneOf(fam,l){
+  if(fam.neutral) return 'medio';
+  if(l>=72) return 'claro';
+  if(l<=32) return 'oscuro';
+  return 'medio';
+}
+
+const NAMED_COLORS_RAW = [
+  ['Negro','#000000'],['Blanco','#FFFFFF'],['Gris Claro','#D3D3D3'],['Gris','#808080'],
+  ['Gris Oscuro','#4B4B4B'],['Gris Carbón','#36454F'],['Plata','#C0C0C0'],['Humo','#F5F5F5'],
+  ['Marfil','#FFFFF0'],['Beige','#F5F5DC'],['Taupe','#483C32'],
+  ['Rojo','#FF0000'],['Rojo Fuego','#B22222'],['Carmesí','#DC143C'],['Granate','#800000'],
+  ['Vino','#722F37'],['Rojo Claro','#F08080'],['Rojo Oscuro','#8B0000'],['Tomate','#FF6347'],['Bermellón','#E34234'],
+  ['Rosa','#FFC0CB'],['Rosa Claro','#FFB6C1'],['Rosa Fuerte','#FF69B4'],['Rosa Intenso','#FF1493'],
+  ['Fucsia','#FF00FF'],['Salmón','#FA8072'],['Salmón Claro','#FFA07A'],['Rosa Viejo','#C08081'],
+  ['Naranja','#FFA500'],['Naranja Oscuro','#FF8C00'],['Coral','#FF7F50'],['Melocotón','#FFE5B4'],
+  ['Durazno','#FFDAB9'],['Calabaza','#FF7518'],['Ámbar','#FFBF00'],['Cobre','#B87333'],['Ladrillo','#CB4154'],
+  ['Marrón','#A52A2A'],['Marrón Claro','#C4A484'],['Marrón Oscuro','#654321'],['Café','#6F4E37'],
+  ['Chocolate','#D2691E'],['Caoba','#C04000'],['Castaño','#954535'],['Siena','#A0522D'],['Nuez','#773F1A'],
+  ['Camel','#C19A6B'],['Sepia','#704214'],
+  ['Amarillo','#FFFF00'],['Amarillo Claro','#FFFFE0'],['Oro','#FFD700'],['Mostaza','#FFDB58'],
+  ['Caqui','#F0E68C'],['Champán','#F7E7CE'],['Vainilla','#F3E5AB'],['Limón','#FFF44F'],
+  ['Trigo','#F5DEB3'],['Mantequilla','#FFF1B5'],
+  ['Verde','#008000'],['Verde Claro','#90EE90'],['Verde Lima','#32CD32'],['Lima','#00FF00'],
+  ['Verde Oscuro','#006400'],['Verde Bosque','#228B22'],['Verde Menta','#98FF98'],['Menta','#3EB489'],
+  ['Oliva','#808000'],['Oliva Claro','#BAB86C'],['Oliva Oscuro','#556B2F'],['Verde Musgo','#8A9A5B'],
+  ['Salvia','#9CAF88'],['Verde Esmeralda','#50C878'],['Verde Jade','#00A86B'],['Verde Hierba','#7CFC00'],
+  ['Verde Cazador','#355E3B'],['Verde Militar','#4B5320'],['Verde Pino','#1B4D3E'],
+  ['Turquesa','#40E0D0'],['Turquesa Claro','#AFEEEE'],['Turquesa Oscuro','#00CED1'],['Aguamarina','#7FFFD4'],
+  ['Verde Azulado','#008080'],['Petróleo','#005F6A'],['Cian','#00FFFF'],['Verde Mar','#2E8B57'],
+  ['Azul','#0000FF'],['Azul Claro','#ADD8E6'],['Azul Cielo','#87CEEB'],['Azul Bebé','#89CFF0'],
+  ['Azul Marino','#000080'],['Azul Rey','#4169E1'],['Azul Acero','#4682B4'],['Azul Cobalto','#0047AB'],
+  ['Azul Zafiro','#0F52BA'],['Azul Cerúleo','#007BA7'],['Azul Polvo','#B0C4DE'],['Azul Medianoche','#191970'],
+  ['Azul Aciano','#6495ED'],['Denim','#1560BD'],['Azul Eléctrico','#7DF9FF'],
+  ['Índigo','#4B0082'],['Azul Violeta','#8A2BE2'],['Violeta','#EE82EE'],['Ciruela','#DDA0DD'],
+  ['Lavanda','#E6E6FA'],['Lila','#C8A2C8'],['Amatista','#9966CC'],['Púrpura','#800080'],
+  ['Púrpura Medio','#9370DB'],['Orquídea','#DA70D6'],['Malva','#E0B0FF'],['Berenjena','#614051'],
+  ['Verde Pastel','#C1E8C1'],['Azul Pastel','#BFD7FF'],['Rosa Pastel','#FFD1DC'],
+  ['Lila Pastel','#D7C4F2'],['Amarillo Pastel','#FFF5BA'],['Naranja Pastel','#FFD8B8'],['Turquesa Pastel','#B8F2E6'],
+  // Las 24 muestras oficiales de la carta ColorChecker Classic (X-Rite/Calibrite),
+  // valores sRGB de referencia publicados — útil para fotografía/color de producción.
+  ['Piel Oscura','#735244'],['Piel Clara','#C29682'],['Cielo Azul','#627A9D'],['Follaje','#576C43'],
+  ['Flor Azul','#8580B1'],['Verde Azulado ColorChecker','#67BDAA'],['Naranja ColorChecker','#D67E2C'],
+  ['Azul Violáceo','#505BA6'],['Rojo Moderado','#C15A63'],['Púrpura ColorChecker','#5E3C6C'],
+  ['Verde Amarillento','#9DBC40'],['Amarillo Anaranjado','#E0A32E'],['Azul ColorChecker','#383D96'],
+  ['Verde ColorChecker','#469449'],['Rojo ColorChecker','#AF363C'],['Amarillo ColorChecker','#E7C71F'],
+  ['Magenta ColorChecker','#BB5695'],['Cian ColorChecker','#0885A1'],['Blanco 9.5','#F3F3F3'],
+  ['Neutro 8','#C8C8C8'],['Neutro 6.5','#A0A0A0'],['Neutro 5','#7A7A7A'],['Neutro 3.5','#555555'],['Negro 2','#343434'],
+];
+const NAMED_COLORS = NAMED_COLORS_RAW.map(([name,hex])=>{
+  const rgb = hexToRgb(hex);
+  return { name, hex, lab: rgbToLab(rgb.r,rgb.g,rgb.b) };
+});
+
+function nearestColorName(r,g,b){
+  const lab = rgbToLab(r,g,b);
+  let best=null, bestDist=Infinity;
+  for(const c of NAMED_COLORS){
+    const d = Math.hypot(lab.L-c.lab.L, lab.a-c.lab.a, lab.b-c.lab.b);
+    if(d<bestDist){ bestDist=d; best=c; }
+  }
+  return best;
+}
+
+// Pantone's actual matching data is proprietary/licensed (Pantone LLC) — there is
+// no free official conversion. This is a small, cross-checked-by-hand reference
+// set (Colors of the Year 2000-2026 + the 12 standard "basic identity" Pantone
+// colors + the fluorescent/neon line + 2 famous ones), used only for an
+// illustrative nearest-match — never a certified conversion. Hex values are
+// digital approximations of physical ink. Colors of the Year skew muted/tasteful
+// by design, so without the neon set below, any vivid saturated input (a neon
+// green, say) had nothing closer than ~ΔE60 to land on — not a real match.
+const PANTONE_RAW = [
+  ['802 C','Verde flúor','#44D62C', null],
+  ['803 C','Amarillo flúor','#FFE900', null],
+  ['804 C','Naranja flúor','#FFAA4D', null],
+  ['806 C','Rosa flúor','#FF3EB5', null],
+  ['2925 C','Azul brillante','#009CDE', null],
+  ['11-4201 TCX','Cloud Dancer','#F0EEE9',2026],
+  ['17-1230 TCX','Mocha Mousse','#A47764',2025],
+  ['13-1023 TCX','Peach Fuzz','#FFBE98',2024],
+  ['18-1750 TCX','Viva Magenta','#BB2649',2023],
+  ['17-3938 TCX','Very Peri','#6667AB',2022],
+  ['17-5104 TCX','Ultimate Gray','#939597',2021],
+  ['13-0858 TCX','Illuminating','#F5DF4D',2021],
+  ['19-4052 TCX','Classic Blue','#0F4C81',2020],
+  ['16-1546 TCX','Living Coral','#FF6F61',2019],
+  ['18-3838 TCX','Ultra Violet','#5F4B8B',2018],
+  ['15-0343 TCX','Greenery','#88B04B',2017],
+  ['13-2010 TCX','Rose Quartz','#F7CAC9',2016],
+  ['15-3817 TCX','Serenity','#92A8D1',2016],
+  ['18-1438 TCX','Marsala','#955251',2015],
+  ['18-3025 TCX','Radiant Orchid','#B163A3',2014],
+  ['17-0145 TCX','Emerald','#009473',2013],
+  ['17-1463 TCX','Tangerine Tango','#DD4132',2012],
+  ['18-2120 TCX','Honeysuckle','#D94F70',2011],
+  ['15-5519 TCX','Turquoise','#44B3C1',2010],
+  ['14-0848 TCX','Mimosa','#EFC050',2009],
+  ['18-3943 TCX','Blue Iris','#5A5B9F',2008],
+  ['19-1557 TCX','Chili Pepper','#9B1B30',2007],
+  ['13-1108 TCX','Sand Dollar','#DECDBE',2006],
+  ['15-5217 TCX','Blue Turquoise','#53B0AE',2005],
+  ['16-1546 TCX','Tigerlily','#E2583E',2004],
+  ['14-4811 TCX','Aqua Sky','#7BC4E2',2003],
+  ['19-1664 TCX','True Red','#BF1932',2002],
+  ['17-2034 TCX','Fuchsia Rose','#C74375',2001],
+  ['15-4020 TCX','Cerulean','#9BB7D4',2000],
+  ['Yellow C','',      '#FEDD00', null],
+  ['Orange 021 C','',  '#FE5000', null],
+  ['Warm Red C','',    '#F9423A', null],
+  ['Red 032 C','',     '#EF3340', null],
+  ['Rubine Red C','',  '#CE0058', null],
+  ['Rhodamine Red C','','#E10098', null],
+  ['Purple C','',      '#BB29BB', null],
+  ['Violet C','',      '#440099', null],
+  ['Reflex Blue C','', '#001489', null],
+  ['Process Blue C','','#0085CA', null],
+  ['Green C','',       '#00AB84', null],
+  ['Black C','',       '#2D2926', null],
+  ['Cool Gray 1 C','', '#D9D9D6', null],
+  ['Cool Gray 6 C','', '#A7A8AA', null],
+  ['Cool Gray 11 C','','#53565A', null],
+  ['11-0616 TCX','Pastel Yellow','#F2E6B1', null],
+  ['14-3812 TCX','Pastel Lilac','#BCAFCF', null],
+  ['12-1209 TCX','Soft Pink','#F2D8CC', null],
+  ['13-5309 TCX','Pastel Turquoise','#99C5C4', null],
+  ['13-5410 TCX','Iced Aqua','#ABD3DB', null],
+  ['11-4805 TCX','Hint of Mint','#D8EBE6', null],
+  ['448 C','El "color más feo del mundo"','#4A412A', null],
+  ['1837','Azul Tiffany (color exclusivo)','#81D8D0', null],
+];
+const PANTONE_COLORS = PANTONE_RAW.map(([code,name,hex,year])=>{
+  const rgb = hexToRgb(hex);
+  return { code, name, hex, year, lab: rgbToLab(rgb.r,rgb.g,rgb.b) };
+});
+
+function nearestPantone(r,g,b){
+  const lab = rgbToLab(r,g,b);
+  let best=null, bestDist=Infinity;
+  for(const c of PANTONE_COLORS){
+    const d = Math.hypot(lab.L-c.lab.L, lab.a-c.lab.a, lab.b-c.lab.b);
+    if(d<bestDist){ bestDist=d; best=c; }
+  }
+  return { ...best, distance: bestDist };
+}
+
+// Real artwork, exported from Illustrator as one row of 7 bare marks
+// (iconos.svg, viewBox 0 0 928.68 165.22). Each icon sits in its own ~132.67-wide
+// column with no overlap into neighbors, so cropping by column is exact —
+// paths are used verbatim. Each viewBox is a tight, centered square computed
+// from the real getBBox() of that icon's paths (+14% padding), not a guess —
+// a shared generic crop window left every icon off-center by a different amount.
+const FAMILY_ICONS = {
+  rojo: { viewBox:'46.07 48.05 41.38 41.38', paths:[
+    'M56.23,84.12l-3.46.78c-.92.21-1.99-2.58-1.99-3.59l-.02-25.21c0-1.26,1.97-3.52,3.31-3.52l25.67.04c.9,0,3.06.78,3.03,1.58l-.14,3.53-26.41,26.4Z',
+  ]},
+  naranja: { viewBox:'178.00 45.36 65.98 65.98', paths:[
+    'M190.76,84.12l-3.46.78c-.92.21-1.99-2.58-1.99-3.59l-.02-25.21c0-1.26,1.97-3.52,3.31-3.52l25.67.04c.9,0,3.06.78,3.03,1.58l-.14,3.53-26.41,26.4Z',
+    'M195.98,103.28c-1.61,1.6-4.91.65-5.8-.49-1.2-1.53-1.21-4.35.01-5.87l40.07-40.04c1.87-.38,4.75,0,5.76,1.07.96,1.02.9,4.49-.13,5.51l-39.91,39.82Z',
+  ]},
+  amarillo: { viewBox:'317.18 50.08 60.71 60.71', paths:[
+    'M330.52,103.28c-1.61,1.6-4.91.65-5.8-.49-1.2-1.53-1.21-4.35.01-5.87l40.07-40.04c1.87-.38,4.75,0,5.76,1.07.96,1.02.9,4.49-.13,5.51l-39.91,39.82Z',
+  ]},
+  verde: { viewBox:'447.25 49.45 66.61 66.61', paths:[
+    'M501.04,77.24l3.46-.78c.92-.21,1.99,2.58,1.99,3.59l.02,25.21c0,1.26-1.97,3.52-3.31,3.52l-25.67-.04c-.9,0-3.06-.78-3.03-1.58l.14-3.53,26.41-26.4Z',
+    'M461.3,103.28c-1.61,1.6-4.91.65-5.8-.49-1.2-1.53-1.21-4.35.01-5.87l40.07-40.04c1.87-.38,4.75,0,5.76,1.07.96,1.02.9,4.49-.13,5.51l-39.91,39.82Z',
+  ]},
+  azul: { viewBox:'603.83 71.40 41.38 41.38', paths:[
+    'M635.06,76.72l3.46-.78c.92-.21,1.99,2.58,1.99,3.59l.02,25.21c0,1.26-1.97,3.52-3.31,3.52l-25.67-.04c-.9,0-3.06-.78-3.03-1.58l.14-3.53,26.41-26.4Z',
+  ]},
+  purpura: { viewBox:'704.16 44.71 71.94 71.94', paths:[
+    'M717.65,84.12l-3.46.78c-.92.21-1.99-2.58-1.99-3.59l-.02-25.21c0-1.26,1.97-3.52,3.31-3.52l25.67.04c.9,0,3.06.78,3.03,1.58l-.14,3.53-26.41,26.4Z',
+    'M762.61,77.24l3.46-.78c.92-.21,1.99,2.58,1.99,3.59l.02,25.21c0,1.26-1.97,3.52-3.31,3.52l-25.67-.04c-.9,0-3.06-.78-3.03-1.58l.14-3.53,26.41-26.4Z',
+  ]},
+  marron: { viewBox:'831.72 44.71 71.94 71.94', paths:[
+    'M845.21,84.12l-3.46.78c-.92.21-1.99-2.58-1.99-3.59l-.02-25.21c0-1.26,1.97-3.52,3.31-3.52l25.67.04c.9,0,3.06.78,3.03,1.58l-.14,3.53-26.41,26.4Z',
+    'M890.17,77.24l3.46-.78c.92-.21,1.99,2.58,1.99,3.59l.02,25.21c0,1.26-1.97,3.52-3.31,3.52l-25.67-.04c-.9,0-3.06-.78-3.03-1.58l.14-3.53,26.41-26.4Z',
+    'M850.43,103.28c-1.61,1.6-4.91.65-5.8-.49-1.2-1.53-1.21-4.35.01-5.87l40.07-40.04c1.87-.38,4.75,0,5.76,1.07.96,1.02.9,4.49-.13,5.51l-39.91,39.82Z',
+  ]},
+};
+
+function generateFamilyIconSVG(fam,hex,tone){
+  if(fam.key==='negro'){
+    return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="6" width="88" height="88" rx="14" fill="#000"/></svg>`;
+  }
+  if(fam.key==='blanco'){
+    return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="9" y="9" width="82" height="82" rx="13" fill="none" stroke="#000" stroke-width="6"/></svg>`;
+  }
+  if(fam.key==='gris'){
+    return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs><clipPath id="grisClip"><rect x="6" y="6" width="88" height="88" rx="14"/></clipPath></defs>
+      <g clip-path="url(#grisClip)">
+        <rect x="6" y="6" width="88" height="88" fill="#fff"/>
+        <polygon points="6,94 94,94 94,6" fill="#000"/>
+      </g>
+      <rect x="9" y="9" width="82" height="82" rx="13" fill="none" stroke="#000" stroke-width="6"/>
+    </svg>`;
+  }
+
+  const icon = FAMILY_ICONS[fam.key];
+  const pathsSvg = icon.paths.map(d=>`<path d="${d}" fill="currentColor"></path>`).join('');
+
+  // Medium/light tint the mark itself with the picked color, so the mark's
+  // color always matches the actual hex — that consistency is what makes the
+  // shape+color pairing useful as a recognition cue. Dark tone keeps the mark
+  // white for contrast and tints the frame instead.
+  if(tone==='oscuro'){
+    const inner = `<svg x="12" y="12" width="76" height="76" viewBox="${icon.viewBox}" style="color:#fff">${pathsSvg}</svg>`;
+    return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="6" width="88" height="88" rx="14" fill="${hex}"/>${inner}</svg>`;
+  }
+  const inner = `<svg x="12" y="12" width="76" height="76" viewBox="${icon.viewBox}" style="color:${hex}">${pathsSvg}</svg>`;
+  if(tone==='claro'){
+    return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="8" width="84" height="84" rx="14" fill="none" stroke="${hex}" stroke-width="4"/>${inner}</svg>`;
+  }
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+}
+
+const bigSwatch=document.getElementById('bigSwatch');
+const outHex=document.getElementById('outHex');
+const outFamily=document.getElementById('outFamily'), outName=document.getElementById('outName');
+const familyIcon=document.getElementById('familyIcon');
+const rInput=document.getElementById('rInput'), gInput=document.getElementById('gInput'), bInput=document.getElementById('bInput');
+const hInput=document.getElementById('hInput'), sInput=document.getElementById('sInput'), lInput=document.getElementById('lInput');
+const cInput=document.getElementById('cInput'), mInput=document.getElementById('mInput'), yInput=document.getElementById('yInput'), kInput=document.getElementById('kInput');
+const sbField=document.getElementById('satBrightField'), sbCursor=document.getElementById('sbCursor');
+const hueSlider=document.getElementById('hueSlider'), hueCursor=document.getElementById('hueCursor');
+const toggleVisualPicker=document.getElementById('toggleVisualPicker'), hsbPicker=document.getElementById('hsbPicker');
+const pantoneSwatch=document.getElementById('pantoneSwatch'), pantoneCode=document.getElementById('pantoneCode'), pantoneName=document.getElementById('pantoneName');
+const pantoneMatch=document.getElementById('pantoneMatch');
+const togglePantone=document.getElementById('togglePantone'), pantoneBody=document.getElementById('pantoneBody');
+const pantoneArrow=togglePantone.querySelector('.collapsible-arrow');
+const toggleCmyk=document.getElementById('toggleCmyk'), cmykBody=document.getElementById('cmykBody');
+const cmykArrow=toggleCmyk.querySelector('.collapsible-arrow');
+const toggleHsl=document.getElementById('toggleHsl'), hslWrap=document.getElementById('hslWrap');
+const toggleFineTune=document.getElementById('toggleFineTune'), fineTunePanel=document.getElementById('fineTunePanel');
+const satSlider=document.getElementById('satSlider'), satCursor=document.getElementById('satCursor');
+const lightSlider=document.getElementById('lightSlider'), lightCursor=document.getElementById('lightCursor');
+const toggleCompare=document.getElementById('toggleCompare'), compareBody=document.getElementById('compareBody');
+const compareArrow=toggleCompare.querySelector('.collapsible-arrow');
+const addSwatchBtn=document.getElementById('addSwatchBtn'), clearSwatchesBtn=document.getElementById('clearSwatchesBtn');
+const swatchTray=document.getElementById('swatchTray'), swatchEmpty=document.getElementById('swatchEmpty');
+const toggleHarmony=document.getElementById('toggleHarmony'), harmonyBody=document.getElementById('harmonyBody');
+const harmonyArrow=toggleHarmony.querySelector('.collapsible-arrow');
+const harmonyComplementary=document.getElementById('harmonyComplementary'), harmonyAnalogous=document.getElementById('harmonyAnalogous');
+const harmonySplit=document.getElementById('harmonySplit'), harmonyTriadic=document.getElementById('harmonyTriadic');
+const harmonyTetradic=document.getElementById('harmonyTetradic'), harmonyMono=document.getElementById('harmonyMono');
+
+let current = {r:101,g:237,b:83};
+
+function setColor(rgb){
+  current = { r:clamp(Math.round(rgb.r),0,255), g:clamp(Math.round(rgb.g),0,255), b:clamp(Math.round(rgb.b),0,255) };
+  render();
+}
+
+function renderHarmonySwatches(container, hexList){
+  container.innerHTML = hexList.map(hex=>
+    `<button type="button" class="harmony-swatch" style="background:${hex}" title="${hex.toUpperCase()}"></button>`
+  ).join('');
+  container.querySelectorAll('.harmony-swatch').forEach((btn,i)=>{
+    btn.addEventListener('click', ()=>{
+      const rgb = hexToRgb(hexList[i]);
+      if(rgb) setColor(rgb);
+    });
+  });
+}
+
+function updateHarmonies(hsl){
+  const wrap = deg => ((deg%360)+360)%360;
+  const at = (hue,sat,light) => hslToHex(wrap(hue), sat, light);
+  const h=hsl.h, s=hsl.s, l=hsl.l;
+
+  renderHarmonySwatches(harmonyComplementary, [at(h,s,l), at(h+180,s,l)]);
+  renderHarmonySwatches(harmonyAnalogous, [at(h-30,s,l), at(h,s,l), at(h+30,s,l)]);
+  renderHarmonySwatches(harmonySplit, [at(h,s,l), at(h+150,s,l), at(h+210,s,l)]);
+  renderHarmonySwatches(harmonyTriadic, [at(h,s,l), at(h+120,s,l), at(h+240,s,l)]);
+  renderHarmonySwatches(harmonyTetradic, [at(h,s,l), at(h+60,s,l), at(h+180,s,l), at(h+240,s,l)]);
+  renderHarmonySwatches(harmonyMono, [20,32,44,56,68,80].map(ml=> at(h,s,ml)));
+}
+
+function render(){
+  const {r,g,b} = current;
+  const hex = rgbToHex(r,g,b);
+  const hsl = rgbToHsl(r,g,b);
+
+  bigSwatch.style.background = hex;
+  outHex.textContent = hex.toUpperCase();
+
+  rInput.value = r; gInput.value = g; bInput.value = b;
+  hInput.value = Math.round(hsl.h); sInput.value = Math.round(hsl.s); lInput.value = Math.round(hsl.l);
+
+  const cmyk = rgbToCmyk(r,g,b);
+  cInput.value = Math.round(cmyk.c)+'%'; mInput.value = Math.round(cmyk.m)+'%';
+  yInput.value = Math.round(cmyk.y)+'%'; kInput.value = Math.round(cmyk.k)+'%';
+
+  const fam = classifyFamily(hsl.h, hsl.s, hsl.l);
+  const nearest = nearestColorName(r,g,b);
+  outFamily.textContent = familyLabel(fam, hsl.h);
+  outName.textContent = nearest ? nearest.name : '';
+  familyIcon.innerHTML = generateFamilyIconSVG(fam, hex, toneOf(fam, hsl.l));
+
+  const hsb = rgbToHsb(r,g,b);
+  sbField.style.background =
+    `linear-gradient(to top, #000, rgba(0,0,0,0)), linear-gradient(to right, #fff, rgba(255,255,255,0)), hsl(${hsb.h}, 100%, 50%)`;
+  sbCursor.style.left = (hsb.s/100*sbField.clientWidth) + 'px';
+  sbCursor.style.top = ((100-hsb.b)/100*sbField.clientHeight) + 'px';
+  hueCursor.style.top = ((360-hsb.h)/360*hueSlider.clientHeight) + 'px';
+
+  const pantone = nearestPantone(r,g,b);
+  pantoneSwatch.style.background = pantone.hex;
+  pantoneCode.textContent = `PANTONE® ${pantone.code}`;
+  pantoneName.textContent = pantone.name
+    ? pantone.name + (pantone.year ? ` · Color del Año ${pantone.year}` : '')
+    : (pantone.year ? `Color del Año ${pantone.year}` : '');
+  pantoneMatch.className = 'pantone-match';
+  if(pantone.distance < 10){
+    pantoneMatch.textContent = 'Coincidencia cercana';
+    pantoneMatch.classList.add('near');
+  }else if(pantone.distance > 30){
+    pantoneMatch.textContent = 'Coincidencia lejana — no hay nada parecido en esta muestra reducida';
+    pantoneMatch.classList.add('far');
+  }else{
+    pantoneMatch.textContent = 'Coincidencia aproximada';
+  }
+
+  satSlider.style.background = `linear-gradient(to bottom, ${hslToHex(hsl.h,100,hsl.l)}, ${hslToHex(hsl.h,0,hsl.l)})`;
+  satCursor.style.top = ((100-hsl.s)/100*satSlider.clientHeight) + 'px';
+  lightSlider.style.background = `linear-gradient(to bottom, #fff, ${hslToHex(hsl.h,hsl.s,50)}, #000)`;
+  lightCursor.style.top = ((100-hsl.l)/100*lightSlider.clientHeight) + 'px';
+
+  updateHarmonies(hsl);
+}
+
+[[rInput,'r'],[gInput,'g'],[bInput,'b']].forEach(([inp,ch])=>{
+  inp.addEventListener('input', ()=> setColor({...current, [ch]: +inp.value||0}));
+});
+[[hInput,'h'],[sInput,'s'],[lInput,'l']].forEach(([inp,ch])=>{
+  inp.addEventListener('input', ()=>{
+    const hsl = rgbToHsl(current.r,current.g,current.b);
+    hsl[ch] = +inp.value||0;
+    setColor(hslToRgb(hsl.h, hsl.s, hsl.l));
+  });
+});
+document.querySelectorAll('button.copy').forEach(btn=>{
+  btn.addEventListener('click', async ()=>{
+    const key = btn.dataset.copy;
+    const text = key==='hex' ? outHex.textContent
+      : key==='r' ? String(current.r)
+      : key==='g' ? String(current.g)
+      : key==='b' ? String(current.b)
+      : key==='h' ? hInput.value
+      : key==='s' ? sInput.value
+      : key==='l' ? lInput.value
+      : key==='c' ? cInput.value
+      : key==='m' ? mInput.value
+      : key==='y' ? yInput.value
+      : key==='k' ? kInput.value
+      : key==='pantone' ? pantoneCode.textContent
+      : `rgb(${current.r}, ${current.g}, ${current.b})`;
+    try{
+      await navigator.clipboard.writeText(text);
+      const original = btn.textContent;
+      btn.textContent = '¡Copiado!';
+      setTimeout(()=>{ btn.textContent = original; }, 1200);
+    }catch(e){}
+  });
+});
+
+function updateFromSBField(clientX,clientY){
+  const rect = sbField.getBoundingClientRect();
+  const x = clamp(clientX-rect.left, 0, rect.width);
+  const y = clamp(clientY-rect.top, 0, rect.height);
+  const hsb = rgbToHsb(current.r,current.g,current.b);
+  setColor(hsbToRgb(hsb.h, (x/rect.width)*100, 100-(y/rect.height)*100));
+}
+function updateFromHueSlider(clientY){
+  const rect = hueSlider.getBoundingClientRect();
+  const y = clamp(clientY-rect.top, 0, rect.height);
+  const hsb = rgbToHsb(current.r,current.g,current.b);
+  setColor(hsbToRgb(360-(y/rect.height)*360, hsb.s, hsb.b));
+}
+let sbDragging=false, hueDragging=false;
+sbField.addEventListener('pointerdown', e=>{
+  sbDragging = true; sbField.setPointerCapture(e.pointerId);
+  updateFromSBField(e.clientX,e.clientY);
+});
+sbField.addEventListener('pointermove', e=>{ if(sbDragging) updateFromSBField(e.clientX,e.clientY); });
+hueSlider.addEventListener('pointerdown', e=>{
+  hueDragging = true; hueSlider.setPointerCapture(e.pointerId);
+  updateFromHueSlider(e.clientY);
+});
+hueSlider.addEventListener('pointermove', e=>{ if(hueDragging) updateFromHueSlider(e.clientY); });
+
+toggleFineTune.addEventListener('click', ()=>{
+  fineTunePanel.hidden = !fineTunePanel.hidden;
+  toggleFineTune.textContent = fineTunePanel.hidden ? 'Ajuste preciso de S y L ▾' : 'Ajuste preciso de S y L ▴';
+});
+togglePantone.addEventListener('click', ()=>{
+  pantoneBody.hidden = !pantoneBody.hidden;
+  pantoneArrow.textContent = pantoneBody.hidden ? '▾' : '▴';
+});
+toggleCmyk.addEventListener('click', ()=>{
+  cmykBody.hidden = !cmykBody.hidden;
+  cmykArrow.textContent = cmykBody.hidden ? '▾' : '▴';
+});
+toggleCompare.addEventListener('click', ()=>{
+  compareBody.hidden = !compareBody.hidden;
+  compareArrow.textContent = compareBody.hidden ? '▾' : '▴';
+});
+toggleHarmony.addEventListener('click', ()=>{
+  harmonyBody.hidden = !harmonyBody.hidden;
+  harmonyArrow.textContent = harmonyBody.hidden ? '▾' : '▴';
+});
+
+function setVisualPickerHidden(hide){
+  hsbPicker.hidden = hide;
+  toggleVisualPicker.textContent = hide ? 'Mostrar selector visual ▾' : 'Ocultar selector visual ▴';
+  try{ localStorage.setItem('milo-color-picker-hide-visual', hide ? '1' : '0'); }catch(e){}
+}
+toggleVisualPicker.addEventListener('click', ()=> setVisualPickerHidden(!hsbPicker.hidden));
+try{ setVisualPickerHidden(localStorage.getItem('milo-color-picker-hide-visual')==='1'); }catch(e){}
+
+function setHslHidden(hide){
+  hslWrap.hidden = hide;
+  toggleHsl.textContent = hide ? 'Mostrar HSL ▾' : 'Ocultar HSL ▴';
+  try{ localStorage.setItem('milo-color-picker-hide-hsl', hide ? '1' : '0'); }catch(e){}
+}
+toggleHsl.addEventListener('click', ()=> setHslHidden(!hslWrap.hidden));
+try{ setHslHidden(localStorage.getItem('milo-color-picker-hide-hsl')==='1'); }catch(e){}
+
+const toggleBw=document.getElementById('toggleBw');
+function setBwMode(on){
+  document.documentElement.classList.toggle('bw-mode', on);
+  toggleBw.classList.toggle('active', on);
+  try{ localStorage.setItem('milo-color-picker-bw-mode', on ? '1' : '0'); }catch(e){}
+}
+toggleBw.addEventListener('click', ()=> setBwMode(!document.documentElement.classList.contains('bw-mode')));
+try{ setBwMode(localStorage.getItem('milo-color-picker-bw-mode')==='1'); }catch(e){}
+
+function updateFromSatSlider(clientY){
+  const rect = satSlider.getBoundingClientRect();
+  const y = clamp(clientY-rect.top, 0, rect.height);
+  const hsl = rgbToHsl(current.r,current.g,current.b);
+  setColor(hslToRgb(hsl.h, 100-(y/rect.height)*100, hsl.l));
+}
+function updateFromLightSlider(clientY){
+  const rect = lightSlider.getBoundingClientRect();
+  const y = clamp(clientY-rect.top, 0, rect.height);
+  const hsl = rgbToHsl(current.r,current.g,current.b);
+  setColor(hslToRgb(hsl.h, hsl.s, 100-(y/rect.height)*100));
+}
+let satDragging=false, lightDragging=false;
+satSlider.addEventListener('pointerdown', e=>{
+  satDragging = true; satSlider.setPointerCapture(e.pointerId);
+  updateFromSatSlider(e.clientY);
+});
+satSlider.addEventListener('pointermove', e=>{ if(satDragging) updateFromSatSlider(e.clientY); });
+lightSlider.addEventListener('pointerdown', e=>{
+  lightDragging = true; lightSlider.setPointerCapture(e.pointerId);
+  updateFromLightSlider(e.clientY);
+});
+lightSlider.addEventListener('pointermove', e=>{ if(lightDragging) updateFromLightSlider(e.clientY); });
+window.addEventListener('pointerup', ()=>{ sbDragging = false; hueDragging = false; satDragging = false; lightDragging = false; });
+
+const eyedropperBtn=document.getElementById('eyedropperBtn'), eyedropperNote=document.getElementById('eyedropperNote');
+if(!('EyeDropper' in window)){
+  eyedropperBtn.disabled = true;
+  eyedropperNote.hidden = false;
+}else{
+  eyedropperBtn.addEventListener('click', async ()=>{
+    try{
+      const result = await new EyeDropper().open();
+      const rgb = hexToRgb(result.sRGBHex);
+      if(rgb) setColor(rgb);
+    }catch(err){ /* user cancelled */ }
+  });
+}
+
+const dropZone=document.getElementById('dropZone'), uploadBtn=document.getElementById('uploadBtn'), imageFileInput=document.getElementById('imageFileInput');
+const canvasWrap=document.getElementById('canvasWrap'), clearImageBtn=document.getElementById('clearImageBtn');
+const sampleCanvas=document.getElementById('sampleCanvas'), loupeCanvas=document.getElementById('loupeCanvas');
+const ctx = sampleCanvas.getContext('2d', { willReadFrequently:true });
+const loupeCtx = loupeCanvas.getContext('2d');
+const toggleImageUpload=document.getElementById('toggleImageUpload'), imageUploadWrap=document.getElementById('imageUploadWrap');
+
+function setImageUploadHidden(hide){
+  imageUploadWrap.hidden = hide;
+  toggleImageUpload.textContent = hide ? 'Subir imagen ▾' : 'Subir imagen ▴';
+  try{ localStorage.setItem('milo-color-picker-hide-upload', hide ? '1' : '0'); }catch(e){}
+}
+toggleImageUpload.addEventListener('click', ()=> setImageUploadHidden(!imageUploadWrap.hidden));
+try{ setImageUploadHidden(localStorage.getItem('milo-color-picker-hide-upload') !== '0'); }catch(e){ setImageUploadHidden(true); }
+
+uploadBtn.addEventListener('click', ()=> imageFileInput.click());
+imageFileInput.addEventListener('change', e=> loadImageFile(e.target.files[0]));
+
+function loadImageFile(file){
+  if(!file || !file.type.startsWith('image/')) return;
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = ()=>{
+    // Keep sampling pixel-exact (matches Photoshop/Digital Color Meter): only
+    // downscale far past any real camera photo, and never blur while doing it.
+    const MAX = 8000;
+    let w = img.naturalWidth, h = img.naturalHeight;
+    if(Math.max(w,h) > MAX){ const scale = MAX/Math.max(w,h); w = Math.round(w*scale); h = Math.round(h*scale); }
+    sampleCanvas.width = w; sampleCanvas.height = h;
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(img,0,0,w,h);
+    dropZone.hidden = true;
+    canvasWrap.hidden = false;
+    setImageUploadHidden(false);
+    URL.revokeObjectURL(url);
+  };
+  img.src = url;
+}
+
+clearImageBtn.addEventListener('click', ()=>{
+  canvasWrap.hidden = true;
+  dropZone.hidden = false;
+  imageFileInput.value = '';
+});
+
+dropZone.addEventListener('dragover', e=>{ e.preventDefault(); dropZone.classList.add('drag'); });
+['dragleave','drop'].forEach(evt=> dropZone.addEventListener(evt, e=>{ e.preventDefault(); dropZone.classList.remove('drag'); }));
+dropZone.addEventListener('drop', e=> loadImageFile(e.dataTransfer.files && e.dataTransfer.files[0]));
+window.addEventListener('paste', e=>{
+  const items = e.clipboardData && e.clipboardData.items;
+  if(!items) return;
+  for(const it of items){
+    if(it.type.startsWith('image/')){ loadImageFile(it.getAsFile()); break; }
+  }
+});
+
+function canvasPosFromEvent(e){
+  const rect = sampleCanvas.getBoundingClientRect();
+  const scaleX = sampleCanvas.width/rect.width, scaleY = sampleCanvas.height/rect.height;
+  let x = Math.round((e.clientX-rect.left)*scaleX);
+  let y = Math.round((e.clientY-rect.top)*scaleY);
+  return { x: clamp(x,0,sampleCanvas.width-1), y: clamp(y,0,sampleCanvas.height-1) };
+}
+
+function updateLoupe(x,y){
+  const size=14, half=Math.floor(size/2);
+  loupeCtx.imageSmoothingEnabled = false;
+  loupeCtx.clearRect(0,0,loupeCanvas.width,loupeCanvas.height);
+  loupeCtx.drawImage(sampleCanvas, x-half, y-half, size, size, 0, 0, loupeCanvas.width, loupeCanvas.height);
+  const cell = loupeCanvas.width/size;
+  loupeCtx.strokeStyle = 'rgba(255,255,255,0.9)'; loupeCtx.lineWidth = 2;
+  loupeCtx.strokeRect(half*cell, half*cell, cell, cell);
+  loupeCtx.strokeStyle = 'rgba(0,0,0,0.6)'; loupeCtx.lineWidth = 1;
+  loupeCtx.strokeRect(half*cell+1, half*cell+1, cell-2, cell-2);
+}
+
+function samplePixel(x,y){
+  const data = ctx.getImageData(x,y,1,1).data;
+  return { r:data[0], g:data[1], b:data[2] };
+}
+
+let isPointerDown = false;
+sampleCanvas.addEventListener('pointermove', e=>{
+  const {x,y} = canvasPosFromEvent(e);
+  updateLoupe(x,y);
+  if(isPointerDown) setColor(samplePixel(x,y));
+});
+sampleCanvas.addEventListener('pointerdown', e=>{
+  isPointerDown = true;
+  const {x,y} = canvasPosFromEvent(e);
+  updateLoupe(x,y);
+  setColor(samplePixel(x,y));
+});
+window.addEventListener('pointerup', ()=>{ isPointerDown = false; });
+
+let swatches = [];
+try{ swatches = JSON.parse(localStorage.getItem('milo-color-picker-swatches') || '[]'); }catch(e){ swatches = []; }
+
+function saveSwatches(){
+  try{ localStorage.setItem('milo-color-picker-swatches', JSON.stringify(swatches)); }catch(e){}
+}
+
+function renderSwatches(){
+  swatchTray.innerHTML = '';
+  swatchEmpty.hidden = swatches.length > 0;
+  clearSwatchesBtn.hidden = swatches.length === 0;
+  swatches.forEach((hex,i)=>{
+    const chip = document.createElement('div');
+    chip.className = 'swatch-chip';
+    chip.innerHTML = `
+      <button type="button" class="swatch-remove" aria-label="Quitar ${hex}">×</button>
+      <button type="button" class="swatch-color" style="background:${hex}" title="Usar ${hex.toUpperCase()}"></button>
+      <span class="swatch-hex">${hex.toUpperCase()}</span>
+    `;
+    chip.querySelector('.swatch-color').addEventListener('click', ()=>{
+      const rgb = hexToRgb(hex);
+      if(rgb) setColor(rgb);
+    });
+    chip.querySelector('.swatch-remove').addEventListener('click', ()=>{
+      swatches.splice(i,1);
+      saveSwatches();
+      renderSwatches();
+    });
+    swatchTray.appendChild(chip);
+  });
+}
+
+addSwatchBtn.addEventListener('click', ()=>{
+  const hex = rgbToHex(current.r,current.g,current.b);
+  if(!swatches.includes(hex)){
+    swatches.push(hex);
+    saveSwatches();
+    renderSwatches();
+  }
+});
+clearSwatchesBtn.addEventListener('click', ()=>{
+  if(swatches.length && confirm('¿Vaciar todos los colores guardados?')){
+    swatches = [];
+    saveSwatches();
+    renderSwatches();
+  }
+});
+
+renderSwatches();
+setColor(current);
+</script>
+</body>
+</html>

@@ -5,3 +5,7 @@
 # to anything served from here that is not HTML (a PDF, for instance).
 /produccion/*
   X-Robots-Tag: noindex, nofollow, noarchive, noimageindex
+
+# Working tool, reachable by link but deliberately kept out of search results.
+/color-picker/*
+  X-Robots-Tag: noindex, nofollow
