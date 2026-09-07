@@ -15,3 +15,9 @@ produccion/vogue-loreal/*
 
 # Local preview scratch file, not site content
 test-hero-grid/
+
+# CGI section mock-up, not part of the site yet
+
+
+# Vector source for the CGI plate; the path itself is inlined in the page
+images/site/logo/

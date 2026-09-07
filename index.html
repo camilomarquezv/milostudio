@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MILO Studio — Fashion Production &amp; Retouching</title>
+<title>MILO Studio — Production, Retouching &amp; CGI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&display=swap" rel="stylesheet">
@@ -134,6 +134,18 @@
   .btn-outline:hover{background:var(--ink); color:var(--paper);}
   .hero-cta-row{display:flex; gap:0.8rem; margin-top:1.6rem; justify-content:center; flex-wrap:wrap;}
 
+  /* Only ever shown if the sequence is actually slow to arrive — see the delay in the script.
+     A preloader that appears on every visit taxes the fast connections to reassure the slow ones. */
+  .hero-count{
+    position:absolute; inset:0; z-index:4; display:none; gap:0.5em;
+    align-items:center; justify-content:center;
+    font-weight:900; font-size:clamp(2.2rem, 7vw, 4.5rem); letter-spacing:-0.02em;
+    color:var(--ink); font-variant-numeric:tabular-nums;
+    transition:opacity .45s ease; pointer-events:none;
+  }
+  .hero-count.show{display:flex;}
+  .hero-count.done{opacity:0;}
+
   .scroll-cue{
     position:absolute; bottom:32px; left:50%; transform:translateX(-50%);
     font-size:0.7rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--slate);
@@ -167,7 +179,7 @@
   /* the pinned logo reveal, headline, and marquee are one hero moment — no seam between them */
   #heroPin, #heroContent{border-bottom:none;}
   /* dense grid of hairline cell borders/rows — the body's line grid would fight them, so it's suppressed here */
-  #services, #process{background:var(--paper);}
+  #services{background:var(--paper);}
   .section-head{display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; margin-bottom:2.8rem; flex-wrap:wrap;}
   .section-head h2{font-size:2.5rem; font-weight:900;}
   .section-head .desc{max-width:32ch; font-size:1.03rem; line-height:1.5; color:var(--slate);}
@@ -221,6 +233,70 @@
      the .campaigns-* classes wholesale — same pinned single-project-at-a-time slider, just a
      second and third instance of it), and Photography/Creative Direction moved into a small
      slider inside The Studio (see .studio-slider in the About section's CSS). */
+
+  /* ===== CGI =====
+     A stack of renders the pointer paints through. Full-bleed and dark: the material is the work,
+     so it gets the whole width the way a reel would. */
+  .cgi-band{
+    position:relative; width:100vw; margin-left:calc(50% - 50vw);
+    height:min(62vh, 34vw); min-height:11rem;
+    overflow:hidden; background:#FFFFFF;
+  }
+  /* Absolute rather than height:100%: the canvas carries an intrinsic ratio from its width and
+     height attributes, which kept winning over the percentage and left it short of its box. */
+  #inkCanvas{position:absolute; inset:0; display:block; width:100%; height:100%; touch-action:pan-y;}
+  /* Counts the band's own renders in, so the number is the real state of the load rather than a
+     timed animation dressed up as one. */
+  .ink-count{
+    position:absolute; inset:0; z-index:3; display:flex; align-items:center; justify-content:center;
+    gap:0.5em;
+    font-weight:900; font-size:clamp(2.6rem, 9vw, 6rem); letter-spacing:-0.02em;
+    color:var(--ink); font-variant-numeric:tabular-nums;
+    transition:opacity .45s ease; pointer-events:none;
+  }
+  /* The word sits at label scale beside the figure: matched to it, two words of equal weight
+     compete and neither reads first. */
+  .ink-count-label{font-size:.16em; font-weight:800; letter-spacing:.22em; text-transform:uppercase; align-self:center; padding-top:.2em;}
+  .cgi-band.loaded .ink-count{opacity:0;}
+  #inkCanvas{opacity:0; transition:opacity .5s ease;}
+  .cgi-band.loaded #inkCanvas{opacity:1;}
+  .cgi-band:not(.loaded) .ink-hint{opacity:0;}
+
+  .ink-hint{
+    position:absolute; left:50%; bottom:1rem; transform:translateX(-50%); z-index:2;
+    font-size:.68rem; letter-spacing:.16em; text-transform:uppercase; color:var(--paper);
+    mix-blend-mode:difference; opacity:.8; transition:opacity .5s ease;
+    pointer-events:none; white-space:nowrap;
+  }
+  .cgi-band.painted .ink-hint{opacity:0;}
+  /* The whole section sits on white, not on the page's line grid: the plate the brush cuts
+     through is white, and letting the grid run up to it made the band look like a window rather
+     than the surface the section is built on. */
+  #cgi{background:#FFFFFF;}
+  .cgi-work{padding:2rem 0 0.5rem;}
+  .cgi-work-label{display:block; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--slate); margin-bottom:1rem;}
+  /* Two columns, with the process strip taking the full width of its own row: it is a 4.4:1
+     sequence and boxing it into a column would crop the very steps it exists to show. */
+  .cgi-slots{display:grid; grid-template-columns:repeat(3, 1fr); gap:1.1rem;}
+  .cgi-item{display:flex; flex-direction:column; margin:0;}
+  /* Square thumbnails so the three sit level in one row, whatever shape each piece is: the
+     process strip is 4.4:1 and the two stills are portrait, and left at their own proportions
+     they staggered badly. The full, uncropped composition is what the panel opens to. */
+  .cgi-item button{
+    display:block; width:100%; padding:0; border:none; background:none; cursor:pointer;
+    aspect-ratio:1/1; overflow:hidden;
+  }
+  /* Grey until pointed at, matching the treatment the studio and services images already
+     carry — the row reads as one set, and the colour arriving is what marks the piece the
+     cursor is on. */
+  .cgi-item img{width:100%; height:100%; object-fit:cover; display:block;
+    filter:grayscale(1) contrast(1.05);
+    transition:transform .5s cubic-bezier(.22,.9,.24,1), filter .45s ease;}
+  .cgi-item button:hover img, .cgi-item button:focus-visible img{filter:none; transform:scale(1.03);}
+  /* Touch has no hover to give the colour back, so the set stays in colour there. */
+  @media (hover: none){ .cgi-item img{filter:none;} }
+  .cgi-item .cap{display:block; padding-top:0.5rem; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--slate);}
+  @media (max-width:700px){ .cgi-slots{grid-template-columns:1fr;} .cgi-item button{aspect-ratio:4/3;} }
 
   /* ===== SECTION ICONS (chrome letter marks, one per section, floating above the h2) ===== */
   .section-icon-wrap{display:flex; flex-direction:column; align-items:flex-start;}
@@ -287,18 +363,6 @@
   @media (max-width:860px){.builder-inner{grid-template-columns:1fr;}}
 
   /* ===== PROCESS ===== */
-  .process-list{border-top:1px solid var(--line); background:var(--paper); border-radius:0; padding:0 1.7rem;}
-  .process-row{
-    display:grid; grid-template-columns:70px 1fr 1.4fr; gap:2rem; padding:1.7rem;
-    margin:0 -1.7rem; border-bottom:1px solid var(--line); align-items:baseline;
-    transition:background .3s ease;
-  }
-  .process-row .pnum{font-size:1.3rem; font-weight:800; color:var(--slate); transition:color .3s ease;}
-  .process-row h3{font-size:1.15rem; font-weight:700; transition:color .3s ease;}
-  .process-row p{font-size:0.85rem; line-height:1.5; color:var(--slate); max-width:52ch; transition:color .3s ease;}
-  .process-row:hover{background:var(--paper-dim);}
-  .process-row:hover .pnum{color:var(--accent);}
-  @media (max-width:700px){.process-row{grid-template-columns:44px 1fr; row-gap:0.4rem;} .process-row p{grid-column:2/3;}}
 
   /* ===== EDITORIAL / MAGAZINES (3D Coverflow) ===== */
   .editorial-intro{display:grid;grid-template-columns:1.1fr 0.9fr;gap:3rem;align-items:start;} /* was align-items:end — the numbered index column runs longer (7 lines) than .lead's 3, so bottom-aligning pushed .lead's top edge well below the heading instead of starting right under it */
@@ -586,7 +650,7 @@
 <div class="top-accent"></div>
 <div class="top-tag">
   <div class="wrap">
-    <span data-i18n="topTag.left">MILO STUDIO™ — Fashion Production &amp; Retouching</span>
+    <span data-i18n="topTag.left">MILO STUDIO™ — Production, Retouching &amp; CGI</span>
     <span data-i18n="topTag.right">Bogotá, Colombia</span>
   </div>
 </div>
@@ -603,6 +667,7 @@
           <a href="#campaigns" data-i18n="nav.campaigns">Campaigns</a>
           <a href="#work" data-i18n="nav.editorial">Editorial</a>
           <a href="#retouching" data-i18n="nav.retouching">Retouching</a>
+          <a href="#cgi" data-i18n="nav.cgi">Modeling</a>
           <a href="#ecommerce" data-i18n="nav.ecommerce">E-Commerce</a>
         </div>
       </div>
@@ -627,6 +692,7 @@
     <div class="logo-layer" id="logoLayer">
       <img src="images/site/hero-sequence/frame-01.png" alt="MILO" id="logoFrameImg" width="1080" height="622">
     </div>
+    <span class="hero-count" id="heroCount" aria-hidden="true"><span class="ink-count-label" data-i18n="hero.loading">Loading</span><span id="heroCountNum">000</span></span>
     <div class="scroll-cue" id="scrollCue"><span data-i18n="hero.scroll">Scroll</span><div class="line"></div></div>
   </div>
 </section>
@@ -636,7 +702,7 @@
   <div class="wrap">
     <div class="hero-content reveal">
       <span class="eyebrow" data-i18n="hero.eyebrow">Bogotá — Worldwide</span>
-      <h1 data-i18n-html="hero.h1">Full-service <em>fashion</em> production &amp;<br>retouching.</h1>
+      <h1 data-i18n-html="hero.h1">Full-service <em>production</em>,<br>retouching &amp; CGI.</h1>
       <p data-i18n="hero.p">MILO Studio assembles the stylists, casting, and retouchers your campaign needs — one brief, one accountable team.</p>
       <div class="hero-cta-row">
         <a href="#campaigns" class="btn btn-solid" data-i18n="hero.cta1">See the Work</a>
@@ -848,24 +914,12 @@
   </div>
 </section>
 
-<!-- PROCESS -->
-<section id="process">
-  <div class="wrap">
-    <div class="section-head reveal"><div><span class="eyebrow eyebrow-idx"><span data-i18n="process.eyebrow">The Process</span> / 004</span><h2 style="margin-top:0.7rem;" data-i18n="process.h2">From brief to delivery.</h2></div></div>
-    <div class="process-list reveal">
-      <div class="process-row"><span class="pnum">01</span><h3 data-i18n="process1.title">Briefing</h3><p data-i18n="process1.desc">Brand, market, timeline, and budget — one conversation to define the scope of the campaign.</p></div>
-      <div class="process-row"><span class="pnum">02</span><h3 data-i18n="process2.title">Team Assembly</h3><p data-i18n="process2.desc">MILO staffs the project: stylist, MUA, casting, production support — matched to what the brief actually requires.</p></div>
-      <div class="process-row"><span class="pnum">03</span><h3 data-i18n="process3.title">Production</h3><p data-i18n="process3.desc">On-set direction and shoot management, with Camilo leading creative and technical decisions throughout the day.</p></div>
-      <div class="process-row"><span class="pnum">04</span><h3 data-i18n="process4.title">Retouch &amp; Deliver</h3><p data-i18n="process4.desc">Post-production and final asset delivery in the formats the campaign needs — print, digital, or e-commerce ready.</p></div>
-    </div>
-  </div>
-</section>
 
 <!-- ABOUT -->
 <section id="about">
   <div class="wrap">
     <div class="section-head-left reveal">
-      <span class="eyebrow eyebrow-idx"><span data-i18n="about.eyebrow">The Studio</span> / 005</span>
+      <span class="eyebrow eyebrow-idx"><span data-i18n="about.eyebrow">The Studio</span> / 004</span>
       <div class="section-icon-wrap">
         <img class="section-icon" src="images/site/section-icons/icon-s.png" alt="">
         <h2 data-i18n="about.studioTitle">Studio</h2>
@@ -911,7 +965,7 @@
 <section id="retouching">
   <div class="wrap">
     <div class="section-head-left reveal">
-      <span class="eyebrow eyebrow-idx"><span data-i18n="service1.eyebrow">Post-Production</span> / 006</span>
+      <span class="eyebrow eyebrow-idx"><span data-i18n="service1.eyebrow">Post-Production</span> / 005</span>
       <div class="section-icon-wrap">
         <img class="section-icon" src="images/site/section-icons/icon-r.png" alt="">
         <h2 data-i18n="service1.title">Retouching</h2>
@@ -943,6 +997,53 @@
             <p id="retouchingSub" data-i18n="retouching.hint">Hover to see the before.</p>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CGI -->
+<section id="cgi">
+  <div class="wrap">
+    <div class="section-head-left reveal">
+      <span class="eyebrow eyebrow-idx"><span data-i18n="cgi.eyebrow">Computer Graphics</span> / 006</span>
+      <div class="section-icon-wrap">
+        <img class="section-icon" src="images/site/section-icons/icon-m.png" alt="">
+        <h2 data-i18n="cgi.h2">Modeling</h2>
+      </div>
+      <span class="desc" data-i18n="cgi.note">Modelled, lit and integrated.</span>
+    </div>
+    <p class="desc campaigns-desc" data-i18n="cgi.desc">Blender and Cinema 4D modelling, lighting and lookdev — built as its own image, or matched into a photograph so the two read as one shot.</p>
+  </div>
+
+  <div class="cgi-band reveal no-cursor-trail" id="cgiBand">
+    <canvas id="inkCanvas" role="img" aria-label="MILO logo rendered in a sequence of materials"></canvas>
+    <span class="ink-count" aria-hidden="true"><span class="ink-count-label">Loading</span><span id="inkCount">000</span></span>
+    <span class="ink-hint" id="inkHint" data-i18n="cgi.inkHint">Hover to see the texturing</span>
+  </div>
+
+  <div class="wrap">
+    <div class="cgi-work reveal">
+      <span class="cgi-work-label" data-i18n="cgi.workLabel">Selected CGI &amp; integration</span>
+      <div class="cgi-slots">
+        <figure class="cgi-item">
+          <button type="button" data-cgi="cgi_automotion" aria-label="Open Automotion">
+            <img src="images/site/cgi-work/automotion_01.jpg" alt="Automotion — CGI car built and integrated into a photograph" loading="lazy" width="1600" height="1067">
+          </button>
+          <span class="cap">Automotion — <span data-i18n="cgi.cap1">Model, lookdev and integration</span></span>
+        </figure>
+        <figure class="cgi-item">
+          <button type="button" data-cgi="cgi_jacquemus" aria-label="Open Jacquemus">
+            <img src="images/site/cgi-work/jacquemus_01.jpg" alt="Jacquemus — CGI bags composed against a photographed sky" loading="lazy" width="1600" height="2400">
+          </button>
+          <span class="cap">Jacquemus — <span data-i18n="cgi.cap2">Product CGI</span></span>
+        </figure>
+        <figure class="cgi-item">
+          <button type="button" data-cgi="cgi_adidas" aria-label="Open Adidas">
+            <img src="images/site/cgi-work/adidas_01.jpg" alt="Adidas — liquid chrome CGI integrated into a photograph" loading="lazy" width="1600" height="2400">
+          </button>
+          <span class="cap">Adidas — <span data-i18n="cgi.cap3">Photo integration</span></span>
+        </figure>
       </div>
     </div>
   </div>
@@ -1064,7 +1165,7 @@
   <div class="wrap">
     <div class="footer-row">
       <img src="images/site/logo-mark.png" alt="MILO icon">
-      <div class="footer-links"><a href="#campaigns" data-i18n="footer.campaigns">Campaigns</a><a href="#retouching" data-i18n="nav.retouching">Retouching</a><a href="#ecommerce" data-i18n="nav.ecommerce">E-Commerce</a><a href="#work" data-i18n="nav.editorial">Editorial</a><a href="#contact" data-i18n="footer.contact">Contact</a><a href="https://www.behance.net/marquezvillegas" target="_blank" rel="noopener">Behance</a></div>
+      <div class="footer-links"><a href="#campaigns" data-i18n="footer.campaigns">Campaigns</a><a href="#retouching" data-i18n="nav.retouching">Retouching</a><a href="#cgi" data-i18n="nav.cgi">Modeling</a><a href="#ecommerce" data-i18n="nav.ecommerce">E-Commerce</a><a href="#work" data-i18n="nav.editorial">Editorial</a><a href="#contact" data-i18n="footer.contact">Contact</a><a href="https://www.behance.net/marquezvillegas" target="_blank" rel="noopener">Behance</a></div>
       <div style="font-size:0.78rem; color:var(--slate);" data-i18n="footer.tagline">© 2026 MILO Studio. All rights reserved.</div>
     </div>
   </div>
@@ -1072,11 +1173,12 @@
 
 <script>
   const translations = {
-    'topTag.left': {en:'MILO STUDIO™ — Fashion Production & Retouching', es:'MILO STUDIO™ — Producción y Retoque de Moda'},
+    'topTag.left': {en:'MILO STUDIO™ — Production, Retouching & CGI', es:'MILO STUDIO™ — Producción, Retoque y CGI'},
     'topTag.right': {en:'Bogotá, Colombia', es:'Bogotá, Colombia'},
     'nav.work': {en:'Work', es:'Trabajo'},
     'nav.services': {en:'Services', es:'Servicios'},
     'nav.campaigns': {en:'Campaigns', es:'Campañas'},
+    'nav.cgi': {en:'Modeling', es:'Modelado'},
     'nav.retouching': {en:'Retouching', es:'Retoque'},
     'nav.ecommerce': {en:'E-Commerce', es:'E-Commerce'},
     'nav.buildTeam': {en:'Build a Team', es:'Arma un Equipo'},
@@ -1086,6 +1188,7 @@
 
     'hero.eyebrow': {en:'Bogotá — Worldwide', es:'Bogotá — Internacional'},
     'hero.p': {en:'MILO Studio assembles the stylists, casting, and retouchers your campaign needs — one brief, one accountable team.', es:'MILO Studio reúne a los estilistas, el casting y los retocadores que tu campaña necesita — un solo brief, un equipo responsable.'},
+    'hero.loading': {en:'Loading', es:'Cargando'},
     'hero.scroll': {en:'Scroll', es:'Desplázate'},
     'hero.cta1': {en:'See the Work', es:'Ver el Trabajo'},
 
@@ -1112,6 +1215,16 @@
     'service2.desc': {en:'On-set direction and full crew management, from casting to final capture.', es:'Dirección en set y manejo de todo el equipo, desde el casting hasta la captura final.'},
     'service3.title': {en:'Creative Direction', es:'Dirección Creativa'},
     'service3.desc': {en:'Concept, styling, and art direction that carries a campaign from brief to finished asset.', es:'Concepto, styling y dirección de arte que llevan una campaña del brief al asset terminado.'},
+    'cgi.eyebrow': {en:'Computer Graphics', es:'Imagen Generada'},
+    'cgi.h2': {en:'Modeling', es:'Modelado'},
+    'cgi.note': {en:'Modelled, lit and integrated.', es:'Modelado, iluminado e integrado.'},
+    'cgi.desc': {en:'Blender and Cinema 4D modelling, lighting and lookdev — built as its own image, or matched into a photograph so the two read as one shot.', es:'Modelado, iluminación y lookdev en Blender y Cinema 4D — como imagen propia, o integrado en una fotografía para que ambas lean como una sola toma.'},
+    'cgi.workLabel': {en:'Selected CGI & integration', es:'CGI e integración · selección'},
+    'cgi.cap1': {en:'Model, lookdev and integration', es:'Modelado, lookdev e integración'},
+    'cgi.cap2': {en:'Product CGI', es:'CGI de producto'},
+    'cgi.cap3': {en:'Photo integration', es:'Integración fotográfica'},
+    'cgi.inkHint': {en:'Hover to see the texturing', es:'Pasa el cursor para ver el texturizado'},
+    'cgi.inkHintTouch': {en:'Drag to see the texturing', es:'Desliza para ver el texturizado'},
     'service4.eyebrow': {en:'Catalog', es:'Catálogo'},
     'service4.title': {en:'E-Commerce', es:'E-Commerce'},
     'service4.note': {en:'Product & model imagery.', es:'Imágenes de producto y modelo.'},
@@ -1136,17 +1249,6 @@
     'role.retoucher': {en:'Retoucher', es:'Retocador(a)'},
     'role.motion': {en:'Motion / Video', es:'Motion / Video'},
     'role.setdesign': {en:'Set Design', es:'Diseño de Set'},
-
-    'process.eyebrow': {en:'The Process', es:'El Proceso'},
-    'process.h2': {en:'From brief to delivery.', es:'Del brief a la entrega.'},
-    'process1.title': {en:'Briefing', es:'Briefing'},
-    'process1.desc': {en:'Brand, market, timeline, and budget — one conversation to define the scope of the campaign.', es:'Marca, mercado, tiempos y presupuesto — una sola conversación para definir el alcance de la campaña.'},
-    'process2.title': {en:'Team Assembly', es:'Armado del Equipo'},
-    'process2.desc': {en:'MILO staffs the project: stylist, MUA, casting, production support — matched to what the brief actually requires.', es:'MILO arma el equipo del proyecto: estilista, maquillaje, casting, apoyo de producción — según lo que el brief realmente requiere.'},
-    'process3.title': {en:'Production', es:'Producción'},
-    'process3.desc': {en:'On-set direction and shoot management, with Camilo leading creative and technical decisions throughout the day.', es:'Dirección en set y gestión de la producción, con Camilo liderando las decisiones creativas y técnicas durante toda la jornada.'},
-    'process4.title': {en:'Retouch & Deliver', es:'Retoque y Entrega'},
-    'process4.desc': {en:'Post-production and final asset delivery in the formats the campaign needs — print, digital, or e-commerce ready.', es:'Postproducción y entrega final en los formatos que la campaña necesita — listo para impresión, digital o e-commerce.'},
 
     'editorial.eyebrow': {en:'The Archive', es:'El Archivo'},
     'editorial.h2': {en:'Editorial', es:'Editorial'},
@@ -1189,8 +1291,8 @@
 
   const htmlTranslations = {
     'hero.h1': {
-      en: 'Full-service <em>fashion</em> production &amp;<br>retouching.',
-      es: 'Producción y retoque de <em>moda</em><br>integral.'
+      en: 'Full-service <em>production</em>,<br>retouching &amp; CGI.',
+      es: '<em>Producción</em>, retoque<br>y CGI integrales.'
     },
     'contact.h2': {
       en: 'Tell us what <span class="hl">you\'re building.</span>',
@@ -1249,8 +1351,44 @@
   // stays put once assembled — no blur/fade-out; the headline reveals in the section below it.
   const HERO_FRAME_COUNT = 20;
   const heroFrames = [];
+  // The two sequences come to about four and a half megabytes, which is a couple of seconds on a
+  // good line and the better part of half a minute on a bad one. Counting them in gives the slow
+  // case something to read instead of an empty stage that looks broken — but the counter is held
+  // back until the load has actually proved slow, so a fast visit never sees a preloader at all.
+  let heroReady = 0, heroTotal = 0, heroShown = 0, heroCounting = false;
+  const heroCountEl = document.getElementById('heroCount');
+  const heroNumEl   = document.getElementById('heroCountNum');
+  function heroLoaded(){
+    heroReady++;
+    if(heroCounting && heroReady >= heroTotal) requestAnimationFrame(heroFinish);
+  }
+  function heroFinish(){
+    if(heroNumEl) heroNumEl.textContent = '100';
+    if(heroCountEl) heroCountEl.classList.add('done');
+    setTimeout(() => heroCountEl && heroCountEl.classList.remove('show'), 500);
+  }
+  function heroTick(){
+    if(!heroCounting) return;
+    const target = (heroReady/heroTotal)*100;
+    heroShown += (target - heroShown)*0.09;
+    if(heroNumEl) heroNumEl.textContent = String(Math.min(100, Math.round(heroShown))).padStart(3,'0');
+    if(heroReady >= heroTotal && heroShown > 99.4){ heroFinish(); return; }
+    requestAnimationFrame(heroTick);
+  }
+  // Anything still outstanding after this long is slow enough to be worth explaining.
+  setTimeout(() => {
+    if(heroReady >= heroTotal) return;
+    heroCounting = true;
+    if(heroCountEl) heroCountEl.classList.add('show');
+    requestAnimationFrame(heroTick);
+  }, 450);
+
   for(let i = 1; i <= HERO_FRAME_COUNT; i++){
     const img = new Image();
+    heroTotal++;
+    // Counted on failure too, so one frame that never arrives cannot strand the number short of
+    // 100 and leave the panel up for good.
+    img.onload = heroLoaded; img.onerror = heroLoaded;
     img.src = `images/site/hero-sequence/frame-${String(i).padStart(2,'0')}.png`;
     heroFrames.push(img);
   }
@@ -1263,6 +1401,8 @@
   const lookFrames = [];
   for(let i = 1; i <= LOOK_FRAME_COUNT; i++){
     const img = new Image();
+    heroTotal++;
+    img.onload = heroLoaded; img.onerror = heroLoaded;
     img.src = `images/site/hero-sequence/look-around/frame-${String(i).padStart(2,'0')}.png`;
     lookFrames.push(img);
   }
@@ -1520,6 +1660,9 @@
   const projectNextBtn = document.getElementById('projectNextBtn');
 
   const projectData = {
+    cgi_automotion: { images: ['images/site/cgi-work/automotion_01.jpg', 'images/site/cgi-work/automotion_04.jpg', 'images/site/cgi-work/automotion_05.jpg', 'images/site/cgi-work/automotion_06.jpg', 'images/site/cgi-work/automotion_02.jpg', 'images/site/cgi-work/automotion_03.jpg'], folder: 'images/site/cgi-work/', title: 'AUTOMOTION', sub: {en:'Model, lookdev and integration', es:'Modelado, lookdev e integración'}, behance: 'https://www.behance.net/gallery/253385861/CGI-and-Retouch' },
+    cgi_jacquemus:  { images: ['images/site/cgi-work/jacquemus_01.jpg', 'images/site/cgi-work/jacquemus_02.jpg', 'images/site/cgi-work/jacquemus_03.jpg'], folder: 'images/site/cgi-work/', title: 'JACQUEMUS', sub: {en:'Product CGI', es:'CGI de producto'}, behance: 'https://www.behance.net/gallery/247339221/CGI-Jacquemus' },
+    cgi_adidas:     { images: ['images/site/cgi-work/adidas_01.jpg'], folder: 'images/site/cgi-work/', title: 'ADIDAS', sub: {en:'Photo integration', es:'Integración fotográfica'}, behance: 'https://www.behance.net/gallery/246438073/CGI-Integration-Adidas' },
     penida: { images: ['images/editorial/penida/01.jpg', 'images/editorial/penida/06.webp', 'images/editorial/penida/07.webp', 'images/editorial/penida/08.webp', 'images/editorial/penida/09.webp', 'images/editorial/penida/10.webp', 'images/editorial/penida/11.webp', 'images/editorial/penida/12.webp'], folder: 'images/editorial/penida', title: 'PENIDA', sub: {en:'Penida Magazine — Editorial / Sep 2025', es:'Revista Penida — Editorial / Sep 2025'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/230267081/Venon-Bloom' },
     elegant: { images: ['images/editorial/elegant/01.jpg', 'images/editorial/elegant/02.webp', 'images/editorial/elegant/04.webp', 'images/editorial/elegant/05.webp', 'images/editorial/elegant/06.webp', 'images/editorial/elegant/07.webp', 'images/editorial/elegant/08.webp', 'images/editorial/elegant/09.webp', 'images/editorial/elegant/10.webp', 'images/editorial/elegant/11.webp', 'images/editorial/elegant/12.webp'], folder: 'images/editorial/elegant', title: 'ELEGANT', sub: {en:'Elegant Magazine — Otto by Eriko', es:'Revista Elegant — Otto by Eriko'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/136375879/Otto' },
     imirage: { images: ['images/editorial/imirage/01.jpg', 'images/editorial/imirage/07.webp', 'images/editorial/imirage/08.webp', 'images/editorial/imirage/09.webp', 'images/editorial/imirage/10.webp'], folder: 'images/editorial/imirage', title: 'IMIRAGE', sub: {en:'Imirage Magazine — Beauty Editorial', es:'Revista Imirage — Editorial de Belleza'}, note: {en:'Cover shown here from the MILO Studio editorial archive.', es:'Portada del archivo editorial de MILO Studio.'}, behance: 'https://www.behance.net/gallery/121980999/Red-Muse' },
@@ -1619,7 +1762,9 @@
     const n = project ? projectSlideCount(project) : 1;
     const shown = Math.min(n, Math.max(1, Math.round(progress * (n - 1)) + 1));
     projectProgress.textContent = `${String(shown).padStart(2,'0')} / ${String(n).padStart(2,'0')}`;
-    projectScrollHint.style.opacity = progress > 0.05 ? 0 : 1; // same "fade once they've actually scrolled" instinct as the hero's own scroll-cue
+    // Nothing to scroll to when the project is a single frame, so the cue would be an
+    // instruction the modal cannot honour.
+    projectScrollHint.style.opacity = (n <= 1 || progress > 0.05) ? 0 : 1;
   }
   let projectScrollTicking = false;
   projectScroll.addEventListener('scroll', () => {
@@ -1720,7 +1865,7 @@
     updateZoomIcon();
     document.body.style.overflow = 'hidden';
     projectScroll.scrollTop = 0;
-    projectScrollHint.style.opacity = 1; // scrollTop may already have been 0, which wouldn't fire a 'scroll' event to reset this on its own
+    projectScrollHint.style.opacity = projectSlideCount(project) > 1 ? 1 : 0; // scrollTop may already have been 0, which wouldn't fire a 'scroll' event to reset this on its own
 
     // Each image is height:74vh; width:auto, so its rendered width depends on its own intrinsic
     // aspect ratio — resize the pin as each one finishes loading (not just once at the end) so
@@ -1798,6 +1943,7 @@
   function projectCategory(key){
     const p = projectData[key];
     if(!p) return 'campaigns';
+    if(key.startsWith('cgi_')) return 'cgi';
     if(key.startsWith('retouching_')) return 'retouching';
     if(p.folder.includes('/editorial/')) return 'editorial';
     if(p.folder.includes('/ecommerce/')) return 'ecommerce';
@@ -1806,6 +1952,7 @@
   function getProjectOrder(key){
     switch(projectCategory(key)){
       case 'editorial':  return [...coverOrder];
+      case 'cgi':        return ['cgi_automotion','cgi_jacquemus','cgi_adidas'];
       case 'retouching': return retouchingProjectsData.map(r => r.key);
       case 'ecommerce':  return ecommerceProjectsData.filter(e => e.projectKey).map(e => e.projectKey);
       default:           return campaignsData.map(c => c.key);
@@ -2417,6 +2564,12 @@
     window.addEventListener('resize', resize);
 
     window.addEventListener('mousemove', (e) => {
+      // Anything opted out of the trail gets the cursor to itself. Over the CGI band the dashed
+      // marching-ants line sat on top of the brush and read as a second, competing cursor.
+      if(e.target && e.target.closest && e.target.closest('.no-cursor-trail')){
+        points.length = 0;   // drop what is queued, so no tail is left hanging at the edge
+        return;
+      }
       hasMoved = true;
       points.push({x: e.clientX, y: e.clientY, t: performance.now()});
     });
@@ -2487,6 +2640,439 @@
       clearTimeout(t); t = setTimeout(snap, 150);
     });
   })();
+</script>
+
+<script>
+  // The three pieces open in the same panel the rest of the site uses, so a CGI project reads
+  // at the same scale as a campaign or an editorial rather than in a viewer of its own.
+  document.querySelectorAll('.cgi-item button[data-cgi]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const img = btn.querySelector('img');
+      openProjectModal(btn.dataset.cgi, img && img.getAttribute('src'));
+    });
+  });
+
+  // ===== CGI: INK-REVEALED RENDER STACK =====
+  // The white plate is the section's face and never moves: it sits on top, and every material
+  // lives underneath it. Brush strokes cut through the plate to show whichever material is
+  // currently below, so the composition on screen is always the logo, never a slideshow.
+  //
+  // Strokes are kept as objects rather than pixels because they have to retract, not fade: each
+  // one carries its own radius and contracts on its own clock, so a run of overlapping blobs
+  // pulls apart into separate beads and those beads close to nothing — the way a liquid lets go
+  // of a surface. A decaying bitmap mask can only ever dissolve in place, which reads as a
+  // dirty eraser instead.
+  (function(){
+    const host   = document.getElementById('cgiBand');
+    const canvas = document.getElementById('inkCanvas');
+    if(!host || !canvas) return;
+    const ctx  = canvas.getContext('2d');
+    const hint = document.getElementById('inkHint');
+
+    // Each render carries the flat colour its own frame sits on, so the area around a contained
+    // image is indistinguishable from the image itself — that is what lets the compositions stay
+    // uncropped at any viewport ratio.
+    // PNG, not JPEG: two flat tones with a hard edge between them is the worst case for JPEG,
+    // whose ringing lands exactly on the outline and reads as the logo breaking up. At 64
+    // colours the file is effectively lossless here and barely larger.
+    // No file behind it any more: the plate is the outline plus its ground colour.
+    const PLATE     = [null, '#FFFFFF'];
+    const MATERIALS = [
+      ['plastic_bomb.jpg',   '#000000'],
+      ['peluche_blanco.jpg', '#000000'],
+      ['metal.jpg',          '#000000'],
+      ['gotas_mate.jpg',     '#000000'],
+      ['chrome_blanco.jpg',  '#000000'],
+      ['peluche_gris.jpg',   '#000000'],
+      ['cielo.jpg',          '#757575']
+    ];
+
+    // The plate is drawn from the outline itself, not from a picture of it. It is the one flat,
+    // hard-edged artwork in the band, and any raster of it either softens on a dense display or
+    // shows compression along the contour; a path is rasterised at whatever size the band happens
+    // to be. Placement matches where the wordmark sits in the rendered materials, which are all
+    // registered to each other — the plate has to land on the same spot or the reveal slips.
+    const MILO_PATH = new Path2D("M347.16,116.03c.14-9.31.68-19.11.22-27.62-1.03-8.85-4.8-15.08-15.81-15.27-3.69.11-9.69,2.14-12.46,6.5-2.95,4.59-4,14.18-3.25,25.99.08,7.53.06,11.99,0,19.39-.11,3.07-.32,6.14-.43,9.21-.72,6.68-1.34,13.36-2.06,20.04-.16,10.27,6.17,16.62,12.13,18.74.89.28,6.04,1.5,11.48,0,4.2-1.16,8.9-3.73,11.59-10.07,2.17-5.12,1.35-13.15.32-18.95-1.54-8.69-1.88-17.86-1.73-27.94ZM335.35,28.41c-6.74-1.16-13.82,1.79-18.3,7.69-2.62,3.79-3.76,8.42-3.14,13,.56,4.13,2.52,7.94,5.52,10.83,5.49,4.54,12.75,6.16,19.06,3.79,3.63-1.37,6.65-3.95,8.77-7.26,1.7-2.54,2.75-5.43,3.03-8.45.4-4.25-.75-8.48-3.14-12.02-2.83-3.93-6.99-6.76-11.81-7.58ZM269.61,118.49c-.06-7.12-.13-14.23-.19-21.35,0-22.12-.38-47.1-12.5-57.34-8.31-7.03-18.87-8.43-33.14-4.06-32.25,9.87-30.52,42.08-27.6,57.01,1.45,9.86,3.18,19.67,4.64,29.52,1.22,7.01-1.44,16.54-8.24,15.11-5.46-1.14-7.24-5.86-9.21-10.39-2.58-6.11-5.19-12.97-7.77-19.08-5.56-13.04-10.8-25.63-16.35-38.67-.96-2.07-5.4-13.67-12.24-22.42-13.24-16.92-41.76-21.86-55.56,7.04-7.99,24.18-3.88,59.18-3.72,85.23.13,22.68,8.92,31.91,22.2,34.37,3.17.59,7.49.21,10.08-.47,12.99-3.43,16.25-16.63,11.63-30.99-1.69-5.24-4.07-10.2-6.2-15.12-4.36-10.55-8.72-21.1-13.08-31.65-3.33-7.65-6.77-15.88-9.42-24.06-10.21-31.5,33.13-38.29,27.25-7.59-3.17,20.99-2.99,28.1,14.23,61.09,5.17,9.9,10.44,20.38,16.14,29.89,4.83,8.07,9.15,17.23,20.31,19.07,12.14,2,18.2-10.74,21.32-18.14,3.75-8.9,6.13-18.92,9.21-28.44,5.56-17.76,11.11-35.52,16.67-53.28,1.49-4.79,2.97-9.57,4.46-14.36,3.58-11.09,8.47-17.56,14.92-15.87,9,2.6,5.63,18.76,3,27.11-5.74,19.79-20.7,64.67-22.48,72.97-3.52,16.47,2.52,25.96,12.98,29.15,8.39,2.56,18.35-.47,22.19-5.1,2.26-2.73,4.14-5.62,5.33-9.45,1.46-4.67,1.26-10.4,1.26-16.34-.03-7.81-.06-15.62-.1-23.43ZM461.8,133.71c-2.52-1.49-4.94-2.22-8.6-2.62-5.55-.61-12.18,3.15-15.42,5.19-6.28,3.93-11.76,8.92-17.5,13.55-3.25,2.62-6.68,5-10.14,7.32-2,1.34-3.16,2.64-5.35,3.4-3.42,1.18-7.7.95-9.75-2.92-1.41-2.68-1.65-6.2-.76-8.64,2.23-6.07,5.44-11.47,8.55-16.79,11.52-21.5,23.05-43.02,34.57-64.52,1.01-2.31,1.96-4.77,2.47-7.4,2.4-12.5-3.46-20.55-9.84-23.63-21.71-10.48-30.6,10.42-32.8,24.58-.47,3.64-.95,7.27-1.42,10.91-2.55,17.52-5.48,38.87-7.37,53.32-1.39,10.6-2.1,17.49-2.02,16.17-.62,8.31-.5,16.8,2.45,21.98,4.75,8.35,14.37,8.54,27.08,8.54,6.27,0,12.81-.28,19.08-.28,7.57,0,15.66.67,22.08-1.23,6.15-1.83,9.37-4.94,11.81-10.51,4.78-10.93.04-22.18-7.1-26.4ZM386.41,141.63c.02-.3.04-.6.07-.9-.04.44-.06.73-.07.9ZM598.76,99.14c-.78-13.32-4.12-24.9-5.63-29.68-9.4-24.53-29.73-36.81-63.04-36.5-3.19.1-12.76,1.13-19.71,3.47-33.93,11.37-37.98,41.16-39.42,52.53-.68,9.6-2.06,28.72,4.22,46.46,5.09,14.36,15.13,28.02,35.2,33.46,17.82,4.83,36.57,3.29,45.69.47,36.01-11.11,44.2-44.54,42.7-70.22ZM587.26,115.27c-1.58,5.41-11.82,8.95-18.61,11.71-4.87,1.82-10.03,3.59-14.95,5.52-10.44,4.1-20.62,8.71-31.19,12.89-5.33,2.16-15.41,6.58-21.23,4.87-5.5-1.61-8.59-4.3-9.64-8.88-1.12-4.9.04-11.82,1.84-17.41,5.81-17.24,11.37-34.64,17.01-52.23,1.85-5.77,7.54-32.18,21.55-25.89,3.3,1.48,6.72,5.32,11.05,11.05,11.19,13.91,22.38,25.88,33.58,39.21,3.17,4,12.82,11.56,10.59,19.16Z");
+    // The path's own bounding box inside that space — not the viewBox, which carries margin the
+    // artwork does not. Scaling the viewBox instead rendered the wordmark a fifth too small.
+    const MILO_VB  = { w: 651.91, h: 225.81 };
+    const MILO_BB  = { x: 86.5, y: 28.2, w: 512.4, h: 145.7 };
+    // Where the wordmark sits inside a render, as a share of that render. Every material is
+    // registered to the same spot, so the plate is placed by these numbers rather than by its
+    // own edges — otherwise the black letters and the material underneath drift apart.
+    const MILO_BOX = { x: 0.207, y: 0.236, w: 0.5325 };
+    // The wordmark was rendered a little left of centre. Correcting it on the plate alone would
+    // pull the outline off the materials underneath, which are all registered to that same
+    // off-centre spot — so both layers move together, by whatever the lockup needs.
+
+    const imgs = new Map();
+    const SOURCES_ALL = MATERIALS;   // the plate needs no download, so it is not part of the count
+    let ready = 0, started = false;
+    const countEl = document.getElementById('inkCount');
+    let shownPct = 0;
+    // Eased towards the true figure rather than snapped to it: from a warm cache every render is
+    // ready at once, and a counter that jumps straight to 100 reads as broken rather than fast.
+    function tickCount(){
+      const target = (ready/SOURCES_ALL.length)*100;
+      shownPct += (target - shownPct)*0.09;
+      if(countEl) countEl.textContent = String(Math.min(100, Math.round(shownPct))).padStart(3,'0');
+      if(ready >= SOURCES_ALL.length && shownPct > 99.4){
+        if(countEl) countEl.textContent = '100';
+        host.classList.add('loaded');
+        return;
+      }
+      requestAnimationFrame(tickCount);
+    }
+    // Held until the band is actually on screen. Started at page load it would run while the
+    // section is still thousands of pixels below the fold and be over long before anyone reaches
+    // it — a count nobody sees. Waiting also means the figure is read at the moment it matters.
+    if(window.IntersectionObserver){
+      const io = new IntersectionObserver((entries, obs) => {
+        if(entries.some(e => e.isIntersecting)){
+          obs.disconnect();
+          requestAnimationFrame(tickCount);
+        }
+      }, { threshold: 0.15 });
+      io.observe(host);
+    } else {
+      requestAnimationFrame(tickCount);
+    }
+    SOURCES_ALL.forEach(([f]) => {
+      const im = new Image();
+      // Counted on failure too: one render that never arrives must not strand the number short
+      // of 100 and leave the panel hidden behind it.
+      im.onload  = () => { if(++ready === 1) begin(); };
+      im.onerror = () => { ready++; };
+      im.src = 'images/site/hero-ink/' + f;
+      imgs.set(f, im);
+    });
+
+    let W = 0, H = 0, DPR = 1;
+    const plate    = document.createElement('canvas');   // the white layer, cut through per frame
+    const plateCtx = plate.getContext('2d');
+    const mask     = document.createElement('canvas');   // rebuilt from the live strokes
+    const maskCtx  = mask.getContext('2d');
+
+    let mat = 0, prevMat = -1, swapAt = 0;
+    let brushes = [], brushSize = 72;
+    let pointer = null;                  // null until the pointer is actually over the band
+    let sx = 0, sy = 0, px = 0, py = 0, seeded = false;
+    let strokes = [];
+    let prevTs = 0, matSince = 0;
+
+    const LIFE_MS     = 1050;   // a stroke has fully retracted this long after it was laid down
+    const HOLD_MS     = 2000;   // each material gets this long on screen while hovered
+    const BLEND_MS    = 480;    // the outgoing material dissolves into the incoming one
+    const MAX_STROKES = 260;    // ceiling, so a frantic pointer cannot grow the redraw without end
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Kept as a path in a unit box rather than a rasterised sprite. Stamping used to scale a
+    // bitmap, and every scale ran it through bilinear interpolation, which is what softened the
+    // edge; a path is re-rasterised at its final size each time, so the boundary stays as crisp
+    // as the shape itself. Roughly half the joins are taken as straight lines to the vertex,
+    // because curving every corner rounded the silhouette back into a lozenge however uneven the
+    // radii were — the hard corners are what read as torn ink.
+    const UNIT = 100;
+    function makeBrushPath(){
+      const R = UNIT*0.42, N = 11;
+      const cx = (Math.random()-0.5)*R*0.34, cy = (Math.random()-0.5)*R*0.34;
+      const pts = [];
+      let a = Math.random()*Math.PI*2;
+      for(let i=0;i<N;i++){
+        a += (Math.PI*2/N)*(0.55 + Math.random()*0.9);
+        const rr = R*(0.34 + Math.random()*1.16);
+        pts.push([cx + Math.cos(a)*rr, cy + Math.sin(a)*rr]);
+      }
+      const pa = new Path2D();
+      pa.moveTo((pts[0][0]+pts[N-1][0])/2, (pts[0][1]+pts[N-1][1])/2);
+      for(let i=0;i<N;i++){
+        const p = pts[i], q = pts[(i+1)%N];
+        if(Math.random() < 0.45){
+          pa.lineTo(p[0], p[1]);
+          pa.lineTo((p[0]+q[0])/2, (p[1]+q[1])/2);
+        } else {
+          pa.quadraticCurveTo(p[0], p[1], (p[0]+q[0])/2, (p[1]+q[1])/2);
+        }
+      }
+      pa.closePath();
+      return pa;
+    }
+
+    // Contain, never cover: the wordmark reaches close to the edges of every render, so cropping
+    // to fill would cut letters off.
+    function place(img){
+      const s = Math.min(W/img.naturalWidth, H/img.naturalHeight);
+      const w = img.naturalWidth*s, h = img.naturalHeight*s;
+      return [ (W-w)/2, (H-h)/2, w, h ];
+    }
+    // dx/dy drift the material only. The plate is the section's fixed face and the renders are
+    // aligned to each other on purpose, so moving it would break both; the ground is painted
+    // across the full canvas first, so a drifting image never exposes an edge.
+    // Wordmark and label are laid out as one lockup: the pair is measured, then centred as a
+    // unit. Centring the wordmark alone left the label hanging off the right and the whole thing
+    // read as pushed left, which is what it was.
+    function lockup(rx, ry, rw, rh, c){
+      const size = Math.max(9, rw*0.021);
+      c.save();
+      c.font = '800 ' + size + 'px Archivo, "Helvetica Neue", Helvetica, Arial, sans-serif';
+      if('letterSpacing' in c) c.letterSpacing = (size*0.22) + 'px';
+      const tw = c.measureText('CGI').width;
+      c.restore();
+      const lw = rw*MILO_BOX.w;
+      const gap = rw*0.035;
+      const total = lw + gap + tw;
+      const x = rx + (rw - total)/2;
+      return { x, lw, gap, tw, size, markX: x + lw + gap };
+    }
+    // "CGI" is painted twice, once into each layer and in opposite colours: black on the plate,
+    // white on the material beneath. The brush does the inversion by itself — erasing the plate
+    // takes the black word with it and uncovers the white one — so there is no hover state to
+    // track and it flips exactly where the ink actually reaches, letter by letter.
+    function drawMark(c, colour, L, ry, rh){
+      c.save();
+      c.fillStyle = colour;
+      c.font = '800 ' + L.size + 'px Archivo, "Helvetica Neue", Helvetica, Arial, sans-serif';
+      if('letterSpacing' in c) c.letterSpacing = (L.size*0.22) + 'px';
+      c.textAlign = 'left';
+      c.textBaseline = 'middle';
+      c.fillText('CGI', L.markX, ry + rh*0.5);
+      c.restore();
+    }
+
+    function drawLayer(c, src, dx, dy){
+      c.globalCompositeOperation = 'source-over';
+      c.fillStyle = src[1];
+      c.fillRect(0, 0, W, H);
+      if(src === PLATE){
+        // Positioned inside the same contained rectangle an image would occupy, so the wordmark
+        // lands exactly where every rendered material puts its own.
+        const ref = imgs.get(MATERIALS[0][0]);
+        let rx = 0, ry = 0, rw = W, rh = H;
+        if(ref && ref.naturalWidth){ [rx, ry, rw, rh] = place(ref); }
+        const L = lockup(rx, ry, rw, rh, c);
+        const sc = L.lw/MILO_BB.w;
+        c.save();
+        c.translate(L.x - MILO_BB.x*sc, ry + rh*MILO_BOX.y - MILO_BB.y*sc);
+        c.scale(sc, sc);
+        c.fillStyle = '#000';
+        c.fill(MILO_PATH);
+        c.restore();
+        drawMark(c, '#000', L, ry, rh);
+        return;
+      }
+      const im = imgs.get(src[0]);
+      if(im && im.naturalWidth){
+        const [x,y,w,h] = place(im);
+        // The render carries its wordmark baked in at MILO_BOX.x; shift the whole image by the
+        // distance the lockup moved, so the letters underneath stay under the outline above.
+        const L = lockup(x, y, w, h, c);
+        const shift = (L.x - x) - w*MILO_BOX.x;
+        c.drawImage(im, x + (dx||0) + shift, y + (dy||0), w, h);
+        drawMark(c, '#FFFFFF', L, y, h);
+      }
+    }
+    // Two periods that do not divide into each other, so the drift never visibly repeats.
+    // Quick but short: the renders are aligned to each other and to the plate, so a wide swing
+    // reads as the logo slipping out of register. Short periods keep it alive, small amplitude
+    // keeps it in place.
+    function floatX(ts){ return (Math.sin(ts/900) + Math.sin(ts/1500)*0.5) * W * 0.0035; }
+    function floatY(ts){ return (Math.cos(ts/1150) + Math.cos(ts/1900)*0.5) * W * 0.0025; }
+
+    let lastW = 0, lastH = 0;
+    function resize(){
+      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      // The canvas, not the band: the band's rect includes its 2px rules, and sizing to those
+      // four extra pixels stretched every render by just over a percent.
+      const r = canvas.getBoundingClientRect();
+      W = Math.round(r.width*DPR); H = Math.round(r.height*DPR);
+      if(!W || !H || (W === lastW && H === lastH)) return;
+      lastW = W; lastH = H;
+      canvas.width = W; canvas.height = H;
+      plate.width = W; plate.height = H;
+      mask.width  = W; mask.height  = H;
+      brushes = [0,1,2,3,4,5,6,7].map(makeBrushPath);
+      brushSize = Math.max(72, W*0.068);
+      strokes.length = 0;
+      render(performance.now());
+      // Sizing this band moves everything below it, so the rules that were snapped to the
+      // background grid on load are now off by however much the band settled. Nudge the pass
+      // that owns that alignment to run again.
+      clearTimeout(resize._t);
+      resize._t = setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
+    }
+
+    // Elongated along the direction of travel and aligned to it, so the stroke behaves like a
+    // body of liquid being dragged rather than a rubber stamp pressed down repeatedly.
+    function lay(x, y, r, angle, stretch, lifeScale){
+      if(strokes.length >= MAX_STROKES) strokes.shift();
+      // Distance from the middle, on the diagonal. Strokes out at the corners are given a much
+      // shorter life so the opening keeps its weight in the centre and the edges let go first,
+      // instead of the whole band staying peeled back to its borders.
+      const ex = Math.abs(x/W - 0.5)*2, ey = Math.abs(y/H - 0.5)*2;
+      const edge = Math.min(1, Math.hypot(ex, ey)/1.414);
+      strokes.push({ x, y, r, born: performance.now(), rot: angle, e: stretch,
+                     life: LIFE_MS*(1 - edge*0.62)*(lifeScale || 1),
+                     b: (Math.random()*brushes.length)|0 });
+    }
+
+    function strokeTo(x, y){
+      const dx = x-px, dy = y-py, dist = Math.hypot(dx, dy);
+      const angle = Math.atan2(dy, dx);
+      const speed = Math.min(dist/(30*DPR), 1);
+      // A dragged brush thins as it accelerates. The spread was too narrow to notice, so the
+      // stroke now runs from broad at rest to a thin whip at speed.
+      const base  = brushSize*(1.45 - speed*1.02);
+      const step  = Math.max(2, base*0.34);
+      const n = Math.max(1, Math.ceil(dist/step));
+      for(let i=1;i<=n;i++){
+        const t = i/n;
+        const x0 = px + dx*t, y0 = py + dy*t;
+        lay(x0, y0, base*(0.72 + Math.random()*0.62),
+            angle + (Math.random()-0.5)*0.8, 1 + speed*0.5 + Math.random()*0.45);
+        // A body of liquid does not shed a droplet cleanly: it stretches a filament that thins
+        // fastest in the middle until the neck parts and the far end pulls into a bead. That is
+        // Rayleigh-Plateau breakup, and it is what makes this read as liquid rather than as spray.
+        // So the outlying mark is not laid on its own — it arrives on the end of a ligament that
+        // is drawn back to the stroke, and the ligament is given a much shorter life than either
+        // end, so it necks, parts, and leaves the bead behind.
+        if(Math.random() < 0.05){
+          const a  = Math.random()*Math.PI*2;
+          const d  = base*(0.62 + Math.random()*0.55);
+          const bx = x0 + Math.cos(a)*d, by = y0 + Math.sin(a)*d;
+          const beadR = base*(0.14 + Math.random()*0.18);
+          const LINK = 5;
+          for(let k=1;k<LINK;k++){
+            const u = k/LINK;
+            // Thickness runs from the stroke down to the bead, pinched hardest at mid-span.
+            const neck = 1 - 0.72*Math.sin(Math.PI*u);
+            lay(x0 + (bx-x0)*u, y0 + (by-y0)*u,
+                (base*0.5*(1-u) + beadR*u) * neck * (0.85 + Math.random()*0.3),
+                a, 1.6 + Math.random()*1.2,
+                0.30 + 0.35*Math.abs(u-0.5)*2);   // the middle of the filament goes first
+          }
+          lay(bx, by, beadR, Math.random()*Math.PI*2, 2.4 + Math.random()*2.6);
+        }
+      }
+      px = x; py = y;
+    }
+
+    // The whole mask is redrawn every frame from the live strokes: that is what lets each one
+    // carry its own radius and pull away from its neighbours as it goes.
+    function rebuildMask(ts){
+      maskCtx.clearRect(0, 0, W, H);
+      maskCtx.lineJoin = 'round';
+      maskCtx.lineCap  = 'round';
+      maskCtx.fillStyle = '#000';
+      maskCtx.strokeStyle = '#000';
+      for(let i=strokes.length-1;i>=0;i--){
+        const s = strokes[i];
+        const age = (ts - s.born)/s.life;
+        if(age >= 1){ strokes.splice(i, 1); continue; }
+        // Holds near full size, then lets go: the late collapse is what makes a continuous
+        // stroke break into beads instead of thinning evenly along its whole length.
+        const k = 1 - age*age*age;
+        const rr = s.r*k;
+        if(rr < 1) continue;
+        maskCtx.save();
+        maskCtx.translate(s.x, s.y);
+        maskCtx.rotate(s.rot);
+        maskCtx.scale(s.e, 1);
+        const sc = rr/UNIT;
+        maskCtx.scale(sc, sc);
+        // Filled and then outlined with a round join. The outline is what rounds the corners:
+        // half its width is the radius, and dividing by the scale keeps that radius at a
+        // constant 2px however large or small the mark is drawn.
+        maskCtx.lineWidth = 4/sc;
+        maskCtx.stroke(brushes[s.b]);
+        maskCtx.fill(brushes[s.b]);
+        maskCtx.restore();
+      }
+    }
+
+    function render(ts){
+      if(!W) return;
+      drawLayer(plateCtx, PLATE);
+      plateCtx.globalCompositeOperation = 'destination-out';
+      plateCtx.drawImage(mask, 0, 0);
+      plateCtx.globalCompositeOperation = 'source-over';
+
+      ctx.clearRect(0, 0, W, H);
+      const fx = floatX(ts), fy = floatY(ts);
+      // Cross-dissolve rather than a cut: the swap happens under an opening the pointer is still
+      // moving through, so a hard change registered as a flicker at the edge of vision.
+      if(prevMat >= 0){
+        const k = (ts - swapAt)/BLEND_MS;
+        if(k >= 1){ prevMat = -1; drawLayer(ctx, MATERIALS[mat], fx, fy); }
+        else {
+          drawLayer(ctx, MATERIALS[prevMat], fx, fy);
+          ctx.globalAlpha = k < 0.5 ? 2*k*k : 1 - Math.pow(-2*k + 2, 2)/2;   // easeInOutQuad
+          drawLayer(ctx, MATERIALS[mat], fx, fy);
+          ctx.globalAlpha = 1;
+        }
+      } else {
+        drawLayer(ctx, MATERIALS[mat], fx, fy);
+      }
+      ctx.drawImage(plate, 0, 0);
+    }
+
+    function loop(ts){
+      requestAnimationFrame(loop);
+      if(!W) return;
+      prevTs = ts;
+
+      if(pointer){
+        // Easing gives the trail its lag: it arrives after the cursor, never with it.
+        sx += (pointer[0]-sx)*0.20;
+        sy += (pointer[1]-sy)*0.20;
+        if(Math.hypot(sx-px, sy-py) > 0.8) strokeTo(sx, sy);
+      }
+
+      rebuildMask(ts);
+
+      // Held for a fixed spell rather than paced by how much brush has gone down: tying it to
+      // the ink meant a broad sweep tore through several materials in a second, too fast to read
+      // any of them. The clock only runs while the pointer is on the band, so a material is
+      // always waiting where it was left.
+      if(pointer){
+        if(!matSince) matSince = ts;
+        if(ts - matSince >= HOLD_MS){
+          prevMat = mat; swapAt = ts;
+          mat = (mat + 1) % MATERIALS.length; matSince = ts;
+        }
+      } else {
+        matSince = 0;
+      }
+
+      render(ts);
+    }
+
+    function begin(){
+      if(started) return;
+      started = true;
+      resize();
+      // A window resize listener is not enough: the band is sized in rem and vw, so it moves when
+      // the web fonts land — after this has already run — and the backing store would keep the
+      // old ratio. Observing the element catches every source of change.
+      if(window.ResizeObserver) new ResizeObserver(resize).observe(canvas);
+      else addEventListener('resize', resize);
+
+      host.addEventListener('pointermove', e => {
+        const r = canvas.getBoundingClientRect();
+        pointer = [ (e.clientX-r.left)*DPR, (e.clientY-r.top)*DPR ];
+        if(!seeded){ sx = px = pointer[0]; sy = py = pointer[1]; seeded = true; }
+        host.classList.add('painted');
+      }, { passive: true });
+      // Nothing moves until the pointer arrives: the band is meant to be found, not to advertise
+      // itself, so there is no idle animation to notice out of the corner of the eye.
+      host.addEventListener('pointerleave', () => { pointer = null; }, { passive: true });
+
+      const noHover = !matchMedia('(hover: hover)').matches;
+      if(hint && noHover) hint.textContent = t('cgi.inkHintTouch');
+      if(reduce && hint) hint.textContent = '';
+      requestAnimationFrame(loop);
+    }
+  })();
+
 </script>
 
 </body>

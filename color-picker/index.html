@@ -98,6 +98,9 @@
   }
   .drop-zone.drag{ border-color:var(--ink); background:var(--bg); }
   .drop-zone p{ margin:0 0 12px; color:var(--muted); font-size:13px; }
+  .upload-actions{ display:inline-flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+  .camera-btn{ display:none; }
+  @media (max-width:879px){ .camera-btn{ display:inline-flex; } }
 
   .canvas-wrap{ position:relative; margin-top:14px; }
   .canvas-wrap .canvas-head{ display:flex; justify-content:flex-end; margin-bottom:8px; }
@@ -273,8 +276,12 @@
       <div id="imageUploadWrap" hidden>
         <div id="dropZone" class="drop-zone">
           <p>Arrastra una imagen aquí, pégala con Cmd/Ctrl+V, o:</p>
-          <button type="button" id="uploadBtn" class="btn secondary">Subir imagen / foto</button>
+          <div class="upload-actions">
+            <button type="button" id="uploadBtn" class="btn secondary">Subir imagen / foto</button>
+            <button type="button" id="cameraBtn" class="btn secondary camera-btn">📷 Usar cámara</button>
+          </div>
           <input id="imageFileInput" type="file" accept="image/*" hidden>
+          <input id="cameraFileInput" type="file" accept="image/*" capture="environment" hidden>
         </div>
         <div id="canvasWrap" class="canvas-wrap" hidden>
           <div class="canvas-head"><button type="button" id="clearImageBtn">Quitar imagen</button></div>
@@ -1083,6 +1090,7 @@ if(!('EyeDropper' in window)){
 }
 
 const dropZone=document.getElementById('dropZone'), uploadBtn=document.getElementById('uploadBtn'), imageFileInput=document.getElementById('imageFileInput');
+const cameraBtn=document.getElementById('cameraBtn'), cameraFileInput=document.getElementById('cameraFileInput');
 const canvasWrap=document.getElementById('canvasWrap'), clearImageBtn=document.getElementById('clearImageBtn');
 const sampleCanvas=document.getElementById('sampleCanvas'), loupeCanvas=document.getElementById('loupeCanvas');
 const ctx = sampleCanvas.getContext('2d', { willReadFrequently:true });
@@ -1099,6 +1107,8 @@ try{ setImageUploadHidden(localStorage.getItem('milo-color-picker-hide-upload') 
 
 uploadBtn.addEventListener('click', ()=> imageFileInput.click());
 imageFileInput.addEventListener('change', e=> loadImageFile(e.target.files[0]));
+cameraBtn.addEventListener('click', ()=> cameraFileInput.click());
+cameraFileInput.addEventListener('change', e=> loadImageFile(e.target.files[0]));
 
 function loadImageFile(file){
   if(!file || !file.type.startsWith('image/')) return;
