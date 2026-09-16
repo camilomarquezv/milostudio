@@ -127,6 +127,17 @@
   .value-row{ display:flex; align-items:center; gap:8px; }
   .value-row .k{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); width:32px; flex-shrink:0; }
   .value-row .v{ font-size:14px; font-weight:700; flex:1; }
+  /* The HEX reads as a value, like it always did, but it is a field: a faint outline on hover
+     and a firm one on focus say it can be typed into without turning the result into a form. */
+  .hex-input{
+    font:inherit; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:14px; font-weight:700;
+    color:var(--ink); background:transparent; min-width:0;
+    border:1px solid transparent; border-radius:8px; padding:4px 8px; margin-left:-8px;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .hex-input:hover{ border-color:var(--line-strong); }
+  .hex-input:focus{ outline:none; border-color:var(--ink); background:var(--bg); }
+  .hex-input.invalid{ border-color:#d64545; }
   button.copy{
     font:inherit; font-size:12px; background:none; border:1px solid var(--line-strong);
     border-radius:8px; padding:4px 9px; color:var(--muted); cursor:pointer; flex-shrink:0;
@@ -297,7 +308,7 @@
       <div class="result-top">
         <div id="bigSwatch" class="big-swatch"></div>
         <div class="values">
-          <div class="value-row"><span class="k">HEX</span><span id="outHex" class="v mono"></span><button class="copy" data-copy="hex">Copiar</button></div>
+          <div class="value-row"><span class="k">HEX</span><input id="outHex" class="v mono hex-input" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12" placeholder="#000000" aria-label="Código HEX — escribe o pega uno para buscar ese color" title="Escribe o pega un HEX para buscar ese color"><button class="copy" data-copy="hex">Copiar</button></div>
           <div class="channel-row">
             <div class="channel-col">
               <label for="rInput">R</label>
@@ -567,6 +578,28 @@ function rgbToLab(r,g,b){
   return { L:116*fy-16, a:500*(fx-fy), b:200*(fy-fz) };
 }
 
+// Hue as the eye sees it (OKLCH, Björn Ottosson 2020), used only to split blue from purple.
+// HSL hue is a geometric angle around the RGB cube, not a perceptual one: equal steps in HSL
+// are not equal steps to a viewer, and the gap is widest exactly in the blue-violet range.
+function rgbToOklchHue(r,g,b){
+  const lin = c => { c/=255; return c<=0.04045 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); };
+  const R=lin(r), G=lin(g), B=lin(b);
+  const l=Math.cbrt(0.4122214708*R+0.5363325363*G+0.0514459929*B);
+  const m=Math.cbrt(0.2119034982*R+0.6806995451*G+0.1073969566*B);
+  const s=Math.cbrt(0.0883024619*R+0.2817188376*G+0.6299787005*B);
+  const a=1.9779984951*l-2.4285922050*m+0.4505937099*s;
+  const bb=0.0259040371*l+0.7827717662*m-0.8086757660*s;
+  return (Math.atan2(bb,a)*180/Math.PI+360)%360;
+}
+// Where blue becomes purple, measured rather than chosen. Fitted to the xkcd colour survey
+// (2010, 222,500 participants naming colours freely): among its names ending in "blue" versus
+// "purple / violet / lilac / lavender", the split that misclassifies the fewest sits at about
+// 285-288° OKLCH (2 misses in 135). The survey's own in-between answers — "blurple",
+// "blue/purple", "purple blue", and every "indigo" — all land between 283° and 290°, so that
+// band is labelled as both rather than forced to one side.
+const BLUE_PURPLE_OK = 286.5;
+const BLUE_PURPLE_BAND = [283, 290];
+
 const FAMILIES = {
   negro:    { key:'negro',    label:'Negro',    neutral:true },
   blanco:   { key:'blanco',   label:'Blanco',   neutral:true },
@@ -581,12 +614,12 @@ const FAMILIES = {
 };
 
 // 7 chromatic families total (matches ColorADD's own set), not 10 — turquoise
-// folds into green/blue at cyan (180°), indigo folds fully into blue, and
+// folds into green/blue at cyan (180°), indigo (the dye, #00416A) reads as blue, and
 // pink/magenta folds into red, per the user's own read of where those sit.
 // Hue ranges alone can't tell bright yellow (#FFFF00, l=50%) from dark
 // olive (#808000, l=25%) — same hue, 60°. Below l=40 a yellow-ish hue
 // reads as olive/green rather than "yellow", so lightness shifts the bucket.
-function classifyFamily(h,s,l){
+function classifyFamily(h,s,l,okH){
   if(l<=6) return FAMILIES.negro;
   if(l>=96 && s<=15) return FAMILIES.blanco;
   if(s<=10) return l<30 ? FAMILIES.negro : (l>=85 ? FAMILIES.blanco : FAMILIES.gris);
@@ -599,16 +632,20 @@ function classifyFamily(h,s,l){
   // medium lightness — only a fairly saturated, fairly light hue reads as true yellow.
   if(h<70) return (l<40 || (s<50 && l<75)) ? FAMILIES.verde : FAMILIES.amarillo;
   if(h<180) return FAMILIES.verde;
-  if(h<276) return FAMILIES.azul;
-  return FAMILIES.purpura;
+  // Blue against purple is decided on perceptual hue (see BLUE_PURPLE_OK). The old fixed cut at
+  // 276° HSL put Púrpura Rebecca, Amatista, Púrpura Medio and Lila Pastel in "Azul".
+  if(okH == null) return h<255 ? FAMILIES.azul : FAMILIES.purpura;
+  return okH < BLUE_PURPLE_OK ? FAMILIES.azul : FAMILIES.purpura;
 }
 
 // The label alone gets a hue-aware nuance within "rojo" (not a real 10th
 // family — same icon, same dataset, just clearer wording): 345°-15° is true
 // red, 306°-345° leans pink/magenta enough that "Rojo" alone reads wrong
 // (e.g. deep pink, magenta quinacridona), while pure red must stay just "Rojo".
-function familyLabel(fam,h){
+function familyLabel(fam,h,okH){
   if(fam.key==='rojo' && h>=306 && h<345) return 'Rojo / Magenta';
+  if((fam.key==='azul' || fam.key==='purpura') && okH!=null &&
+     okH>=BLUE_PURPLE_BAND[0] && okH<=BLUE_PURPLE_BAND[1]) return 'Azul / Púrpura';
   return fam.label;
 }
 
@@ -619,6 +656,9 @@ function toneOf(fam,l){
   return 'medio';
 }
 
+// "Índigo" is the dye — the blue of denim. CSS's own `indigo` (#4B0082) is a dark violet that
+// entered X11 by mistake in the 1980s and was inherited by HTML; it is kept as "Índigo Web" so
+// the plain name never labels a purple.
 const NAMED_COLORS_RAW = [
   ['Negro','#000000'],['Blanco','#FFFFFF'],['Gris Claro','#D3D3D3'],['Gris','#808080'],
   ['Gris Oscuro','#4B4B4B'],['Gris Carbón','#36454F'],['Plata','#C0C0C0'],['Humo','#F5F5F5'],
@@ -646,11 +686,31 @@ const NAMED_COLORS_RAW = [
   ['Azul Marino','#000080'],['Azul Rey','#4169E1'],['Azul Acero','#4682B4'],['Azul Cobalto','#0047AB'],
   ['Azul Zafiro','#0F52BA'],['Azul Cerúleo','#007BA7'],['Azul Polvo','#B0C4DE'],['Azul Medianoche','#191970'],
   ['Azul Aciano','#6495ED'],['Denim','#1560BD'],['Azul Eléctrico','#7DF9FF'],
-  ['Índigo','#4B0082'],['Azul Violeta','#8A2BE2'],['Violeta','#EE82EE'],['Ciruela','#DDA0DD'],
+  ['Índigo','#00416A'],['Índigo Web','#4B0082'],['Azul Violeta','#8A2BE2'],['Violeta','#EE82EE'],['Ciruela','#DDA0DD'],
   ['Lavanda','#E6E6FA'],['Lila','#C8A2C8'],['Amatista','#9966CC'],['Púrpura','#800080'],
   ['Púrpura Medio','#9370DB'],['Orquídea','#DA70D6'],['Malva','#E0B0FF'],['Berenjena','#614051'],
   ['Verde Pastel','#C1E8C1'],['Azul Pastel','#BFD7FF'],['Rosa Pastel','#FFD1DC'],
   ['Lila Pastel','#D7C4F2'],['Amarillo Pastel','#FFF5BA'],['Naranja Pastel','#FFD8B8'],['Turquesa Pastel','#B8F2E6'],
+  // Colores con nombre de CSS/HTML (referencia: htmlcolorcodes.com), en español. Solo los que
+  // no estaban ya por código ni por nombre, para que ningún color tenga dos nombres.
+  ['Rojo Indio','#CD5C5C'],['Salmón Oscuro','#E9967A'],['Rojo Violáceo','#C71585'],['Rosa Violáceo','#DB7093'],
+  ['Rojo Anaranjado','#FF4500'],['Crema de Limón','#FFFACD'],['Amarillo Pajizo','#FAFAD2'],['Crema de Papaya','#FFEFD5'],
+  ['Mocasín','#FFE4B5'],['Dorado Pálido','#EEE8AA'],['Caqui Oscuro','#BDB76B'],['Cardo','#D8BFD8'],
+  ['Orquídea Media','#BA55D3'],['Púrpura Rebecca','#663399'],['Violeta Oscuro','#9400D3'],['Orquídea Oscura','#9932CC'],
+  ['Magenta Oscuro','#8B008B'],['Azul Pizarra','#6A5ACD'],['Azul Pizarra Oscuro','#483D8B'],['Azul Pizarra Medio','#7B68EE'],
+  ['Verde Ácido','#ADFF2F'],['Verde Chartreuse','#7FFF00'],['Verde Pálido','#98FB98'],['Verde Primavera Medio','#00FA9A'],
+  ['Verde Primavera','#00FF7F'],['Verde Mar Medio','#3CB371'],['Verde Amarillo','#9ACD32'],['Verde Oliva Apagado','#6B8E23'],
+  ['Aguamarina Media','#66CDAA'],['Verde Mar Oscuro','#8FBC8B'],['Verde Mar Claro','#20B2AA'],['Cian Oscuro','#008B8B'],
+  ['Cian Claro','#E0FFFF'],['Turquesa Medio','#48D1CC'],['Azul Cadete','#5F9EA0'],['Azul Empolvado','#B0E0E6'],
+  ['Azul Cielo Claro','#87CEFA'],['Azul Cielo Intenso','#00BFFF'],['Azul Brillante','#1E90FF'],['Azul Medio','#0000CD'],
+  ['Azul Oscuro','#00008B'],['Seda de Maíz','#FFF8DC'],['Almendra','#FFEBCD'],['Bizcocho','#FFE4C4'],
+  ['Blanco Navajo','#FFDEAD'],['Madera','#DEB887'],['Tostado','#D2B48C'],['Marrón Rosado','#BC8F8F'],
+  ['Marrón Arena','#F4A460'],['Vara de Oro','#DAA520'],['Vara de Oro Oscuro','#B8860B'],['Perú','#CD853F'],
+  ['Marrón Cuero','#8B4513'],['Nieve','#FFFAFA'],['Rocío de Miel','#F0FFF0'],['Crema de Menta','#F5FFFA'],
+  ['Azur','#F0FFFF'],['Azul Alicia','#F0F8FF'],['Blanco Fantasma','#F8F8FF'],['Concha','#FFF5EE'],
+  ['Encaje Antiguo','#FDF5E6'],['Blanco Floral','#FFFAF0'],['Blanco Antiguo','#FAEBD7'],['Lino','#FAF0E6'],
+  ['Rubor Lavanda','#FFF0F5'],['Rosa Brumoso','#FFE4E1'],['Gris Gainsboro','#DCDCDC'],['Gris Ceniza','#A9A9A9'],
+  ['Gris Tenue','#696969'],['Gris Pizarra Claro','#778899'],['Gris Pizarra','#708090'],['Gris Pizarra Oscuro','#2F4F4F'],
   // Las 24 muestras oficiales de la carta ColorChecker Classic (X-Rite/Calibrite),
   // valores sRGB de referencia publicados — útil para fotografía/color de producción.
   ['Piel Oscura','#735244'],['Piel Clara','#C29682'],['Cielo Azul','#627A9D'],['Follaje','#576C43'],
@@ -897,7 +957,9 @@ function render(){
   const hsl = rgbToHsl(r,g,b);
 
   bigSwatch.style.background = hex;
-  outHex.textContent = hex.toUpperCase();
+  // Left alone while it has focus: rewriting the field mid-typing would jump the caret and
+  // reformat a half-typed code under the user's fingers.
+  if(document.activeElement !== outHex) outHex.value = hex.toUpperCase();
 
   rInput.value = r; gInput.value = g; bInput.value = b;
   hInput.value = Math.round(hsl.h); sInput.value = Math.round(hsl.s); lInput.value = Math.round(hsl.l);
@@ -906,9 +968,10 @@ function render(){
   cInput.value = Math.round(cmyk.c)+'%'; mInput.value = Math.round(cmyk.m)+'%';
   yInput.value = Math.round(cmyk.y)+'%'; kInput.value = Math.round(cmyk.k)+'%';
 
-  const fam = classifyFamily(hsl.h, hsl.s, hsl.l);
+  const okH = rgbToOklchHue(r,g,b);
+  const fam = classifyFamily(hsl.h, hsl.s, hsl.l, okH);
   const nearest = nearestColorName(r,g,b);
-  outFamily.textContent = familyLabel(fam, hsl.h);
+  outFamily.textContent = familyLabel(fam, hsl.h, okH);
   outName.textContent = nearest ? nearest.name : '';
   familyIcon.innerHTML = generateFamilyIconSVG(fam, hex, toneOf(fam, hsl.l));
 
@@ -944,6 +1007,56 @@ function render(){
   updateHarmonies(hsl);
 }
 
+// HEX lookup. Accepts what people actually paste: with or without "#", a "0x" prefix, stray
+// spaces, three-digit shorthand, and eight-digit codes with alpha (the alpha is dropped — this
+// tool describes opaque colour). The colour only changes once the code is complete, and a
+// half-typed code is never flagged as wrong; only one that can no longer become valid is.
+function parseHexInput(raw){
+  let t = String(raw||'').trim().replace(/\s+/g,'').replace(/^#|^0x/i,'');
+  if(/^[0-9a-f]{8}$/i.test(t)) t = t.slice(0,6);
+  return (/^[0-9a-f]{3}$/i.test(t) || /^[0-9a-f]{6}$/i.test(t)) ? hexToRgb(t) : null;
+}
+function hexCouldStillBeValid(raw){
+  const t = String(raw||'').trim().replace(/\s+/g,'').replace(/^#|^0x/i,'');
+  return /^[0-9a-f]{0,8}$/i.test(t) && t.length !== 7;
+}
+outHex.addEventListener('input', ()=>{
+  const rgb = parseHexInput(outHex.value);
+  if(rgb){ outHex.classList.remove('invalid'); setColor(rgb); return; }
+  outHex.classList.toggle('invalid', !hexCouldStillBeValid(outHex.value));
+});
+// A paste from another app often carries the code inside other text ("Color: #1E90FF",
+// "fill: 1e90ff;"), so the first code found in the pasted text is taken on its own.
+outHex.addEventListener('paste', e=>{
+  const txt = (e.clipboardData || window.clipboardData)?.getData('text') || '';
+  // A bare paste of a code is used as it is. Inside other text, a six-digit code is safe to pick
+  // out, but a three-digit one only counts with its "#" — otherwise ordinary words like "add" or
+  // "bad" would be read as colours.
+  let code = parseHexInput(txt) ? txt.trim().replace(/^#|^0x/i,'') : null;
+  if(!code){
+    const m6 = txt.match(/#?\b([0-9a-f]{6})\b/i);
+    const m3 = txt.match(/#([0-9a-f]{3})\b/i);
+    code = m6 ? m6[1] : (m3 ? m3[1] : null);
+  }
+  if(!code) return;
+  e.preventDefault();
+  outHex.value = '#' + code.slice(0,6).toUpperCase();
+  outHex.dispatchEvent(new Event('input', {bubbles:true}));
+});
+// Select the whole code on entry, so typing replaces it instead of appending to it. Selecting on
+// focus alone is not enough with a mouse: the click's own mouseup lands afterwards and drops the
+// caret at the click point, undoing the selection — so that first mouseup is swallowed.
+let hexSelectOnUp = false;
+outHex.addEventListener('focus', ()=>{ outHex.select(); hexSelectOnUp = true; });
+outHex.addEventListener('mouseup', e=>{ if(hexSelectOnUp){ e.preventDefault(); hexSelectOnUp = false; } });
+outHex.addEventListener('keydown', e=>{ if(e.key==='Enter') outHex.blur(); if(e.key==='Escape'){ outHex.value=''; outHex.blur(); } });
+// On leaving the field it always settles back to the colour actually shown, so an abandoned or
+// invalid entry never lingers next to a swatch it does not describe.
+outHex.addEventListener('blur', ()=>{
+  outHex.classList.remove('invalid');
+  outHex.value = rgbToHex(current.r,current.g,current.b).toUpperCase();
+});
+
 [[rInput,'r'],[gInput,'g'],[bInput,'b']].forEach(([inp,ch])=>{
   inp.addEventListener('input', ()=> setColor({...current, [ch]: +inp.value||0}));
 });
@@ -957,7 +1070,7 @@ function render(){
 document.querySelectorAll('button.copy').forEach(btn=>{
   btn.addEventListener('click', async ()=>{
     const key = btn.dataset.copy;
-    const text = key==='hex' ? outHex.textContent
+    const text = key==='hex' ? rgbToHex(current.r,current.g,current.b).toUpperCase()
       : key==='r' ? String(current.r)
       : key==='g' ? String(current.g)
       : key==='b' ? String(current.b)
