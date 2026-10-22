@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="robots" content="noindex, nofollow">
@@ -216,6 +216,8 @@
     .approx-badge{ color:#f3cf7a; background:#3a2f10; border-color:#5c4a1c; }
   }
   .pantone-row{ display:flex; align-items:center; gap:12px; }
+  .pantone-row + .pantone-row{ margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
+  .pantone-lib{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
   .pantone-swatch{ width:48px; height:48px; border-radius:10px; border:1px solid var(--line); flex-shrink:0; }
   .pantone-text{ flex:1; min-width:0; }
   .pantone-code{ font-weight:700; font-size:15px; }
@@ -228,6 +230,28 @@
     .pantone-match.far{ color:#e8985a; }
   }
   .pantone-note{ font-size:11px; color:var(--muted); line-height:1.5; margin:10px 2px 0; }
+
+  .pantone-search{ margin-bottom:16px; }
+  .pantone-search input{
+    font:inherit; font-size:14px; width:100%; padding:10px 12px;
+    border:1px solid var(--line-strong); border-radius:10px;
+    background:var(--bg); color:var(--ink);
+  }
+  .pantone-search input:focus{ outline:none; border-color:var(--ink); }
+  .pantone-results{ margin-top:8px; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  .pantone-results:empty{ display:none; }
+  .pantone-result{
+    display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+    font:inherit; background:var(--card); border:0; border-top:1px solid var(--line);
+    padding:8px 10px; cursor:pointer; color:var(--ink);
+  }
+  .pantone-result:first-child{ border-top:0; }
+  .pantone-result:hover, .pantone-result:focus{ background:var(--bg); outline:none; }
+  .pantone-result .chip{ width:28px; height:28px; border-radius:7px; border:1px solid var(--line); flex-shrink:0; }
+  .pantone-result .code{ font-weight:700; font-size:13px; }
+  .pantone-result .sub{ font-size:11px; color:var(--muted); }
+  .pantone-result .hex{ margin-left:auto; font-size:11px; color:var(--muted); font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  .pantone-empty{ font-size:12px; color:var(--muted); font-style:italic; margin:8px 2px 0; }
 
   .compare-row{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
   .compare-clear{
@@ -264,66 +288,67 @@
         <path fill="currentColor" fill-rule="evenodd" d="M104.46,64.8c5.56,13.04,10.8,25.63,16.35,38.67,2.58,6.11,5.19,12.97,7.77,19.08,1.97,4.53,3.75,9.25,9.21,10.39,6.79,1.42,9.45-8.1,8.24-15.12-1.45-9.86-3.18-19.67-4.64-29.52-2.92-14.93-4.65-47.14,27.6-57.01,14.27-4.37,24.83-2.96,33.14,4.06,12.12,10.24,12.5,35.22,12.5,57.34.06,7.12.13,14.23.19,21.35.03,7.81.06,15.62.1,23.43,0,5.95.2,11.67-1.26,16.34-1.19,3.82-3.06,6.72-5.33,9.45-3.84,4.63-13.8,7.67-22.19,5.1-10.46-3.2-16.5-12.68-12.98-29.15,1.77-8.3,16.73-53.18,22.48-72.97,2.63-8.35,6-24.51-3-27.11-6.45-1.69-11.35,4.78-14.92,15.87-1.49,4.79-2.97,9.57-4.46,14.36-5.56,17.76-11.11,35.52-16.67,53.28-3.08,9.51-5.45,19.54-9.21,28.44-3.12,7.4-9.18,20.14-21.32,18.14-11.16-1.84-15.48-11-20.31-19.07-5.69-9.52-10.97-19.99-16.14-29.89-17.22-32.99-17.4-40.1-14.23-61.09,5.88-30.7-37.46-23.91-27.25,7.59,2.65,8.18,6.09,16.41,9.42,24.06,4.36,10.55,8.72,21.1,13.08,31.65,2.13,4.92,4.52,9.87,6.2,15.12,4.62,14.35,1.36,27.56-11.63,30.99-2.59.68-6.91,1.06-10.08.47-13.28-2.46-22.07-11.69-22.2-34.37-.16-26.06-4.26-61.05,3.72-85.23,13.8-28.9,42.32-23.96,55.56-7.04,6.84,8.75,11.28,20.35,12.24,22.42Z"/>
       </svg>
       <h1>Color Picker</h1>
-      <button type="button" id="toggleBw" class="bw-toggle">B/N</button>
+      <button type="button" id="toggleBw" class="bw-toggle" data-i18n="bw">B/W</button>
+      <button type="button" id="toggleLang" class="bw-toggle">Español</button>
     </div>
-    <p class="sub">Apunta a un color en pantalla, sube una foto o escribe un valor — te digo su familia, su nombre y sus códigos HEX/RGB/HSL.</p>
+    <p class="sub" data-i18n="sub">Point at a color on your screen, upload a photo or type a value — it tells you the color's family, its name and its HEX/RGB/HSL codes.</p>
   </header>
 
   <main class="grid">
     <section class="card">
-      <h2>1 · Elige un color</h2>
-      <button id="eyedropperBtn" class="btn primary">🎯 Elegir color en la pantalla</button>
-      <p id="eyedropperNote" class="note" hidden>Tu navegador no soporta selección directa de pantalla (EyeDropper). Funciona en Chrome/Edge de escritorio y Android. Usa la imagen o los campos manuales abajo.</p>
+      <h2 data-i18n="step1">1 · Pick a color</h2>
+      <button id="eyedropperBtn" class="btn primary" data-i18n="eyedropper">🎯 Pick a color on screen</button>
+      <p id="eyedropperNote" class="note" hidden data-i18n="eyedropperNote">Your browser can't pick colors straight off the screen (EyeDropper). That works in desktop Chrome/Edge and on Android. Use the image or the fields below instead.</p>
 
-      <button type="button" id="toggleVisualPicker" class="fine-tune-toggle">Ocultar selector visual ▴</button>
+      <button type="button" id="toggleVisualPicker" class="fine-tune-toggle">Hide visual picker ▴</button>
       <div id="hsbPicker" class="hsb-picker">
         <div id="satBrightField" class="sb-field"><div id="sbCursor" class="sb-cursor"></div></div>
         <div id="hueSlider" class="hue-slider"><div id="hueCursor" class="hue-cursor"></div></div>
       </div>
 
-      <div class="divider">o</div>
+      <div class="divider" data-i18n="or">or</div>
 
-      <button type="button" id="toggleImageUpload" class="fine-tune-toggle">Subir imagen ▾</button>
+      <button type="button" id="toggleImageUpload" class="fine-tune-toggle">Upload image ▾</button>
       <div id="imageUploadWrap" hidden>
         <div id="dropZone" class="drop-zone">
-          <p>Arrastra una imagen aquí, pégala con Cmd/Ctrl+V, o:</p>
+          <p data-i18n="dropHint">Drag an image here, paste it with Cmd/Ctrl+V, or:</p>
           <div class="upload-actions">
-            <button type="button" id="uploadBtn" class="btn secondary">Subir imagen / foto</button>
-            <button type="button" id="cameraBtn" class="btn secondary camera-btn">📷 Usar cámara</button>
+            <button type="button" id="uploadBtn" class="btn secondary" data-i18n="uploadFile">Upload image / photo</button>
+            <button type="button" id="cameraBtn" class="btn secondary camera-btn" data-i18n="camera">📷 Use camera</button>
           </div>
           <input id="imageFileInput" type="file" accept="image/*" hidden>
           <input id="cameraFileInput" type="file" accept="image/*" capture="environment" hidden>
         </div>
         <div id="canvasWrap" class="canvas-wrap" hidden>
-          <div class="canvas-head"><button type="button" id="clearImageBtn">Quitar imagen</button></div>
+          <div class="canvas-head"><button type="button" id="clearImageBtn" data-i18n="removeImage">Remove image</button></div>
           <canvas id="sampleCanvas"></canvas>
           <canvas id="loupeCanvas" width="110" height="110"></canvas>
-          <p class="hint">Mueve el cursor o el dedo sobre la imagen para apuntar; haz clic o toca para fijar el color.</p>
+          <p class="hint" data-i18n="canvasHint">Move the cursor or your finger over the image to aim; click or tap to lock the color in.</p>
         </div>
       </div>
     </section>
 
     <section class="card" aria-live="polite">
-      <h2>2 · Resultado</h2>
+      <h2 data-i18n="step2">2 · Result</h2>
       <div class="result-top">
         <div id="bigSwatch" class="big-swatch"></div>
         <div class="values">
-          <div class="value-row"><span class="k">HEX</span><input id="outHex" class="v mono hex-input" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12" placeholder="#000000" aria-label="Código HEX — escribe o pega uno para buscar ese color" title="Escribe o pega un HEX para buscar ese color"><button class="copy" data-copy="hex">Copiar</button></div>
+          <div class="value-row"><span class="k">HEX</span><input id="outHex" class="v mono hex-input" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12" placeholder="#000000" data-i18n-aria="hexAria" data-i18n-title="hexTitle" aria-label="HEX code — type or paste one to look that color up" title="Type or paste a HEX code to look that color up"><button class="copy" data-copy="hex" data-i18n="copy">Copy</button></div>
           <div class="channel-row">
             <div class="channel-col">
               <label for="rInput">R</label>
               <input id="rInput" type="number" min="0" max="255">
-              <button class="copy" data-copy="r">Copiar</button>
+              <button class="copy" data-copy="r" data-i18n="copy">Copy</button>
             </div>
             <div class="channel-col">
               <label for="gInput">G</label>
               <input id="gInput" type="number" min="0" max="255">
-              <button class="copy" data-copy="g">Copiar</button>
+              <button class="copy" data-copy="g" data-i18n="copy">Copy</button>
             </div>
             <div class="channel-col">
               <label for="bInput">B</label>
               <input id="bInput" type="number" min="0" max="255">
-              <button class="copy" data-copy="b">Copiar</button>
+              <button class="copy" data-copy="b" data-i18n="copy">Copy</button>
             </div>
           </div>
         </div>
@@ -332,36 +357,36 @@
       <div class="family-block">
         <div class="family-icon-wrap" tabindex="0">
           <div id="familyIcon" class="family-icon"></div>
-          <div class="icon-tooltip">Triángulo a la izquierda = rojo, diagonal = amarillo, triángulo a la derecha = azul; el resto combina estas tres marcas. Contorno = tono claro, blanco sobre negro = tono oscuro. Concepto inspirado en <a href="https://www.coloradd.net/es/el-codigo-coloradd/" target="_blank" rel="noopener">ColorADD</a>.</div>
+          <div class="icon-tooltip" data-i18n-html="iconTooltip">Triangle pointing left = red, diagonal = yellow, triangle pointing right = blue; everything else combines those three marks. Outline = light tone, white on black = dark tone. Concept inspired by <a href="https://www.coloradd.net/" target="_blank" rel="noopener">ColorADD</a>.</div>
         </div>
         <div class="family-text">
-          <div class="family-label">Familia</div>
+          <div class="family-label" data-i18n="family">Family</div>
           <div id="outFamily" class="family-name"></div>
           <div id="outName" class="specific-name"></div>
         </div>
       </div>
 
-      <button type="button" id="toggleHsl" class="fine-tune-toggle">Ocultar HSL ▴</button>
+      <button type="button" id="toggleHsl" class="fine-tune-toggle">Hide HSL ▴</button>
       <div id="hslWrap">
         <div class="channel-row">
           <div class="channel-col">
             <label for="hInput">H</label>
             <input id="hInput" type="number" min="0" max="360">
-            <button class="copy" data-copy="h">Copiar</button>
+            <button class="copy" data-copy="h" data-i18n="copy">Copy</button>
           </div>
           <div class="channel-col">
             <label for="sInput">S</label>
             <input id="sInput" type="number" min="0" max="100">
-            <button class="copy" data-copy="s">Copiar</button>
+            <button class="copy" data-copy="s" data-i18n="copy">Copy</button>
           </div>
           <div class="channel-col">
             <label for="lInput">L</label>
             <input id="lInput" type="number" min="0" max="100">
-            <button class="copy" data-copy="l">Copiar</button>
+            <button class="copy" data-copy="l" data-i18n="copy">Copy</button>
           </div>
         </div>
 
-        <button type="button" id="toggleFineTune" class="fine-tune-toggle">Ajuste preciso de S y L ▾</button>
+        <button type="button" id="toggleFineTune" class="fine-tune-toggle">Fine-tune S and L ▾</button>
         <div id="fineTunePanel" class="fine-tune-panel" hidden>
           <div class="fine-tune-col">
             <label>S</label>
@@ -376,36 +401,37 @@
 
       <div class="collapsible">
         <button type="button" id="toggleCompare" class="collapsible-head">
-          <span class="family-label">Comparar colores</span>
+          <span class="family-label" data-i18n="compare">Compare colors</span>
           <span class="collapsible-arrow">▾</span>
         </button>
         <div id="compareBody" class="collapsible-body" hidden>
           <div class="compare-row">
-            <button type="button" id="addSwatchBtn" class="btn secondary">+ Agregar color actual</button>
-            <button type="button" id="clearSwatchesBtn" class="compare-clear" hidden>Vaciar todo</button>
+            <button type="button" id="addSwatchBtn" class="btn secondary" data-i18n="addSwatch">+ Add current color</button>
+            <button type="button" id="clearSwatchesBtn" class="compare-clear" hidden data-i18n="clearAll">Clear all</button>
           </div>
           <div id="swatchTray" class="swatch-tray"></div>
-          <p id="swatchEmpty" class="compare-empty">Aún no has agregado ningún color. Usa "Agregar color actual" para ir guardando swatches y compararlos lado a lado.</p>
+          <p id="swatchEmpty" class="compare-empty" data-i18n="swatchEmpty">No colors saved yet. Use "Add current color" to keep swatches and compare them side by side.</p>
         </div>
       </div>
 
       <div class="collapsible">
         <button type="button" id="togglePantone" class="collapsible-head">
-          <span class="family-label">Pantone® más cercano</span>
-          <span class="approx-badge">Aproximado</span>
+          <span class="family-label" data-i18n="pantoneHead">Nearest Pantone®</span>
+          <span class="approx-badge" data-i18n="approx">Approximate</span>
           <span class="collapsible-arrow">▾</span>
         </button>
         <div id="pantoneBody" class="collapsible-body" hidden>
-          <div class="pantone-row">
-            <div id="pantoneSwatch" class="pantone-swatch"></div>
-            <div class="pantone-text">
-              <div id="pantoneCode" class="pantone-code"></div>
-              <div id="pantoneName" class="pantone-name"></div>
-              <div id="pantoneMatch" class="pantone-match"></div>
-            </div>
-            <button class="copy" data-copy="pantone">Copiar</button>
+          <div class="pantone-search">
+            <input id="pantoneSearch" type="text" autocomplete="off" spellcheck="false"
+                   data-i18n-placeholder="searchPlaceholder" data-i18n-aria="searchPlaceholder"
+                   placeholder="Search a Pantone: 185 C, 17-1230, Classic Blue…"
+                   aria-label="Search a Pantone: 185 C, 17-1230, Classic Blue…">
+            <div id="pantoneResults" class="pantone-results"></div>
+            <p id="pantoneNoResults" class="pantone-empty" hidden data-i18n="searchNone">No Pantone matches that.</p>
           </div>
-          <p class="pantone-note">Coincidencia por color más cercano calculada en tu navegador, no una conversión oficial de Pantone LLC. No usar para aprobar producción de impresión — para eso verifica con una guía Pantone física u oficial.</p>
+          <div id="pantoneRows"></div>
+          <p class="pantone-note" data-i18n-html="pantoneNote1">Three libraries: <strong>TCX</strong> is Fashion, Home + Interiors, the fabric one (the same number on paper is called TPG, formerly TPX). <strong>C</strong> and <strong>U</strong> are the same graphics guide printed on coated and on uncoated paper: one number gives two different colors, so each is searched on its own.</p>
+          <p class="pantone-note" data-i18n-html="pantoneNote2">ΔE is how far the Pantone chip sits from the color you have: below 1 the eye can't tell them apart, below 3 you have to look for it. Nearest-color match computed in your browser, not an official Pantone LLC conversion. Don't approve production from it — check a physical Pantone guide for that.</p>
         </div>
       </div>
 
@@ -419,65 +445,147 @@
             <div class="channel-col">
               <label for="cInput">C</label>
               <input id="cInput" type="text" readonly>
-              <button class="copy" data-copy="c">Copiar</button>
+              <button class="copy" data-copy="c" data-i18n="copy">Copy</button>
             </div>
             <div class="channel-col">
               <label for="mInput">M</label>
               <input id="mInput" type="text" readonly>
-              <button class="copy" data-copy="m">Copiar</button>
+              <button class="copy" data-copy="m" data-i18n="copy">Copy</button>
             </div>
             <div class="channel-col">
               <label for="yInput">Y</label>
               <input id="yInput" type="text" readonly>
-              <button class="copy" data-copy="y">Copiar</button>
+              <button class="copy" data-copy="y" data-i18n="copy">Copy</button>
             </div>
             <div class="channel-col">
               <label for="kInput">K</label>
               <input id="kInput" type="text" readonly>
-              <button class="copy" data-copy="k">Copiar</button>
+              <button class="copy" data-copy="k" data-i18n="copy">Copy</button>
             </div>
           </div>
-          <p class="pantone-note">Aproximado (sin perfil de impresión) — para preprensa real usa el perfil ICC de tu imprenta.</p>
+          <p class="pantone-note" data-i18n="cmykNote">Approximate (no press profile) — for real prepress use your printer's ICC profile.</p>
         </div>
       </div>
 
       <div class="collapsible">
         <button type="button" id="toggleHarmony" class="collapsible-head">
-          <span class="family-label">Esquemas de color</span>
+          <span class="family-label" data-i18n="harmony">Color schemes</span>
           <span class="collapsible-arrow">▾</span>
         </button>
         <div id="harmonyBody" class="collapsible-body" hidden>
           <div class="harmony-group">
-            <div class="harmony-label">Complementario</div>
+            <div class="harmony-label" data-i18n="hComplementary">Complementary</div>
             <div class="harmony-row" id="harmonyComplementary"></div>
           </div>
           <div class="harmony-group">
-            <div class="harmony-label">Análogo</div>
+            <div class="harmony-label" data-i18n="hAnalogous">Analogous</div>
             <div class="harmony-row" id="harmonyAnalogous"></div>
           </div>
           <div class="harmony-group">
-            <div class="harmony-label">Complementario dividido</div>
+            <div class="harmony-label" data-i18n="hSplit">Split complementary</div>
             <div class="harmony-row" id="harmonySplit"></div>
           </div>
           <div class="harmony-group">
-            <div class="harmony-label">Triádico</div>
+            <div class="harmony-label" data-i18n="hTriadic">Triadic</div>
             <div class="harmony-row" id="harmonyTriadic"></div>
           </div>
           <div class="harmony-group">
-            <div class="harmony-label">Tetrádico</div>
+            <div class="harmony-label" data-i18n="hTetradic">Tetradic</div>
             <div class="harmony-row" id="harmonyTetradic"></div>
           </div>
           <div class="harmony-group">
-            <div class="harmony-label">Monocromático</div>
+            <div class="harmony-label" data-i18n="hMono">Monochromatic</div>
             <div class="harmony-row" id="harmonyMono"></div>
           </div>
-          <p class="compare-empty">Haz clic en cualquier color del esquema para explorarlo como color actual.</p>
+          <p class="compare-empty" data-i18n="harmonyHint">Click any color in a scheme to explore it as the current color.</p>
         </div>
       </div>
     </section>
   </main>
 </div>
 <script>
+// --- Idiomas ---
+// La página está en inglés y el botón del encabezado la pasa a español. La elección se guarda,
+// así que el idioma dura de una visita a otra. El texto fijo vive en el HTML con data-i18n (el
+// inglés escrito ahí es el que se ve si el JS no llega a correr); el que se arma en JS pasa por t().
+const STRINGS = {
+  en: {
+    langButton:'Español', bw:'B/W',
+    sub:"Point at a color on your screen, upload a photo or type a value — it tells you the color's family, its name and its HEX/RGB/HSL codes.",
+    step1:'1 · Pick a color', step2:'2 · Result',
+    eyedropper:'🎯 Pick a color on screen',
+    eyedropperNote:"Your browser can't pick colors straight off the screen (EyeDropper). That works in desktop Chrome/Edge and on Android. Use the image or the fields below instead.",
+    or:'or', dropHint:'Drag an image here, paste it with Cmd/Ctrl+V, or:',
+    uploadFile:'Upload image / photo', camera:'📷 Use camera', removeImage:'Remove image',
+    canvasHint:'Move the cursor or your finger over the image to aim; click or tap to lock the color in.',
+    copy:'Copy', copied:'Copied!',
+    hexAria:'HEX code — type or paste one to look that color up',
+    hexTitle:'Type or paste a HEX code to look that color up',
+    family:'Family',
+    iconTooltip:'Triangle pointing left = red, diagonal = yellow, triangle pointing right = blue; everything else combines those three marks. Outline = light tone, white on black = dark tone. Concept inspired by <a href="https://www.coloradd.net/" target="_blank" rel="noopener">ColorADD</a>.',
+    showPicker:'Show visual picker ▾', hidePicker:'Hide visual picker ▴',
+    showUpload:'Upload image ▾', hideUpload:'Upload image ▴',
+    showHsl:'Show HSL ▾', hideHsl:'Hide HSL ▴',
+    showFine:'Fine-tune S and L ▾', hideFine:'Fine-tune S and L ▴',
+    compare:'Compare colors', addSwatch:'+ Add current color', clearAll:'Clear all',
+    swatchEmpty:'No colors saved yet. Use "Add current color" to keep swatches and compare them side by side.',
+    confirmClear:'Clear every saved color?', removeSwatch:'Remove', useSwatch:'Use',
+    pantoneHead:'Nearest Pantone®', approx:'Approximate',
+    pantoneNote1:'Three libraries: <strong>TCX</strong> is Fashion, Home + Interiors, the fabric one (the same number on paper is called TPG, formerly TPX). <strong>C</strong> and <strong>U</strong> are the same graphics guide printed on coated and on uncoated paper: one number gives two different colors, so each is searched on its own.',
+    pantoneNote2:"ΔE is how far the Pantone chip sits from the color you have: below 1 the eye can't tell them apart, below 3 you have to look for it. Nearest-color match computed in your browser, not an official Pantone LLC conversion. Don't approve production from it — check a physical Pantone guide for that.",
+    searchPlaceholder:'Search a Pantone: 185 C, 17-1230, Classic Blue…',
+    searchNone:'No Pantone matches that.',
+    libTcx:'Fashion, Home + Interiors', libTcxHint:'fabric (TCX) · paper (TPG/TPX)',
+    libGraphics:'Graphics', libCoated:'coated paper (C)', libUncoated:'uncoated paper (U)',
+    deSame:'virtually the same color', deClose:'close match',
+    deApprox:'approximate match', deFar:'the closest there is, but it looks different',
+    coy:'Color of the Year',
+    cmykNote:"Approximate (no press profile) — for real prepress use your printer's ICC profile.",
+    harmony:'Color schemes', hComplementary:'Complementary', hAnalogous:'Analogous',
+    hSplit:'Split complementary', hTriadic:'Triadic', hTetradic:'Tetradic', hMono:'Monochromatic',
+    harmonyHint:'Click any color in a scheme to explore it as the current color.',
+  },
+  es: {
+    langButton:'English', bw:'B/N',
+    sub:'Apunta a un color en pantalla, sube una foto o escribe un valor — te digo su familia, su nombre y sus códigos HEX/RGB/HSL.',
+    step1:'1 · Elige un color', step2:'2 · Resultado',
+    eyedropper:'🎯 Elegir color en la pantalla',
+    eyedropperNote:'Tu navegador no soporta selección directa de pantalla (EyeDropper). Funciona en Chrome/Edge de escritorio y Android. Usa la imagen o los campos manuales abajo.',
+    or:'o', dropHint:'Arrastra una imagen aquí, pégala con Cmd/Ctrl+V, o:',
+    uploadFile:'Subir imagen / foto', camera:'📷 Usar cámara', removeImage:'Quitar imagen',
+    canvasHint:'Mueve el cursor o el dedo sobre la imagen para apuntar; haz clic o toca para fijar el color.',
+    copy:'Copiar', copied:'¡Copiado!',
+    hexAria:'Código HEX — escribe o pega uno para buscar ese color',
+    hexTitle:'Escribe o pega un HEX para buscar ese color',
+    family:'Familia',
+    iconTooltip:'Triángulo a la izquierda = rojo, diagonal = amarillo, triángulo a la derecha = azul; el resto combina estas tres marcas. Contorno = tono claro, blanco sobre negro = tono oscuro. Concepto inspirado en <a href="https://www.coloradd.net/es/el-codigo-coloradd/" target="_blank" rel="noopener">ColorADD</a>.',
+    showPicker:'Mostrar selector visual ▾', hidePicker:'Ocultar selector visual ▴',
+    showUpload:'Subir imagen ▾', hideUpload:'Subir imagen ▴',
+    showHsl:'Mostrar HSL ▾', hideHsl:'Ocultar HSL ▴',
+    showFine:'Ajuste preciso de S y L ▾', hideFine:'Ajuste preciso de S y L ▴',
+    compare:'Comparar colores', addSwatch:'+ Agregar color actual', clearAll:'Vaciar todo',
+    swatchEmpty:'Aún no has agregado ningún color. Usa "Agregar color actual" para ir guardando swatches y compararlos lado a lado.',
+    confirmClear:'¿Vaciar todos los colores guardados?', removeSwatch:'Quitar', useSwatch:'Usar',
+    pantoneHead:'Pantone® más cercano', approx:'Aproximado',
+    pantoneNote1:'Tres bibliotecas: <strong>TCX</strong> es Fashion, Home + Interiors, la de telas (el mismo número en papel se llama TPG, antes TPX). <strong>C</strong> y <strong>U</strong> son la misma guía gráfica impresa en papel couché y en papel sin couché: el mismo número da dos colores distintos, por eso se buscan por separado.',
+    pantoneNote2:'ΔE es cuánto se aleja la muestra Pantone del color que tienes: por debajo de 1 el ojo no nota la diferencia, por debajo de 3 hay que buscarla. Coincidencia por color más cercano calculada en tu navegador, no una conversión oficial de Pantone LLC. No usar para aprobar producción — para eso verifica con una guía Pantone física.',
+    searchPlaceholder:'Busca un Pantone: 185 C, 17-1230, Classic Blue…',
+    searchNone:'Ningún Pantone coincide con eso.',
+    libTcx:'Fashion, Home + Interiors', libTcxHint:'telas (TCX) · papel (TPG/TPX)',
+    libGraphics:'Artes gráficas', libCoated:'papel couché (C)', libUncoated:'papel sin couché (U)',
+    deSame:'prácticamente el mismo color', deClose:'coincidencia cercana',
+    deApprox:'coincidencia aproximada', deFar:'lo más cercano, pero se ve distinto',
+    coy:'Color del Año',
+    cmykNote:'Aproximado (sin perfil de impresión) — para preprensa real usa el perfil ICC de tu imprenta.',
+    harmony:'Esquemas de color', hComplementary:'Complementario', hAnalogous:'Análogo',
+    hSplit:'Complementario dividido', hTriadic:'Triádico', hTetradic:'Tetrádico', hMono:'Monocromático',
+    harmonyHint:'Haz clic en cualquier color del esquema para explorarlo como color actual.',
+  },
+};
+let lang = 'en';
+try{ if(localStorage.getItem('milo-color-picker-lang') === 'es') lang = 'es'; }catch(e){}
+function t(key){ return (STRINGS[lang] && STRINGS[lang][key]) || STRINGS.en[key] || key; }
+
 function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
 
 function hexToRgb(hex){
@@ -601,16 +709,16 @@ const BLUE_PURPLE_OK = 286.5;
 const BLUE_PURPLE_BAND = [283, 290];
 
 const FAMILIES = {
-  negro:    { key:'negro',    label:'Negro',    neutral:true },
-  blanco:   { key:'blanco',   label:'Blanco',   neutral:true },
-  gris:     { key:'gris',     label:'Gris',     neutral:true },
-  rojo:     { key:'rojo',     label:'Rojo' },
-  naranja:  { key:'naranja',  label:'Naranja' },
-  marron:   { key:'marron',   label:'Marrón' },
-  amarillo: { key:'amarillo', label:'Amarillo' },
-  verde:    { key:'verde',    label:'Verde' },
-  azul:     { key:'azul',     label:'Azul' },
-  purpura:  { key:'purpura',  label:'Púrpura' },
+  negro:    { key:'negro',    label:{en:'Black',  es:'Negro'},    neutral:true },
+  blanco:   { key:'blanco',   label:{en:'White',  es:'Blanco'},   neutral:true },
+  gris:     { key:'gris',     label:{en:'Gray',   es:'Gris'},     neutral:true },
+  rojo:     { key:'rojo',     label:{en:'Red',    es:'Rojo'} },
+  naranja:  { key:'naranja',  label:{en:'Orange', es:'Naranja'} },
+  marron:   { key:'marron',   label:{en:'Brown',  es:'Marrón'} },
+  amarillo: { key:'amarillo', label:{en:'Yellow', es:'Amarillo'} },
+  verde:    { key:'verde',    label:{en:'Green',  es:'Verde'} },
+  azul:     { key:'azul',     label:{en:'Blue',   es:'Azul'} },
+  purpura:  { key:'purpura',  label:{en:'Purple', es:'Púrpura'} },
 };
 
 // 7 chromatic families total (matches ColorADD's own set), not 10 — turquoise
@@ -643,10 +751,10 @@ function classifyFamily(h,s,l,okH){
 // red, 306°-345° leans pink/magenta enough that "Rojo" alone reads wrong
 // (e.g. deep pink, magenta quinacridona), while pure red must stay just "Rojo".
 function familyLabel(fam,h,okH){
-  if(fam.key==='rojo' && h>=306 && h<345) return 'Rojo / Magenta';
+  if(fam.key==='rojo' && h>=306 && h<345) return lang==='es' ? 'Rojo / Magenta' : 'Red / Magenta';
   if((fam.key==='azul' || fam.key==='purpura') && okH!=null &&
-     okH>=BLUE_PURPLE_BAND[0] && okH<=BLUE_PURPLE_BAND[1]) return 'Azul / Púrpura';
-  return fam.label;
+     okH>=BLUE_PURPLE_BAND[0] && okH<=BLUE_PURPLE_BAND[1]) return lang==='es' ? 'Azul / Púrpura' : 'Blue / Purple';
+  return fam.label[lang] || fam.label.en;
 }
 
 function toneOf(fam,l){
@@ -660,70 +768,70 @@ function toneOf(fam,l){
 // entered X11 by mistake in the 1980s and was inherited by HTML; it is kept as "Índigo Web" so
 // the plain name never labels a purple.
 const NAMED_COLORS_RAW = [
-  ['Negro','#000000'],['Blanco','#FFFFFF'],['Gris Claro','#D3D3D3'],['Gris','#808080'],
-  ['Gris Oscuro','#4B4B4B'],['Gris Carbón','#36454F'],['Plata','#C0C0C0'],['Humo','#F5F5F5'],
-  ['Marfil','#FFFFF0'],['Beige','#F5F5DC'],['Taupe','#483C32'],
-  ['Rojo','#FF0000'],['Rojo Fuego','#B22222'],['Carmesí','#DC143C'],['Granate','#800000'],
-  ['Vino','#722F37'],['Rojo Claro','#F08080'],['Rojo Oscuro','#8B0000'],['Tomate','#FF6347'],['Bermellón','#E34234'],
-  ['Rosa','#FFC0CB'],['Rosa Claro','#FFB6C1'],['Rosa Fuerte','#FF69B4'],['Rosa Intenso','#FF1493'],
-  ['Fucsia','#FF00FF'],['Salmón','#FA8072'],['Salmón Claro','#FFA07A'],['Rosa Viejo','#C08081'],
-  ['Naranja','#FFA500'],['Naranja Oscuro','#FF8C00'],['Coral','#FF7F50'],['Melocotón','#FFE5B4'],
-  ['Durazno','#FFDAB9'],['Calabaza','#FF7518'],['Ámbar','#FFBF00'],['Cobre','#B87333'],['Ladrillo','#CB4154'],
-  ['Marrón','#A52A2A'],['Marrón Claro','#C4A484'],['Marrón Oscuro','#654321'],['Café','#6F4E37'],
-  ['Chocolate','#D2691E'],['Caoba','#C04000'],['Castaño','#954535'],['Siena','#A0522D'],['Nuez','#773F1A'],
-  ['Camel','#C19A6B'],['Sepia','#704214'],
-  ['Amarillo','#FFFF00'],['Amarillo Claro','#FFFFE0'],['Oro','#FFD700'],['Mostaza','#FFDB58'],
-  ['Caqui','#F0E68C'],['Champán','#F7E7CE'],['Vainilla','#F3E5AB'],['Limón','#FFF44F'],
-  ['Trigo','#F5DEB3'],['Mantequilla','#FFF1B5'],
-  ['Verde','#008000'],['Verde Claro','#90EE90'],['Verde Lima','#32CD32'],['Lima','#00FF00'],
-  ['Verde Oscuro','#006400'],['Verde Bosque','#228B22'],['Verde Menta','#98FF98'],['Menta','#3EB489'],
-  ['Oliva','#808000'],['Oliva Claro','#BAB86C'],['Oliva Oscuro','#556B2F'],['Verde Musgo','#8A9A5B'],
-  ['Salvia','#9CAF88'],['Verde Esmeralda','#50C878'],['Verde Jade','#00A86B'],['Verde Hierba','#7CFC00'],
-  ['Verde Cazador','#355E3B'],['Verde Militar','#4B5320'],['Verde Pino','#1B4D3E'],
-  ['Turquesa','#40E0D0'],['Turquesa Claro','#AFEEEE'],['Turquesa Oscuro','#00CED1'],['Aguamarina','#7FFFD4'],
-  ['Verde Azulado','#008080'],['Petróleo','#005F6A'],['Cian','#00FFFF'],['Verde Mar','#2E8B57'],
-  ['Azul','#0000FF'],['Azul Claro','#ADD8E6'],['Azul Cielo','#87CEEB'],['Azul Bebé','#89CFF0'],
-  ['Azul Marino','#000080'],['Azul Rey','#4169E1'],['Azul Acero','#4682B4'],['Azul Cobalto','#0047AB'],
-  ['Azul Zafiro','#0F52BA'],['Azul Cerúleo','#007BA7'],['Azul Polvo','#B0C4DE'],['Azul Medianoche','#191970'],
-  ['Azul Aciano','#6495ED'],['Denim','#1560BD'],['Azul Eléctrico','#7DF9FF'],
-  ['Índigo','#00416A'],['Índigo Web','#4B0082'],['Azul Violeta','#8A2BE2'],['Violeta','#EE82EE'],['Ciruela','#DDA0DD'],
-  ['Lavanda','#E6E6FA'],['Lila','#C8A2C8'],['Amatista','#9966CC'],['Púrpura','#800080'],
-  ['Púrpura Medio','#9370DB'],['Orquídea','#DA70D6'],['Malva','#E0B0FF'],['Berenjena','#614051'],
-  ['Verde Pastel','#C1E8C1'],['Azul Pastel','#BFD7FF'],['Rosa Pastel','#FFD1DC'],
-  ['Lila Pastel','#D7C4F2'],['Amarillo Pastel','#FFF5BA'],['Naranja Pastel','#FFD8B8'],['Turquesa Pastel','#B8F2E6'],
+  ['Black','Negro','#000000'],['White','Blanco','#FFFFFF'],['Light Gray','Gris Claro','#D3D3D3'],['Gray','Gris','#808080'],
+  ['Dark Gray','Gris Oscuro','#4B4B4B'],['Charcoal','Gris Carbón','#36454F'],['Silver','Plata','#C0C0C0'],['White Smoke','Humo','#F5F5F5'],
+  ['Ivory','Marfil','#FFFFF0'],['Beige','Beige','#F5F5DC'],['Taupe','Taupe','#483C32'],
+  ['Red','Rojo','#FF0000'],['Firebrick','Rojo Fuego','#B22222'],['Crimson','Carmesí','#DC143C'],['Maroon','Granate','#800000'],
+  ['Wine','Vino','#722F37'],['Light Coral','Rojo Claro','#F08080'],['Dark Red','Rojo Oscuro','#8B0000'],['Tomato','Tomate','#FF6347'],['Vermilion','Bermellón','#E34234'],
+  ['Pink','Rosa','#FFC0CB'],['Light Pink','Rosa Claro','#FFB6C1'],['Hot Pink','Rosa Fuerte','#FF69B4'],['Deep Pink','Rosa Intenso','#FF1493'],
+  ['Fuchsia','Fucsia','#FF00FF'],['Salmon','Salmón','#FA8072'],['Light Salmon','Salmón Claro','#FFA07A'],['Old Rose','Rosa Viejo','#C08081'],
+  ['Orange','Naranja','#FFA500'],['Dark Orange','Naranja Oscuro','#FF8C00'],['Coral','Coral','#FF7F50'],['Peach','Melocotón','#FFE5B4'],
+  ['Peach Puff','Durazno','#FFDAB9'],['Pumpkin','Calabaza','#FF7518'],['Amber','Ámbar','#FFBF00'],['Copper','Cobre','#B87333'],['Brick','Ladrillo','#CB4154'],
+  ['Brown','Marrón','#A52A2A'],['Light Brown','Marrón Claro','#C4A484'],['Dark Brown','Marrón Oscuro','#654321'],['Coffee','Café','#6F4E37'],
+  ['Chocolate','Chocolate','#D2691E'],['Mahogany','Caoba','#C04000'],['Chestnut','Castaño','#954535'],['Sienna','Siena','#A0522D'],['Walnut','Nuez','#773F1A'],
+  ['Camel','Camel','#C19A6B'],['Sepia','Sepia','#704214'],
+  ['Yellow','Amarillo','#FFFF00'],['Light Yellow','Amarillo Claro','#FFFFE0'],['Gold','Oro','#FFD700'],['Mustard','Mostaza','#FFDB58'],
+  ['Khaki','Caqui','#F0E68C'],['Champagne','Champán','#F7E7CE'],['Vanilla','Vainilla','#F3E5AB'],['Lemon','Limón','#FFF44F'],
+  ['Wheat','Trigo','#F5DEB3'],['Butter','Mantequilla','#FFF1B5'],
+  ['Green','Verde','#008000'],['Light Green','Verde Claro','#90EE90'],['Lime Green','Verde Lima','#32CD32'],['Lime','Lima','#00FF00'],
+  ['Dark Green','Verde Oscuro','#006400'],['Forest Green','Verde Bosque','#228B22'],['Mint Green','Verde Menta','#98FF98'],['Mint','Menta','#3EB489'],
+  ['Olive','Oliva','#808000'],['Light Olive','Oliva Claro','#BAB86C'],['Dark Olive Green','Oliva Oscuro','#556B2F'],['Moss Green','Verde Musgo','#8A9A5B'],
+  ['Sage','Salvia','#9CAF88'],['Emerald','Verde Esmeralda','#50C878'],['Jade','Verde Jade','#00A86B'],['Lawn Green','Verde Hierba','#7CFC00'],
+  ['Hunter Green','Verde Cazador','#355E3B'],['Army Green','Verde Militar','#4B5320'],['Pine Green','Verde Pino','#1B4D3E'],
+  ['Turquoise','Turquesa','#40E0D0'],['Pale Turquoise','Turquesa Claro','#AFEEEE'],['Dark Turquoise','Turquesa Oscuro','#00CED1'],['Aquamarine','Aguamarina','#7FFFD4'],
+  ['Teal','Verde Azulado','#008080'],['Petrol Blue','Petróleo','#005F6A'],['Cyan','Cian','#00FFFF'],['Sea Green','Verde Mar','#2E8B57'],
+  ['Blue','Azul','#0000FF'],['Light Blue','Azul Claro','#ADD8E6'],['Sky Blue','Azul Cielo','#87CEEB'],['Baby Blue','Azul Bebé','#89CFF0'],
+  ['Navy','Azul Marino','#000080'],['Royal Blue','Azul Rey','#4169E1'],['Steel Blue','Azul Acero','#4682B4'],['Cobalt Blue','Azul Cobalto','#0047AB'],
+  ['Sapphire','Azul Zafiro','#0F52BA'],['Cerulean','Azul Cerúleo','#007BA7'],['Light Steel Blue','Azul Polvo','#B0C4DE'],['Midnight Blue','Azul Medianoche','#191970'],
+  ['Cornflower Blue','Azul Aciano','#6495ED'],['Denim','Denim','#1560BD'],['Electric Blue','Azul Eléctrico','#7DF9FF'],
+  ['Indigo','Índigo','#00416A'],['Web Indigo','Índigo Web','#4B0082'],['Blue Violet','Azul Violeta','#8A2BE2'],['Violet','Violeta','#EE82EE'],['Plum','Ciruela','#DDA0DD'],
+  ['Lavender','Lavanda','#E6E6FA'],['Lilac','Lila','#C8A2C8'],['Amethyst','Amatista','#9966CC'],['Purple','Púrpura','#800080'],
+  ['Medium Purple','Púrpura Medio','#9370DB'],['Orchid','Orquídea','#DA70D6'],['Mauve','Malva','#E0B0FF'],['Eggplant','Berenjena','#614051'],
+  ['Pastel Green','Verde Pastel','#C1E8C1'],['Pastel Blue','Azul Pastel','#BFD7FF'],['Pastel Pink','Rosa Pastel','#FFD1DC'],
+  ['Pastel Lilac','Lila Pastel','#D7C4F2'],['Pastel Yellow','Amarillo Pastel','#FFF5BA'],['Pastel Orange','Naranja Pastel','#FFD8B8'],['Pastel Turquoise','Turquesa Pastel','#B8F2E6'],
   // Colores con nombre de CSS/HTML (referencia: htmlcolorcodes.com), en español. Solo los que
   // no estaban ya por código ni por nombre, para que ningún color tenga dos nombres.
-  ['Rojo Indio','#CD5C5C'],['Salmón Oscuro','#E9967A'],['Rojo Violáceo','#C71585'],['Rosa Violáceo','#DB7093'],
-  ['Rojo Anaranjado','#FF4500'],['Crema de Limón','#FFFACD'],['Amarillo Pajizo','#FAFAD2'],['Crema de Papaya','#FFEFD5'],
-  ['Mocasín','#FFE4B5'],['Dorado Pálido','#EEE8AA'],['Caqui Oscuro','#BDB76B'],['Cardo','#D8BFD8'],
-  ['Orquídea Media','#BA55D3'],['Púrpura Rebecca','#663399'],['Violeta Oscuro','#9400D3'],['Orquídea Oscura','#9932CC'],
-  ['Magenta Oscuro','#8B008B'],['Azul Pizarra','#6A5ACD'],['Azul Pizarra Oscuro','#483D8B'],['Azul Pizarra Medio','#7B68EE'],
-  ['Verde Ácido','#ADFF2F'],['Verde Chartreuse','#7FFF00'],['Verde Pálido','#98FB98'],['Verde Primavera Medio','#00FA9A'],
-  ['Verde Primavera','#00FF7F'],['Verde Mar Medio','#3CB371'],['Verde Amarillo','#9ACD32'],['Verde Oliva Apagado','#6B8E23'],
-  ['Aguamarina Media','#66CDAA'],['Verde Mar Oscuro','#8FBC8B'],['Verde Mar Claro','#20B2AA'],['Cian Oscuro','#008B8B'],
-  ['Cian Claro','#E0FFFF'],['Turquesa Medio','#48D1CC'],['Azul Cadete','#5F9EA0'],['Azul Empolvado','#B0E0E6'],
-  ['Azul Cielo Claro','#87CEFA'],['Azul Cielo Intenso','#00BFFF'],['Azul Brillante','#1E90FF'],['Azul Medio','#0000CD'],
-  ['Azul Oscuro','#00008B'],['Seda de Maíz','#FFF8DC'],['Almendra','#FFEBCD'],['Bizcocho','#FFE4C4'],
-  ['Blanco Navajo','#FFDEAD'],['Madera','#DEB887'],['Tostado','#D2B48C'],['Marrón Rosado','#BC8F8F'],
-  ['Marrón Arena','#F4A460'],['Vara de Oro','#DAA520'],['Vara de Oro Oscuro','#B8860B'],['Perú','#CD853F'],
-  ['Marrón Cuero','#8B4513'],['Nieve','#FFFAFA'],['Rocío de Miel','#F0FFF0'],['Crema de Menta','#F5FFFA'],
-  ['Azur','#F0FFFF'],['Azul Alicia','#F0F8FF'],['Blanco Fantasma','#F8F8FF'],['Concha','#FFF5EE'],
-  ['Encaje Antiguo','#FDF5E6'],['Blanco Floral','#FFFAF0'],['Blanco Antiguo','#FAEBD7'],['Lino','#FAF0E6'],
-  ['Rubor Lavanda','#FFF0F5'],['Rosa Brumoso','#FFE4E1'],['Gris Gainsboro','#DCDCDC'],['Gris Ceniza','#A9A9A9'],
-  ['Gris Tenue','#696969'],['Gris Pizarra Claro','#778899'],['Gris Pizarra','#708090'],['Gris Pizarra Oscuro','#2F4F4F'],
+  ['Indian Red','Rojo Indio','#CD5C5C'],['Dark Salmon','Salmón Oscuro','#E9967A'],['Medium Violet Red','Rojo Violáceo','#C71585'],['Pale Violet Red','Rosa Violáceo','#DB7093'],
+  ['Orange Red','Rojo Anaranjado','#FF4500'],['Lemon Chiffon','Crema de Limón','#FFFACD'],['Light Goldenrod Yellow','Amarillo Pajizo','#FAFAD2'],['Papaya Whip','Crema de Papaya','#FFEFD5'],
+  ['Moccasin','Mocasín','#FFE4B5'],['Pale Goldenrod','Dorado Pálido','#EEE8AA'],['Dark Khaki','Caqui Oscuro','#BDB76B'],['Thistle','Cardo','#D8BFD8'],
+  ['Medium Orchid','Orquídea Media','#BA55D3'],['Rebecca Purple','Púrpura Rebecca','#663399'],['Dark Violet','Violeta Oscuro','#9400D3'],['Dark Orchid','Orquídea Oscura','#9932CC'],
+  ['Dark Magenta','Magenta Oscuro','#8B008B'],['Slate Blue','Azul Pizarra','#6A5ACD'],['Dark Slate Blue','Azul Pizarra Oscuro','#483D8B'],['Medium Slate Blue','Azul Pizarra Medio','#7B68EE'],
+  ['Green Yellow','Verde Ácido','#ADFF2F'],['Chartreuse','Verde Chartreuse','#7FFF00'],['Pale Green','Verde Pálido','#98FB98'],['Medium Spring Green','Verde Primavera Medio','#00FA9A'],
+  ['Spring Green','Verde Primavera','#00FF7F'],['Medium Sea Green','Verde Mar Medio','#3CB371'],['Yellow Green','Verde Amarillo','#9ACD32'],['Olive Drab','Verde Oliva Apagado','#6B8E23'],
+  ['Medium Aquamarine','Aguamarina Media','#66CDAA'],['Dark Sea Green','Verde Mar Oscuro','#8FBC8B'],['Light Sea Green','Verde Mar Claro','#20B2AA'],['Dark Cyan','Cian Oscuro','#008B8B'],
+  ['Light Cyan','Cian Claro','#E0FFFF'],['Medium Turquoise','Turquesa Medio','#48D1CC'],['Cadet Blue','Azul Cadete','#5F9EA0'],['Powder Blue','Azul Empolvado','#B0E0E6'],
+  ['Light Sky Blue','Azul Cielo Claro','#87CEFA'],['Deep Sky Blue','Azul Cielo Intenso','#00BFFF'],['Dodger Blue','Azul Brillante','#1E90FF'],['Medium Blue','Azul Medio','#0000CD'],
+  ['Dark Blue','Azul Oscuro','#00008B'],['Cornsilk','Seda de Maíz','#FFF8DC'],['Blanched Almond','Almendra','#FFEBCD'],['Bisque','Bizcocho','#FFE4C4'],
+  ['Navajo White','Blanco Navajo','#FFDEAD'],['Burlywood','Madera','#DEB887'],['Tan','Tostado','#D2B48C'],['Rosy Brown','Marrón Rosado','#BC8F8F'],
+  ['Sandy Brown','Marrón Arena','#F4A460'],['Goldenrod','Vara de Oro','#DAA520'],['Dark Goldenrod','Vara de Oro Oscuro','#B8860B'],['Peru','Perú','#CD853F'],
+  ['Saddle Brown','Marrón Cuero','#8B4513'],['Snow','Nieve','#FFFAFA'],['Honeydew','Rocío de Miel','#F0FFF0'],['Mint Cream','Crema de Menta','#F5FFFA'],
+  ['Azure','Azur','#F0FFFF'],['Alice Blue','Azul Alicia','#F0F8FF'],['Ghost White','Blanco Fantasma','#F8F8FF'],['Seashell','Concha','#FFF5EE'],
+  ['Old Lace','Encaje Antiguo','#FDF5E6'],['Floral White','Blanco Floral','#FFFAF0'],['Antique White','Blanco Antiguo','#FAEBD7'],['Linen','Lino','#FAF0E6'],
+  ['Lavender Blush','Rubor Lavanda','#FFF0F5'],['Misty Rose','Rosa Brumoso','#FFE4E1'],['Gainsboro','Gris Gainsboro','#DCDCDC'],['Ash Gray','Gris Ceniza','#A9A9A9'],
+  ['Dim Gray','Gris Tenue','#696969'],['Light Slate Gray','Gris Pizarra Claro','#778899'],['Slate Gray','Gris Pizarra','#708090'],['Dark Slate Gray','Gris Pizarra Oscuro','#2F4F4F'],
   // Las 24 muestras oficiales de la carta ColorChecker Classic (X-Rite/Calibrite),
   // valores sRGB de referencia publicados — útil para fotografía/color de producción.
-  ['Piel Oscura','#735244'],['Piel Clara','#C29682'],['Cielo Azul','#627A9D'],['Follaje','#576C43'],
-  ['Flor Azul','#8580B1'],['Verde Azulado ColorChecker','#67BDAA'],['Naranja ColorChecker','#D67E2C'],
-  ['Azul Violáceo','#505BA6'],['Rojo Moderado','#C15A63'],['Púrpura ColorChecker','#5E3C6C'],
-  ['Verde Amarillento','#9DBC40'],['Amarillo Anaranjado','#E0A32E'],['Azul ColorChecker','#383D96'],
-  ['Verde ColorChecker','#469449'],['Rojo ColorChecker','#AF363C'],['Amarillo ColorChecker','#E7C71F'],
-  ['Magenta ColorChecker','#BB5695'],['Cian ColorChecker','#0885A1'],['Blanco 9.5','#F3F3F3'],
-  ['Neutro 8','#C8C8C8'],['Neutro 6.5','#A0A0A0'],['Neutro 5','#7A7A7A'],['Neutro 3.5','#555555'],['Negro 2','#343434'],
+  ['Dark Skin','Piel Oscura','#735244'],['Light Skin','Piel Clara','#C29682'],['Blue Sky','Cielo Azul','#627A9D'],['Foliage','Follaje','#576C43'],
+  ['Blue Flower','Flor Azul','#8580B1'],['Bluish Green (ColorChecker)','Verde Azulado ColorChecker','#67BDAA'],['Orange (ColorChecker)','Naranja ColorChecker','#D67E2C'],
+  ['Purplish Blue','Azul Violáceo','#505BA6'],['Moderate Red','Rojo Moderado','#C15A63'],['Purple (ColorChecker)','Púrpura ColorChecker','#5E3C6C'],
+  ['Yellow Green (ColorChecker)','Verde Amarillento','#9DBC40'],['Orange Yellow','Amarillo Anaranjado','#E0A32E'],['Blue (ColorChecker)','Azul ColorChecker','#383D96'],
+  ['Green (ColorChecker)','Verde ColorChecker','#469449'],['Red (ColorChecker)','Rojo ColorChecker','#AF363C'],['Yellow (ColorChecker)','Amarillo ColorChecker','#E7C71F'],
+  ['Magenta (ColorChecker)','Magenta ColorChecker','#BB5695'],['Cyan (ColorChecker)','Cian ColorChecker','#0885A1'],['White 9.5','Blanco 9.5','#F3F3F3'],
+  ['Neutral 8','Neutro 8','#C8C8C8'],['Neutral 6.5','Neutro 6.5','#A0A0A0'],['Neutral 5','Neutro 5','#7A7A7A'],['Neutral 3.5','Neutro 3.5','#555555'],['Black 2','Negro 2','#343434'],
 ];
-const NAMED_COLORS = NAMED_COLORS_RAW.map(([name,hex])=>{
+const NAMED_COLORS = NAMED_COLORS_RAW.map(([en,es,hex])=>{
   const rgb = hexToRgb(hex);
-  return { name, hex, lab: rgbToLab(rgb.r,rgb.g,rgb.b) };
+  return { en, es, hex, lab: rgbToLab(rgb.r,rgb.g,rgb.b) };
 });
 
 function nearestColorName(r,g,b){
@@ -744,78 +852,3763 @@ function nearestColorName(r,g,b){
 // digital approximations of physical ink. Colors of the Year skew muted/tasteful
 // by design, so without the neon set below, any vivid saturated input (a neon
 // green, say) had nothing closer than ~ΔE60 to land on — not a real match.
-const PANTONE_RAW = [
-  ['802 C','Verde flúor','#44D62C', null],
-  ['803 C','Amarillo flúor','#FFE900', null],
-  ['804 C','Naranja flúor','#FFAA4D', null],
-  ['806 C','Rosa flúor','#FF3EB5', null],
-  ['2925 C','Azul brillante','#009CDE', null],
-  ['11-4201 TCX','Cloud Dancer','#F0EEE9',2026],
-  ['17-1230 TCX','Mocha Mousse','#A47764',2025],
-  ['13-1023 TCX','Peach Fuzz','#FFBE98',2024],
-  ['18-1750 TCX','Viva Magenta','#BB2649',2023],
-  ['17-3938 TCX','Very Peri','#6667AB',2022],
-  ['17-5104 TCX','Ultimate Gray','#939597',2021],
-  ['13-0858 TCX','Illuminating','#F5DF4D',2021],
-  ['19-4052 TCX','Classic Blue','#0F4C81',2020],
-  ['16-1546 TCX','Living Coral','#FF6F61',2019],
-  ['18-3838 TCX','Ultra Violet','#5F4B8B',2018],
-  ['15-0343 TCX','Greenery','#88B04B',2017],
-  ['13-2010 TCX','Rose Quartz','#F7CAC9',2016],
-  ['15-3817 TCX','Serenity','#92A8D1',2016],
-  ['18-1438 TCX','Marsala','#955251',2015],
-  ['18-3025 TCX','Radiant Orchid','#B163A3',2014],
-  ['17-0145 TCX','Emerald','#009473',2013],
-  ['17-1463 TCX','Tangerine Tango','#DD4132',2012],
-  ['18-2120 TCX','Honeysuckle','#D94F70',2011],
-  ['15-5519 TCX','Turquoise','#44B3C1',2010],
-  ['14-0848 TCX','Mimosa','#EFC050',2009],
-  ['18-3943 TCX','Blue Iris','#5A5B9F',2008],
-  ['19-1557 TCX','Chili Pepper','#9B1B30',2007],
-  ['13-1108 TCX','Sand Dollar','#DECDBE',2006],
-  ['15-5217 TCX','Blue Turquoise','#53B0AE',2005],
-  ['16-1546 TCX','Tigerlily','#E2583E',2004],
-  ['14-4811 TCX','Aqua Sky','#7BC4E2',2003],
-  ['19-1664 TCX','True Red','#BF1932',2002],
-  ['17-2034 TCX','Fuchsia Rose','#C74375',2001],
-  ['15-4020 TCX','Cerulean','#9BB7D4',2000],
-  ['Yellow C','',      '#FEDD00', null],
-  ['Orange 021 C','',  '#FE5000', null],
-  ['Warm Red C','',    '#F9423A', null],
-  ['Red 032 C','',     '#EF3340', null],
-  ['Rubine Red C','',  '#CE0058', null],
-  ['Rhodamine Red C','','#E10098', null],
-  ['Purple C','',      '#BB29BB', null],
-  ['Violet C','',      '#440099', null],
-  ['Reflex Blue C','', '#001489', null],
-  ['Process Blue C','','#0085CA', null],
-  ['Green C','',       '#00AB84', null],
-  ['Black C','',       '#2D2926', null],
-  ['Cool Gray 1 C','', '#D9D9D6', null],
-  ['Cool Gray 6 C','', '#A7A8AA', null],
-  ['Cool Gray 11 C','','#53565A', null],
-  ['11-0616 TCX','Pastel Yellow','#F2E6B1', null],
-  ['14-3812 TCX','Pastel Lilac','#BCAFCF', null],
-  ['12-1209 TCX','Soft Pink','#F2D8CC', null],
-  ['13-5309 TCX','Pastel Turquoise','#99C5C4', null],
-  ['13-5410 TCX','Iced Aqua','#ABD3DB', null],
-  ['11-4805 TCX','Hint of Mint','#D8EBE6', null],
-  ['448 C','El "color más feo del mundo"','#4A412A', null],
-  ['1837','Azul Tiffany (color exclusivo)','#81D8D0', null],
-];
-const PANTONE_COLORS = PANTONE_RAW.map(([code,name,hex,year])=>{
-  const rgb = hexToRgb(hex);
-  return { code, name, hex, year, lab: rgbToLab(rgb.r,rgb.g,rgb.b) };
-});
+// --- Pantone aproximado: tres bibliotecas ---
+// Las tres que de verdad se usan: Fashion, Home + Interiors (TCX, la de telas) y las guías
+// gráficas en sus dos papeles, couché (C) y sin couché (U). El mismo número impreso en papel
+// couché y en papel normal da dos colores distintos, por eso cada uno tiene su propia tabla.
+// Los valores sRGB vienen de dos conjuntos abiertos de la comunidad (pantone-tcx, licencia ISC,
+// y Pantoner), no de datos oficiales de Pantone LLC: sirven para orientarse, nunca para aprobar
+// producción. "código|nombre|HEX" en TCX; "código|HEX couché|HEX sin couché" en las gráficas.
+const PANTONE_TCX_DATA = `11-0103|Egret|F3ECE0
+11-0602|Snow White|F2F0EB
+11-0601|Bright White|F4F5F0
+11-4201|Cloud Dancer|F0EEE9
+11-0604|Gardenia|F1E8DF
+11-4300|Marshmallow|F0EEE4
+11-4800|Blanc De Blanc|E7E9E7
+11-0606|Pristine|F2E8DA
+11-0701|Whisper White|EDE6DB
+12-0104|White Asparagus|E1DBC8
+13-0905|Birch|DDD5C7
+12-5202|Turtledove|DED7C8
+12-0105|Bone White|D7D0C0
+13-4403|Silver Birch|D2CFC4
+11-0104|Vanilla Ice|F0EADA
+11-0107|Papyrus|F5EDD6
+11-0105|Antique White|EDE3D2
+11-0507|Winter White|F5ECD2
+12-0804|Cloud Cream|E6DDC5
+12-0605|Angora|DFD1BB
+12-0703|Seedpearl|E6DAC4
+12-0815|Vanilla Custard|F3E0BE
+12-0713|Almond Oil|F4EFC1
+12-0812|Alabaster Gleam|F0DEBD
+12-0712|Vanilla|F4E1C1
+12-0806|Rutabaga|ECDDBE
+13-0815|Banana Crepe|E7D3AD
+13-0917|Italian Straw|E7D1A1
+12-0304|Whitecap Gray|E0D5C6
+13-0607|Fog|D0C5B1
+12-0000|White Swan|E4D7C5
+13-0907|Sandshell|D8CCBB
+12-1403|Tapioca|DCCDBC
+13-1006|Creme Brulee|DBCCB5
+13-0908|Parchment|DFD1BE
+12-1106|Sheer Pink|F6E5DB
+12-1108|Dew|EEDED1
+11-1404|Powder Puff|F3E0D6
+11-0907|Pearled Ivory|F0DFCC
+12-0704|White Smoke|EDDCC9
+11-0809|Ecru|F3DFCA
+12-0710|Navajo|EFDCC3
+12-2103|Almost Mauve|E7DCD9
+11-2409|Delicacy|F5E3E2
+11-2309|Petal Pink|F2E2E0
+11-1005|Bridal Blush|EEE2DD
+11-1306|Cream Pink|F6E4D9
+11-1305|Angel Wing|F3DFD7
+11-0603|Pastel Parchment|E5D9D3
+11-4202|Star White|EFEFE8
+11-4301|Lily White|E2E2DA
+12-4302|Vaporous Gray|DFDDD7
+11-4802|Summer Shower|E5EBE3
+11-4803|Ice|E0E4D9
+12-6207|Frost|DDE2D6
+12-5201|Icicle|DADCD0
+11-4601|Bit Of Blue|E2EAEB
+11-4303|Mystic Blue|E1E3DE
+12-4304|Bluewash|E2E6E0
+12-4305|Spa Blue|D3DEDF
+11-4804|Lightest Sky|E4EADF
+11-4805|Hint Of Mint|D8E8E6
+12-5203|Murmur|D2D8D2
+12-4306|Barely Blue|DDE0DF
+12-4705|Blue Blush|D6DBD9
+12-5603|Zephyr Blue|D3D9D1
+12-5403|Blue Flower|D0D9D4
+12-5303|Sprout Green|CBD7D2
+11-4604|Billowing Sail|D8E7E7
+12-5508|Hushed Green|D8E9E5
+12-0910|Lambs Wool|E5D0B1
+14-1119|Winter Wheat|DFC09F
+13-0814|Summer Melon|EAD3AE
+13-0916|Chamomile|E8D0A7
+12-0714|Cornhusk|F2D6AE
+12-0817|Apricot Gelato|F5D7AF
+13-1009|Biscotti|DAC7AB
+12-0311|Asparagus Green|D2CDB4
+13-1007|Oyster White|D2CAAF
+13-0711|Putty|D4CAB0
+13-0611|Moth|D2CBAF
+14-1108|Wood Ash|D7CAB0
+14-1014|Gravel|CBBFA2
+15-1216|Pale Khaki|BFAF92
+12-0404|Light Gray|DAD8C9
+12-6204|Silver Green|D7D7C7
+14-6305|Pelican|C1BCAC
+14-0105|Overcast|C3BDAB
+14-0210|Tidal Foam|BFB9A3
+15-6307|Agate Gray|B1B09F
+14-6308|Alfalfa|B7B59F
+14-0108|Castle Wall|C8C1AB
+14-1107|Oyster Gray|CBC1AE
+14-0708|Cement|C4B6A6
+15-0309|Spray Green|AEA692
+15-0513|Eucalyptus|B1A992
+16-1108|Twill|A79B82
+16-1110|Olive Gray|A6997A
+17-1109|Chinchilla|9C8E7B
+17-1107|Seneca Rock|9A927F
+17-0610|Laurel Oak|918C7E
+17-1113|Coriander|938772
+17-1009|Dune|998978
+17-1118|Lead Gray|8A7963
+18-0617|Covert Green|80765F
+15-1306|Oxford Tan|B8A99A
+16-1105|Plaza Taupe|AEA393
+16-1106|Tuffet|A59788
+17-1312|Silver Mink|9F8D7C
+17-1310|Timber Wolf|8D8070
+17-0808|Taupe Gray|8E7C71
+17-1410|Pine Bark|827064
+14-0002|Pumice Stone|CAC2B9
+16-0906|Simply Taupe|AD9F93
+16-1107|Aluminum|9F9586
+16-1407|Cobblestone|A89A8E
+18-1110|Brindle|82776B
+18-1112|Walnut|776A5F
+18-0513|Bungee Cord|696156
+13-0401|Oatmeal|CBC3B4
+13-0000|Moonbeam|CDC6BD
+13-5304|Rainy Day|CFC8BD
+13-0403|Gray Morn|CABEB5
+14-1106|Peyote|C5BBAE
+15-1305|Feather Gray|B8AD9E
+16-0806|Goat|A89A91
+13-0002|White Sand|DBD5D1
+14-0000|Silver Gray|C1B7B0
+15-4503|Chateau Gray|BBB1A8
+16-1305|String|AA9F96
+16-1406|Atmosphere|A89C94
+17-1210|Moon Rock|958B84
+17-1212|Fungi|8F8177
+14-4501|Silver Lining|BDB6AB
+14-4500|Moonstruck|C2BEB6
+15-6304|Pussywillow Gray|AEACA1
+16-0207|London Fog|A29E92
+17-0207|Rock Ridge|918C86
+18-4105|Moon Mist|80817D
+18-0510|Castor Gray|646762
+14-4102|Glacier Gray|C5C6C7
+14-4201|Lunar Rock|C5C5C5
+13-4303|Dawn Blue|CACCCB
+14-4103|Gray Violet|BBBCBC
+14-4203|Vapor Blue|BEBDBD
+15-4101|High Rise|AEB2B5
+16-4702|Limestone|989A98
+15-4502|Silver Cloud|BEB7B0
+15-0000|Dove|B3ADA7
+16-5803|Flint Gray|A09C98
+16-4402|Drizzle|A09F9C
+17-0205|Elephant Skin|8F8982
+17-1506|Cinder|8A7E78
+17-1500|Steeple Gray|827E7C
+14-4503|Metal|BABFBC
+14-4804|Blue Fox|B9BCB6
+15-4003|Storm Gray|B5BAB6
+15-4704|Pigeon|A9AFAA
+15-4703|Mirage Gray|ABAFAE
+15-4702|Puritan Gray|A8B0AE
+16-5904|Wrought Iron|999E98
+16-3801|Opal Gray|A49E9E
+17-1501|Wild Dove|8B8C89
+17-4402|Neutral Gray|8E918F
+18-0503|Gargoyle|686767
+18-0000|Smoked Pearl|656466
+18-5105|Sedona Sage|686D6C
+18-0306|Gunmetal|5C5D5B
+14-4002|Wind Chime|CAC5C2
+16-0000|Paloma|9F9C99
+18-0601|Charcoal Gray|6C6868
+18-4005|Steel Gray|726F70
+18-5203|Pewter|666564
+18-0201|Castlerock|5F5E62
+19-3908|Nine Iron|46434A
+16-3802|Ash|A09998
+17-1502|Cloudburst|837F7F
+17-0000|Frost Gray|848283
+18-3905|Excalibur|676168
+18-0403|Dark Gull Gray|625D5D
+19-3905|Rabbit|5F575C
+19-3903|Shale|4A3F41
+17-0909|Fossil|806F63
+19-0810|Major Brown|5B5149
+19-0809|Chocolate Chip|685A4E
+19-0820|Canteen|5E5347
+18-0615|Stone Gray|685E4F
+18-0820|Capers|695E4B
+19-0618|Beech|5B4F3B
+19-0822|Tarmac|5A5348
+19-0614|Wren|4A4139
+19-0608|Black Olive|48413B
+19-0405|Beluga|4A4843
+19-0506|Black Ink|44413C
+19-0508|Peat|3B3A36
+19-5708|Jet Set|262C2A
+18-1306|Iron|736460
+19-3803|Plum Kitten|625B5C
+19-0812|Turkish Coffee|483F39
+19-1111|Black Coffee|3B302F
+19-1101|After Dark|3C3535
+19-1102|Licorice|3A3536
+19-0000|Raven|413E3D
+19-0303|Jet Black|2D2C2F
+19-4205|Phantom|39373B
+19-4005|Stretch Limo|2B2C30
+19-4203|Moonless Night|2F2D30
+19-4006|Caviar|292A2D
+19-4305|Pirate Black|363838
+19-4007|Anthracite|28282D
+12-1009|Vanilla Cream|F4D8C6
+12-0811|Dawn|EBD2B7
+13-1010|Gray Sand|E5CCAF
+12-0813|Autumn Blonde|EED0AE
+14-1120|Apricot Illusion|E2C4A6
+13-1014|Mellow Buff|D8B998
+14-1122|Sheepskin|DAB58F
+14-1116|Almond Buff|CCB390
+14-1118|Beige|D5BA98
+15-1225|Sand|CCA67F
+15-1220|Latte|C5A582
+16-1334|Tan|B69574
+16-1333|Doe|B98E68
+17-1328|Indian Tan|AD8567
+15-1116|Safari|BAAA91
+15-1213|Candied Ginger|BFA387
+15-1214|Warm Sand|C5AE91
+15-1314|Cuban Sand|C1A68D
+16-1320|Nougat|B69885
+16-1310|Natural|AA907D
+16-1212|Nomad|B49F89
+13-0513|Frozen Dew|D8CFB2
+13-1008|Bleached Sand|DACCB4
+14-1112|Pebble|CAB698
+16-0924|Croissant|C4AB86
+16-1010|Incense|AF9A7E
+16-1315|Cornstalk|A9947A
+17-1320|Tannin|A68A6D
+14-0615|Green Haze|CAC4A4
+15-1217|Mojave Desert|C7B595
+15-1119|Taos Taupe|BFA77F
+16-1324|Lark|B89B72
+17-1022|Kelp|988467
+17-1028|Antique Bronze|907954
+17-0935|Dull Gold|8A6F48
+17-1134|Brown Sugar|A17249
+17-1044|Chipmunk|976F4C
+17-1327|Tobacco Brown|9A7352
+18-1027|Bison|6E4F3A
+18-1048|Monks Robe|704822
+18-1033|Dachshund|704F37
+18-1031|Toffee|755139
+18-1130|Aztec|7A5747
+18-1222|Cocoa Brown|6C5043
+18-1124|Partridge|725440
+19-1230|Friar Brown|6E493A
+19-1217|Mustang|684B40
+19-1121|Pinecone|61473B
+19-1218|Potting Soil|54392D
+18-1022|Ermine|836B4F
+18-1018|Otter|7F674F
+18-0920|Kangaroo|725E43
+18-0928|Sepia|6B543E
+18-0930|Coffee Liqueur|6A513B
+19-0815|Desert Palm|5A4632
+19-0617|Teak|655341
+18-1015|Shitake|736253
+18-1016|Cub|6E5C4B
+19-1116|Carafe|5D473A
+19-1020|Dark Earth|5C4939
+19-0814|Slate Black|4B3D33
+19-0912|Chocolate Brown|4E403B
+19-0712|Demitasse|40342B
+18-1312|Deep Taupe|7B6660
+19-1213|Shopping Bag|5A4743
+19-1118|Chestnut|584039
+19-1015|Bracken|4F3F3B
+19-1314|Seal Brown|493B39
+19-1016|Java|433331
+19-0915|Coffee Bean|40312F
+12-1006|Mother Of Pearl|E9D4C3
+12-1007|Pastel Rose Tan|E9D1BF
+12-1005|Novelle Peach|E7CFBD
+12-0807|Sun Kiss|EBD1BB
+13-1011|Ivory Cream|DAC0A7
+14-1210|Shifting Sand|D8C0AD
+13-1013|Appleblossom|DDBCA0
+12-0601|Eggnog|ECE1D3
+13-1108|Cream Tan|E4C7B8
+13-1106|Sand Dollar|DECDBE
+14-1209|Smoke Gray|CEBAA8
+15-1308|Doeskin|BDAB9B
+15-1215|Sesame|BAA38B
+16-1210|Light Taupe|B19D8D
+16-1318|Warm Taupe|AF9483
+16-1412|Stucco|A58D7F
+16-1415|Almondine|A78C8B
+16-1414|Chanterelle|A28776
+17-1418|Ginger Snap|977D70
+17-1321|Woodsmoke|947764
+17-1319|Amphora|9F8672
+15-1309|Moonlight|C5B1A0
+14-1212|Frappe|D1B7A0
+15-1315|Rugby Tan|C2A594
+16-1221|Roebuck|B09080
+17-1223|Praline|AD8B75
+17-1322|Burro|9E7E67
+17-1417|Beaver Fur|997867
+14-1213|Toasted Almond|D2B49C
+17-1225|Tawny Birch|AE856C
+16-1323|Macaroon|B38B71
+17-1226|Tawny Brown|AB856F
+17-1224|Camel|B0846A
+16-1331|Toast|CA9978
+16-1327|Toasted Nut|C08768
+12-0911|Nude|F2D3BC
+12-0912|Tender Peach|F8D5B8
+12-0913|Alesan|F1CEB3
+12-0915|Pale Peach|FED1BD
+12-1011|Peach Puree|EFCFBA
+13-1114|Bellini|F4C9B1
+14-1217|Amberlight|E2BEA2
+12-1107|Pink Champagne|F0D8CC
+12-1008|Linen|EDD2C0
+12-1010|Scallop Shell|FBD8C9
+12-1209|Soft Pink|F2D8CD
+13-1404|Pale Dogwood|EDCDC2
+12-1206|Silver Peony|E7CFC7
+14-1307|Rose Dust|CDB2A5
+13-1405|Shell|E1CFC6
+13-1107|Whisper Pink|DACBBE
+12-1404|Pink Tint|DBCBBD
+14-1311|Evening Sand|DDB6AB
+15-1317|Sirocco|C39D88
+16-1317|Brush|B99984
+17-1227|Cafe Au Lait|AE8774
+14-1310|Cameo Rose|D7B8AB
+14-1312|Pale Blush|E4BFB3
+14-1313|Rose Cloud|DBB0A2
+14-1314|Spanish Villa|DFBAA9
+15-1316|Maple Sugar|C9A38D
+16-1219|Tuscany|BE9785
+16-1422|Cork|BA8671
+13-1109|Bisque|EDCAB5
+15-1319|Almost Apricot|E5B39B
+15-1318|Pink Sand|DFB19B
+14-1220|Peach Nougat|E6AF91
+15-1327|Peach Bloom|D99B7C
+15-1322|Dusty Coral|D29B83
+16-1220|Cafe Creme|C79685
+16-1235|Sandstorm|BD8B69
+16-1341|Butterum|C68F65
+16-1336|Biscuit|B4835B
+17-1137|Cashew|A47149
+16-1432|Almond|A7754D
+17-1330|Lion|A0714F
+18-1030|Thrush|936B4F
+17-1230|Mocha Mousse|A47864
+17-1430|Pecan Brown|A36E51
+17-1143|Hazel|AE7250
+17-1336|Bran|A66E4A
+17-1340|Adobe|A3623B
+18-1142|Leather Brown|97572B
+18-1154|Glazed Ginger|91552B
+16-1328|Sandstone|C48A69
+16-1439|Caramel|C37C54
+17-1147|Amber Brown|A66646
+18-1239|Sierra|985C41
+18-1244|Ginger Bread|8C4A2F
+18-1140|Mocha Bisque|8C543A
+19-1241|Tortoise Shell|754734
+16-1332|Pheasant|C68463
+16-1429|Sunburn|B37256
+17-1436|Raw Sienna|B9714F
+17-1347|Autumn Leaf|B56A4C
+18-1450|Mecca Orange|BD5745
+18-1248|Rust|B55A30
+18-1250|Bombay Brown|9F5130
+13-1012|Frosted Almond|D2C2AC
+14-1012|Champagne Beige|B39F8D
+15-0927|Pale Gold|BD9865
+16-0836|Rich Gold|C8B273
+16-1325|Copper|C47E5A
+18-1537|Copper Coin|BA6B57
+14-5002|Silver|A2A2A1
+17-1422|Raw Umber|92705F
+18-1321|Brownie|8F7265
+18-1314|Acorn|7E5E52
+18-1320|Clove|876155
+18-1229|Carob Brown|855C4C
+18-1235|Russet|8F5F50
+18-1137|Rawhide|865E49
+18-1433|Chutney|98594B
+18-1441|Baked Clay|9C5642
+18-1336|Copper Brown|9A6051
+18-1242|Brown Patina|834F3D
+18-1238|Rustic Brown|855141
+18-1230|Coconut Shell|874E3C
+19-1333|Sequoia|804839
+19-1228|Root Beer|714A41
+19-1235|Brunette|664238
+19-1320|Sable|6E403C
+19-1436|Cinnamon|6B4139
+19-1431|Fudgesickle|63403A
+19-1430|Mink|734B42
+19-1220|Cappuccino|633F33
+18-1421|Cognac|8B645A
+18-1326|Nutmeg|7E5C54
+19-1012|French Roast|58423F
+19-1420|Deep Mahogany|553B39
+19-1321|Rum Raisin|583432
+19-1322|Brown Stone|593C39
+19-1317|Bitter Chocolate|503130
+18-1425|Mahogany|824D46
+19-1334|Henna|7C423C
+19-1245|Arabian Spice|884332
+19-1325|Hot Chocolate|683B39
+19-1338|Russet Brown|743332
+19-1331|Madder Brown|6A3331
+19-1327|Andorra|603535
+11-0510|Afterglow|F3E6C9
+11-0617|Transparent Yellow|F4ECC2
+12-0715|Double Cream|F3E0AC
+13-0822|Sunlight|EDD59E
+13-0922|Straw|E0C992
+14-0935|Jojoba|DABE81
+14-1031|Rattan|D1B272
+14-1110|Boulder|D1BE9B
+13-0715|Sea Mist|D8C9A3
+13-0915|Reed Yellow|DCC99E
+13-0613|Chino Green|D9CAA5
+14-0925|Parsnip|D6C69A
+12-0619|Dusty Yellow|D4CC9A
+15-0719|Silver Fern|BBAA7E
+12-0626|Lemon Grass|DCD494
+13-0725|Raffia|DAC483
+13-0624|Golden Mist|D5CD94
+14-0826|Pampas|CFBB7B
+14-0740|Bamboo|D2B04C
+15-0643|Cress Green|BCA949
+16-0847|Olive Oil|A98B2D
+14-0626|Dried Moss|CCB97E
+14-0647|Celery|CEC153
+13-0640|Acacia|DACD65
+14-0755|Sulphur|DDB614
+15-0743|Oil Yellow|C4A647
+16-0742|Green Sulphur|AE8E2C
+17-0839|Golden Palm|AA8805
+14-1025|Cocoon|C9B27C
+14-0721|Hemp|C0AD7C
+15-0730|Southern Moss|BCA66A
+15-0732|Olivenite|C1A65C
+15-0636|Golden Green|BDB369
+16-0730|Antique Gold|B59E5F
+16-0737|Burnished Gold|AA9855
+12-0722|French Vanilla|EFE1A7
+11-0616|Pastel Yellow|F2E6B1
+11-0710|Tender Yellow|EDEDB7
+11-0618|Wax Yellow|EDE9AD
+12-0721|Lemonade|F0E79D
+11-0620|Elfin Yellow|EEEA97
+12-0740|Limelight|F0E87D
+14-0827|Dusky Citron|E3CC81
+14-0636|Muted Lime|D1C87C
+13-0632|Endive|D2CC81
+13-0720|Custard|E5D68E
+12-0633|Canary Yellow|DFD87E
+12-0738|Yellow Cream|EFDC75
+13-0739|Cream Gold|DEC05F
+12-0642|Aurora|EDDD59
+13-0648|Green Sheen|D9CE52
+13-0746|Maize|EEC843
+12-0643|Blazing Yellow|FEE715
+12-0752|Buttercup|FAE03C
+14-0756|Empire Yellow|F7D000
+13-0752|Lemon|F3BF08
+14-0848|Mimosa|F0C05A
+13-0850|Aspen Gold|FFD662
+13-0758|Dandelion|FFD02E
+13-0858|Vibrant Yellow|FFDA29
+14-0760|Cyber Yellow|FFD400
+14-0852|Freesia|F3C12C
+13-0859|Lemon Chrome|FFC300
+12-0720|Mellow Yellow|F0DD9D
+12-0824|Pale Banana|FAE199
+12-0825|Popcorn|F8DE8D
+12-0727|Sunshine|FADE85
+12-0736|Lemon Drop|FDD878
+13-0755|Primrose Yellow|F6D155
+14-0754|Super Lemon|E4BF45
+14-0837|Misted Yellow|DAB965
+15-0942|Sauterne|C5A253
+16-0946|Honey|BA9238
+16-0954|Arrowwood|BC8D1F
+16-0953|Tawny Olive|C4962C
+15-0850|Ceylon Yellow|D4AE40
+15-0751|Lemon Curry|CDA323
+15-1132|Fall Leaf|C9A86A
+16-1126|Antelope|B19664
+16-1133|Mustard Gold|B08E51
+16-0948|Harvest Gold|B68A3A
+16-0952|Nugget Gold|C89720
+15-0948|Chinese Yellow|C6973F
+15-0953|Golden Yellow|CB8E16
+14-1036|Ochre|D6AF66
+16-0945|Tinsel|C3964D
+16-0947|Bright Gold|CF9F52
+15-1142|Honey Gold|D1A054
+16-1139|Amber Gold|C19552
+15-1046|Mineral Yellow|D39C43
+16-0950|Narcissus|C39449
+14-1113|Marzipan|D8C09D
+16-0928|Curry|BE9E6F
+16-1326|Prairie Sand|B59A6A
+17-1047|Honey Mustard|B68F52
+17-1129|Wood Thrush|A47D43
+18-0940|Golden Brown|91672F
+18-0937|Bronze Brown|825E2F
+17-1045|Apple Cinnamon|B0885A
+17-1128|Bone Brown|9D7446
+17-1125|Dijon|97754C
+17-1036|Bistre|98754A
+17-0942|Medal Bronze|977547
+18-0939|Cumin|927240
+19-1034|Breen|795D34
+13-0840|Snapdragon|FED777
+13-0941|Banana Cream|FFCF73
+14-0850|Daffodil|FDC04E
+14-0846|Yolk Yellow|E2B051
+14-0951|Golden Rod|E2A829
+15-0955|Old Gold|ECA825
+14-0957|Spectra Yellow|F7B718
+12-0826|Golden Haze|FBD897
+14-0936|Sahara Sun|DFC08A
+14-1038|New Wheat|D7B57F
+13-0932|Cornsilk|EDC373
+14-0847|Buff Yellow|F1BF70
+13-0940|Sunset Gold|F7C46C
+13-0939|Golden Cream|F7B768
+13-1025|Impala|F8CE97
+13-0935|Flax|FFC87D
+13-0945|Pale Marigold|FFC66E
+13-0942|Amber Yellow|FAB75A
+14-1045|Amber|EFAD55
+14-1041|Golden Apricot|DDA758
+14-0941|Beeswax|EBA851
+13-0947|Banana|FCB953
+14-0955|Citrus|F9AC2F
+15-1050|Golden Glow|D99938
+15-1049|Artisans Gold|F2AB46
+16-1054|Sunflower|D39237
+18-0935|Buckthorn Brown|A76F1F
+18-0950|Cathay Spice|99642C
+16-0940|Taffy|C39B6A
+16-1144|Oak Buff|CF9C63
+16-1143|Honey Yellow|CA9456
+17-1040|Spruce Yellow|BE8A4A
+17-1048|Inca Gold|BB7A2C
+18-1160|Sudan Brown|AC6B29
+18-0933|Rubber|815B37
+13-1016|Wheat|DEC5A5
+13-1015|Honey Peach|DCBD9E
+13-1018|Desert Dust|E3BC8E
+12-0921|Golden Straw|E6BD8F
+13-1024|Buff|EBC396
+14-1127|Desert Mist|E0B589
+15-1231|Clay|D2A172
+12-0822|Golden Fleece|F2D1A0
+13-1031|Apricot Sherbet|FACD9E
+13-1030|Sunburst|F6C289
+13-1027|Apricot Cream|F1BD89
+14-1128|Buff Orange|FFBB7C
+15-1145|Chamois|F7B26A
+14-1051|Warm Apricot|FFB865
+14-1050|Marigold|FADC53
+16-1142|Golden Nugget|DB9B59
+15-1147|Butterscotch|E19640
+16-1148|Nugget|CF8848
+16-1342|Buckskin|D18E54
+16-1140|Yam|D0893F
+17-1046|Golden Oak|BE752D
+15-1062|Gold Fusion|FFB000
+14-1064|Saffron|FFA500
+15-1054|Cadmium Yellow|EE9626
+14-1159|Zinnia|FFA010
+15-1058|Radiant Yellow|FC9E21
+15-1153|Apricot|F19035
+15-1150|Dark Cheddar|E08119
+13-1020|Apricot Ice|FBBE99
+14-1133|Apricot Nectar|ECAA79
+15-1234|Gold Earth|DD9C6B
+15-1237|Apricot Tan|DD9760
+16-1150|Topaz|D08344
+16-1346|Golden Ochre|C77943
+16-1443|Apricot Buff|CD7E4D
+14-1231|Peach Cobbler|FFB181
+14-1135|Salmon Buff|FEAA7B
+14-1139|Pumpkin|F5A26F
+15-1245|Mock Orange|FFA368
+15-1242|Muskmelon|EC935E
+16-1338|Copper Tan|DE8E65
+16-1337|Coral Gold|D27D56
+16-1255|Russet Orange|E47127
+16-1253|Orange Ochre|DC793A
+16-1350|Amberglow|DC793E
+16-1454|Jaffa Orange|D86D39
+17-1353|Apricot Orange|C86B3C
+16-1448|Burnt Orange|C86733
+16-1260|Harvest Pumpkin|D56231
+15-1160|Blazing Orange|FFA64F
+15-1157|Flame Orange|FB8B23
+15-1164|Bright Marigold|FF8D00
+15-1263|Autumn Glory|FF8812
+16-1257|Sun Orange|F48037
+16-1356|Persimmon Orange|F47327
+17-1350|Orange Popsicle|FF7913
+16-1343|Autumn Sunset|F38554
+15-1247|Tangerine|F88F58
+16-1357|Bird Of Paradise|FF8C55
+16-1359|Orange Peel|FA7A35
+16-1459|Mandarin Orange|EC6A37
+16-1462|Golden Poppy|F56733
+16-1364|Vibrant Orange|FF7420
+16-1360|Nectarine|FF8656
+16-1349|Coral Rose|F3774D
+16-1361|Carrot|FD6F3B
+16-1452|Firecracker|F36944
+17-1464|Red Orange|F05627
+16-1362|Vermillion Orange|F9633B
+17-1462|Flame|F2552C
+13-1026|Creampuff|FFCDA8
+12-0917|Bleached Apricot|FCCAAC
+13-1017|Almond Cream|F4C29F
+14-1225|Beach Sand|FBB995
+13-1019|Cream Blush|F8C19A
+13-1022|Caramel Cream|F4BA94
+13-1023|Peach Fuzz|FFBE98
+13-1021|Prairie Sunset|FFBB9E
+14-1224|Coral Sands|EDAA86
+14-1230|Apricot Wash|FBAC82
+15-1333|Canyon Sunset|E1927A
+16-1340|Brandied Melon|CE7B5B
+16-1435|Carnelian|CE785D
+17-1446|Mango|B75E41
+14-1227|Peach|F2A987
+15-1239|Canteloupe|FFA177
+15-1331|Coral Reef|FAA181
+15-1334|Shell Coral|EA9575
+15-1340|Cadmium Orange|F99471
+16-1442|Melon|FE8863
+16-1344|Dusty Orange|E27A53
+16-1441|Arabesque|D16F52
+16-1440|Langoustino|CA6C56
+17-1444|Ginger|C96551
+16-1450|Flamingo|DF7253
+18-1447|Orange Rust|C25A3C
+18-1354|Burnt Ochre|BB4F35
+18-1448|Chili|BE5141
+18-1535|Ginger Spice|B65D48
+18-1451|Autumn Glaze|B3573F
+18-1343|Auburn|A15843
+19-1250|Picante|8D3F2D
+18-1444|Tandori Spice|9F4440
+18-1540|Cinnabar|9C453B
+18-1547|Bossa Nova|973A36
+13-1318|Tropical Peach|FFC4B2
+14-1219|Peach Parfait|F8BFA8
+14-1318|Coral Pink|E8A798
+14-1316|Dusty Pink|DEAA9B
+16-1330|Muted Clay|D29380
+15-1523|Shrimp|E29A86
+17-1341|Tawny Orange|D37F6F
+16-1329|Coral Haze|E38E84
+16-1431|Canyon Clay|CE8477
+16-1526|Terra Cotta|D38377
+17-1524|Desert Sand|BD7B74
+18-1436|Light Mahogany|AD6D68
+17-1525|Cedar Wood|A1655B
+18-1435|Withered Rose|A26666
+16-1522|Rose Dawn|C2877B
+17-1514|Ash Rose|B5817D
+17-1518|Old Rose|B47B77
+17-1424|Brick Dust|B07069
+17-1520|Canyon Rose|AF6C67
+18-1630|Dusty Cedar|AD5D5D
+18-1438|Marsala|964F4C
+17-1540|Apricot Brandy|C26A5A
+17-1532|Aragon|B06455
+18-1536|Hot Sauce|AB4F41
+18-1346|Bruschetta|A75949
+18-1434|Etruscan Red|A2574B
+18-1443|Redwood|A6594C
+18-1350|Burnt Brick|A14D3A
+18-1629|Faded Rose|BF6464
+18-1648|Baked Apple|B34646
+18-1658|Pompeian Red|A4292E
+18-1449|Ketchup|9A382D
+18-1442|Red Ochre|913832
+18-1531|Barn Red|8F423B
+19-1540|Burnt Henna|7E392F
+14-1419|Peach Pearl|FFB2A5
+14-1418|Peach Melba|FBBDAF
+14-1420|Apricot Blush|FEAEA5
+14-1324|Peach Bud|FDB2AB
+16-1434|Coral Almond|E29D94
+16-1520|Lobster Bisque|DD9289
+16-1624|Lantana|DA7E7A
+14-1228|Peach Nectar|FFB59B
+14-1323|Salmon|FAAA94
+15-1423|Peach Amber|FB9F93
+15-1435|Desert Flower|FF9687
+15-1530|Peach Pink|FA9A85
+16-1529|Burnt Coral|E9897E
+16-1532|Crabapple|D77E70
+15-1433|Papaya Punch|FCA289
+16-1543|Fusion Coral|FF8576
+16-1542|Fresh Salmon|FF7F6A
+16-1544|Persimmon|F67866
+16-1539|Coral|ED7464
+16-1546|Living Coral|FF6F61
+17-1656|Hot Coral|F35B53
+16-1632|Shell Pink|F88180
+16-1641|Georgia Peach|F97272
+16-1640|Sugar Coral|F56C73
+17-1647|Dubarry|F25F66
+17-1643|Porcelain Rose|EA6B6A
+17-1644|Spiced Coral|D75C5D
+18-1649|Deep Sea Coral|D9615B
+17-1635|Rose Of Sharon|DC5B62
+18-1651|Cayenne|E04951
+18-1762|Hibiscus|DD3848
+17-1654|Poinsettia|CB3441
+17-1641|Chrysanthemum|BE454F
+17-1545|Cranberry|BB4A4D
+18-1643|Cardinal|AD3E48
+17-1456|Tigerlily|E2583E
+17-1558|Grenadine|DF3F32
+17-1562|Mandarin Red|E74A33
+17-1564|Fiesta|DD4132
+17-1563|Cherry Tomato|EB3C27
+18-1561|Orange Com|DA321C
+18-1445|Spicy Orange|D73C26
+16-1541|Camellia|F6745F
+16-1451|Nasturtium|FE6347
+17-1547|Emberglow|EA6759
+17-1544|Burnt Sienna|C65D52
+17-1553|Paprika|CE4D42
+18-1454|Red Clay|C2452D
+18-1555|Molten Lava|B5332E
+17-1663|Bittersweet|D93744
+17-1664|Poppy Red|DC343B
+18-1660|Tomato|CE2939
+18-1664|Fiery Red|D01C1F
+18-1662|Flame Scarlet|CD212A
+18-1763|High Risk Red|C71F2D
+18-1550|Aurora Red|B93A32
+18-1652|Rococco Red|BB363F
+18-1661|Tomato Puree|C53346
+18-1764|Lollipop|CC1C3B
+18-1761|Ski Patrol|BB1237
+19-1760|Scarlet|BC2B3D
+19-1764|Lipstick Red|B31A38
+19-1762|Crimson|AE0E36
+19-1763|Formula One|BD162C
+18-1655|Mars Red|BC2731
+19-1761|Tango Red|AC0E2E
+18-1663|Chinese Red|BE132D
+19-1663|Ribbon Red|B92636
+19-1664|True Red|BF1932
+19-1557|Chili Pepper|9B1B30
+14-1714|Quartz Pink|EFA6AA
+15-1717|Pink Icing|EEA0A6
+14-1513|Blossom|F2B2AE
+14-1521|Peaches N Cream|F4A6A3
+15-1621|Candlelight Peach|F8A39D
+16-1720|Strawberry Ice|E78B90
+16-1626|Peach Blossom|DE8286
+15-1821|Flamingo Pink|F7969E
+16-1723|Confetti|E6798E
+17-1928|Bubblegum|EA738D
+16-1735|Pink Lemonade|EE6D8A
+17-1930|Camellia Rose|EB6081
+17-1929|Rapture Rose|D16277
+17-1927|Desert Rose|CF6977
+15-1922|Geranium Pink|F6909D
+15-1624|Conch Shell|FC8F9B
+15-1626|Salmon Rose|FF8D94
+16-1731|Strawberry Pink|F57F8E
+17-1736|Sunkist Coral|EA6676
+17-1744|Calypso Coral|EE5C6C
+16-1620|Tea Rose|DC7178
+17-1753|Geranium|DA3D58
+17-1755|Paradise Pink|E4445E
+18-1756|Teaberry|DC3855
+18-1755|Rouge Red|E24666
+18-1754|Raspberry|D32E5E
+17-1842|Azalea|D42E5B
+18-1856|Virtual Pink|C6174E
+17-1740|Claret Red|C84C61
+18-1741|Raspberry Wine|B63753
+18-1852|Rose Red|C92351
+18-1760|Barberry|BF1945
+18-1945|Bright Rose|C51959
+19-1860|Persian Red|A21441
+19-1955|Cerise|A41247
+13-2806|Pink Lady|EFC1D6
+14-2710|Lilac Sachet|E9ADCA
+14-2311|Prism Pink|F0A1BF
+15-2215|Begonia Pink|EC9ABE
+15-2718|Fuchsia Pink|DF88B7
+15-2214|Rosebloom|E290B2
+17-2520|Ibis Rose|CA628F
+15-2216|Sachet Pink|F18AAD
+16-2120|Wild Orchid|D979A2
+15-2217|Aurora Pink|E881A6
+17-2120|Chateau Rose|D2738F
+15-1920|Morning Glory|EE819F
+16-2126|Azalea Pink|E96A97
+17-2127|Shocking Pink|DE5B8C
+17-1937|Hot Pink|E55982
+17-2033|Fandango Pink|E04F80
+18-2120|Honeysuckle|D94F70
+18-2043|Raspberry Sorbet|D2386C
+17-1831|Carmine|BC4869
+17-2031|Fuchsia Rose|C74375
+18-2143|Beetroot Purple|CF2D71
+16-2124|Pink Carnation|ED7A9E
+17-2230|Carmine Rose|E35B8F
+17-2036|Magenta|D23C77
+18-2133|Pink Flambe|D3507A
+18-2436|Fuchsia Purple|D33479
+17-2227|Lilac Rose|BD4275
+18-2336|Very Berry|B73275
+17-2625|Super Pink|CE6BA4
+17-2627|Phlox Pink|CE5E9A
+18-2333|Raspberry Rose|CC4385
+17-2624|Rose Violet|C0428A
+18-2328|Fuchsia Red|AB3475
+18-2326|Cactus Flower|A83E6C
+18-2525|Magenta Haze|9D446E
+11-2511|Shrinking Violet|F4E1E6
+12-2904|Primrose Pink|EED4D9
+14-1508|Silver Pink|DCB1AF
+14-1511|Powder Pink|ECB2B3
+16-1617|Mauveglow|D18489
+16-1610|Brandied Apricot|CA848A
+17-1718|Dusty Rose|BA797D
+12-2102|Mauve Morn|ECD6D6
+12-2902|Mauve Chalk|E5D0CF
+12-1304|Pearl|F9DBD8
+15-1611|Bridal Rose|D69FA2
+15-1614|Blush|D1969A
+18-1634|Baroque Rose|B35A66
+18-1635|Slate Rose|B45865
+17-1537|Mineral Red|B35457
+18-1633|Garnet Rose|AC4B55
+17-1633|Holly Berry|B44E5D
+19-1759|American Beauty|A73340
+19-1862|Jester Red|9E1030
+19-1656|Rio Red|8A2232
+19-1940|Rumba Red|7C2439
+18-1631|Earth Red|95424E
+19-1840|Deep Claret|973443
+19-1655|Garnet|953640
+19-1543|Brick Red|8C373E
+19-1532|Rosewood|813639
+19-1934|Tibetan Red|782A39
+19-1650|Biking Red|77212E
+18-1426|Apple Butter|844B4D
+19-1524|Oxblood Red|70393F
+19-1533|Cowhide|884344
+19-1530|Burnt Russet|7E3940
+19-1629|Ruby Wine|77333B
+19-1726|Cordovan|702F3B
+19-1725|Tawny Port|5C2C35
+13-1407|Creole Pink|F7D5CC
+13-1504|Peach Blush|E4CCC6
+13-1406|Cloud Pink|F5D1C8
+12-1212|Veiled Rose|F8CDC9
+12-1207|Pearl Blush|F4CEC5
+13-1310|English Rose|F4C6C3
+14-1905|Lotus|E2C1C0
+11-1408|Rosewater|F6DBD8
+14-1309|Peach Whip|DBBEB7
+14-1506|Rose Smoke|D3B4AD
+15-1415|Coral Cloud|E2A9A1
+15-1512|Misty Rose|CAA39A
+15-1516|Peach Beige|D3A297
+16-1516|Cameo Brown|C08A80
+13-1409|Seashell Pink|F7C8C2
+13-1408|Chintz Rose|EEC4BE
+13-1510|Impatiens Pink|FFC4BC
+14-1907|Peachskin|DFB8B6
+15-1515|Mellow Rose|D9A6A1
+16-1511|Rose Tan|D19C97
+16-1518|Rosette|CE8E8B
+17-1522|Mauvewood|A75D67
+17-1623|Rose Wine|A4596D
+17-1723|Malaga|9F5069
+18-1725|Dry Rose|8C4759
+18-1718|Hawthorn Rose|884C5E
+18-1619|Maroon|834655
+18-1420|Wild Ginger|7C4C53
+19-2047|Sangria|982551
+19-1850|Red Bud|962D49
+18-2027|Beaujolais|80304C
+19-2033|Anemone|842C48
+19-2030|Beet Red|7A1F3D
+19-2025|Red Plum|7C2946
+19-2024|Rhododendron|722B3F
+12-2906|Barely Pink|F8D7DD
+12-1310|Blushing Bride|FBD3D9
+12-2905|Cradle Pink|EDD0DD
+13-2803|Pale Lilac|E1C6CC
+13-1904|Chalk Pink|E6C5CA
+12-2903|Light Lilac|DEC6D3
+14-2305|Pink Nectar|D8AAB7
+12-1305|Heavenly Pink|F4DEDE
+13-2004|Potpourri|E7C9CA
+12-1605|Crystal Pink|EDD0CE
+12-1706|Pink Dogwood|F7D1D1
+12-1708|Crystal Rose|FDC3C6
+13-2005|Strawberry Cream|F4C3C4
+13-1513|Gossamer Pink|FAC8C3
+13-1906|Rose Shadow|F9C2CD
+13-2010|Orchid Pink|F3BBCA
+13-2006|Almond Blossom|F5BEC7
+14-1909|Coral Blush|E6B2B8
+14-1911|Candy Pink|F5B0BD
+15-1816|Peony|ED9CA8
+15-1912|Sea Pink|DE98AB
+16-2215|Cashmere Rose|CE879F
+16-1715|Wild Rose|CE8498
+15-2210|Orchid Smoke|D294AA
+16-1712|Polignac|C28799
+16-1708|Lilas|B88995
+16-2111|Mauve Orchid|B58299
+16-2107|Orchid Haze|B0879B
+13-2804|Parfait Pink|E9C3CF
+13-2805|Pink Mist|E6BCCD
+14-2307|Cameo Pink|DBA9B8
+14-2808|Sweet Lilac|E8B5CE
+14-3207|Pink Lavender|D9AFCA
+14-3209|Pastel Lavender|D8A1C4
+15-3214|Orchid|D198C5
+15-2913|Lilac Chiffon|DE9BC4
+16-2614|Moonlite Mauve|D28FB0
+16-3118|Cyclamen|D687BA
+16-3116|Opera Mauve|CA80B1
+16-3115|Crocus|C67FAE
+17-3014|Mulberry|A76C97
+18-3025|Striking Purple|944E87
+16-3320|Violet|C17FB5
+17-3323|Iris Orchid|A767A2
+18-3224|Radiant Orchid|AD5E99
+17-3020|Spring Crocus|BA69A1
+18-3230|Meadow Mauve|A9568C
+18-3015|Amethyst|864D75
+19-2428|Magenta Purple|6B264B
+17-3023|Rosebud|B65F9A
+18-3027|Purple Orchid|AD4D8C
+19-2434|Festival Fuchsia|9E2C6A
+18-2527|Baton Rouge|973C6C
+19-2431|Boysenberry|85325C
+19-2432|Raspberry Radiance|802A50
+19-2430|Purple Potion|692746
+17-2617|Dahlia Mauve|A64F82
+18-3339|Vivid Viola|993C7C
+19-2630|Wild Aster|92316F
+18-3022|Deep Orchid|903F75
+18-2320|Clover|8A3371
+18-2929|Purple Wine|8C3573
+19-2924|Hollyhock|823270
+18-3331|Hyacinth Violet|8D4687
+18-3324|Dahlia|843E83
+19-3336|Sparkling Grape|773376
+19-3138|Byzantium|853B7B
+19-2820|Phlox|692D5D
+19-3230|Grape Juice|682961
+19-3022|Gloxinia|622E5A
+13-3801|Crystal Gray|D7CBC4
+14-1305|Mushroom|BDACA3
+16-1509|Shadow Gray|BBA5A0
+16-1703|Sphinx|AB9895
+16-1506|Bark|A99592
+16-1510|Fawn|AE9490
+16-1508|Adobe Rose|BA9F99
+15-1607|Pale Mauve|C6A4A4
+16-1806|Woodrose|AE8C8E
+16-1707|Deauville Mauve|AF9294
+18-1807|Twilight Mauve|8B6F70
+18-1612|Rose Taupe|806062
+18-1512|Rose Brown|80565B
+18-1616|Roan Rouge|885157
+17-1510|Antler|957A76
+18-1409|Peppercorn|6C5656
+19-1606|Raisin|524144
+19-1620|Huckleberry|5B4349
+19-1621|Catawba Grape|5D3C43
+19-1518|Puce|503938
+19-1619|Fudge|493338
+15-1511|Mahogany Rose|C5A193
+17-1516|Burlwood|9B716B
+18-1415|Marron|6E4C4B
+19-1625|Decadent Chocolate|513235
+19-1521|Red Mahogany|60373D
+19-1623|Vineyard Wine|58363D
+19-2118|Winetasting|492A34
+19-1525|Port|663336
+19-1526|Chocolate Truffle|612E35
+19-1617|Burgundy|64313E
+19-1522|Zinfandel|5C2935
+19-1528|Windsor Wine|582B36
+19-1627|Port Royale|502B33
+19-1718|Fig|532D3B
+15-2706|Violet Ice|C2ACB1
+15-1905|Burnished Lilac|C5AEB1
+15-2705|Keepsake Lilac|C0A5AE
+16-3205|Mauve Shadows|B598A3
+15-2205|Dawn Pink|BFA3AF
+14-3204|Fragrant Lilac|CEADBE
+15-3207|Mauve Mist|C49BD4
+17-1608|Heather Rose|AD6D7F
+17-1818|Red Violet|A35776
+17-1612|Mellow Mauve|996378
+17-1710|Bordeaux|96637B
+18-1720|Violet Quartz|8B4963
+18-1716|Damson|854C65
+19-2410|Amaranth|6F3C56
+15-1906|Zephyr|C89FA5
+17-1610|Dusky Orchid|9A7182
+18-2109|Grape Shake|886971
+17-1511|Wistful Mauve|946C74
+18-1709|Tulipwood|805466
+18-1710|Grape Nectar|8D5C74
+18-3011|Argyle Purple|895C79
+17-1512|Nostalgia Rose|A4777E
+17-1614|Deco Rose|985F68
+18-1613|Renaissance Rose|865560
+18-1614|Nocturne|7A4B56
+18-1418|Crushed Berry|804F5A
+19-2312|Crushed Violets|643A4C
+19-1716|Mauve Wine|5B3644
+18-1411|Plum Wine|674550
+19-2311|Eggplant|613F4C
+19-2014|Prune|603749
+19-1608|Prune Purple|5C3A4D
+19-2315|Grape Wine|5A2F43
+19-2514|Italian Plum|533146
+19-2520|Potent Purple|462639
+16-3310|Lavender Herb|B18EAA
+16-3307|Lavender Mist|AE90A7
+17-3410|Valerian|9F7A93
+18-3220|Very Grape|927288
+18-3211|Grapeade|85677B
+18-3012|Purple Gumdrop|7A596F
+18-3013|Berry Conserve|765269
+18-3418|Chinese Violet|835E81
+18-3522|Crushed Grape|7A547F
+18-3218|Concord Grape|7C5379
+19-3424|Sunset Purple|6F456E
+19-3325|Wood Violet|75406A
+19-3223|Purple Passion|683D62
+19-2524|Dark Purple|582147
+18-3415|Grape Jam|725671
+19-3323|Deep Purple|50314C
+19-2814|Wineberry|5A395B
+19-3518|Grape Royale|4F2D54
+19-3218|Plum Purple|51304E
+19-2009|Hortensia|553B50
+19-2816|Blackberry Wine|4D3246
+19-3714|Navy Cosmos|503B53
+19-3215|Indigo|4C3957
+19-3519|Purple Pennant|432C47
+19-3316|Plum Perfect|473442
+19-3619|Sweet Grape|4B3B4F
+19-3217|Shadow Purple|4E334E
+19-3520|Blackberry Cordial|3F2A47
+19-3620|Purple Reign|56456B
+19-3722|Mulberry Purple|493C62
+19-3720|Gothic Grape|473951
+19-3728|Grape|433455
+19-3617|Mysterioso|46394B
+19-3725|Purple Velvet|41354D
+19-3712|Nightshade|433748
+13-3802|Orchid Tint|DBD2DB
+13-3803|Lilac Ash|D7CDCD
+13-3804|Gray Lilac|D4CACD
+14-3803|Hushed Violet|D1C0BF
+15-3802|Cloud Gray|B7A9AC
+17-1505|Quail|98868C
+17-3808|Nirvana|A2919B
+13-3805|Orchid Hush|CEC3D2
+14-3805|Iris|BAAFBC
+16-3304|Sea Fog|A5929D
+17-1605|Elderberry|9D848E
+18-1706|Black Plum|6C5765
+18-1405|Flint|705861
+19-1624|Sassafras|54353B
+14-3904|Evening Haze|BDB8C7
+14-3907|Thistle|B9B3C5
+17-3910|Lavender Gray|9890A2
+17-3906|Minimal Gray|948D99
+17-3810|Purple Ash|8F8395
+18-3710|Gray Ridge|847986
+18-3712|Purple Sage|75697E
+16-3812|Heirloom Lilac|9D96B2
+16-3810|Wisteria|A198AF
+17-3812|Dusk|897F98
+17-3817|Daybreak|8981A0
+18-3812|Cadet|6A6378
+18-3714|Mulled Grape|675A74
+19-3716|Purple Plumeria|473854
+14-3903|Lilac Marble|C3BABF
+15-0703|Ashes Of Roses|B5ACAB
+16-3803|Gull Gray|A49CA0
+17-2601|Zinc|92898A
+17-3802|Gull|918C8F
+18-1703|Shark|6D636B
+18-1404|Sparrow|69595C
+13-3406|Orchid Ice|E0D0DB
+13-3405|Lilac Snow|E0C7D7
+14-3206|Winsome Orchid|D4B9CB
+15-3508|Fair Orchid|C0AAC0
+15-3507|Lavender Frost|BDABBE
+14-3710|Orchid Petal|BFB4CB
+14-3812|Pastel Lilac|BDB0D0
+14-3612|Orchid Bloom|C5AECF
+15-3412|Orchid Bouquet|D1ACCE
+16-3521|Lupine|BE9CC1
+16-3416|Violet Tulle|C193C0
+16-3617|Sheer Lilac|B793C0
+16-3520|African Violet|B085B7
+17-3313|Dusty Lavender|A1759C
+17-3730|Paisley Purple|8B79B1
+17-3619|Hyacinth|936CA7
+17-3628|Amethyst Orchid|926AA6
+18-3533|Dewberry|8B5987
+18-3520|Purple Heart|745587
+19-3526|Meadow Violet|764F82
+19-3642|Royal Purple|603F83
+18-3633|Deep Lavender|775496
+18-3531|Royal Lilac|774D8E
+19-3542|Pansy|653D7C
+19-3438|Bright Violet|784384
+19-3536|Amaranth Purple|6A397B
+19-3540|Purple Magic|663271
+19-3220|Plum|5A315D
+18-3615|Imperial Palace|604E7A
+18-3518|Patrician Purple|6C4E79
+19-3622|Loganberry|5A4769
+19-3514|Majesty|593761
+19-3528|Imperial Purple|542C5D
+19-3640|Crown Jewel|482D54
+19-3731|Parachute Purple|392852
+13-3820|Lavender Fog|D2C4D6
+15-3620|Lavendula|BCA4CB
+15-3817|Lavender|AFA4CE
+17-3725|Bougainvillea|9884B9
+16-3823|Violet Tulip|9E91C3
+17-3615|Chalk Violet|8F7DA5
+18-3718|Purple Haze|807396
+16-3110|Smoky Grape|B88AAC
+16-3525|Regal Orchid|A98BAF
+16-3815|Viola|A692BA
+17-3612|Orchid Mist|917798
+18-3513|Grape Compote|6B5876
+18-3715|Montana Grape|6C5971
+18-3410|Vintage Violet|634F62
+17-3826|Aster Purple|7D74A8
+17-3834|Dahlia Purple|7E6EAC
+18-3737|Passion Flower|6D5698
+18-3838|Ultra Violet|5F4B8B
+19-3748|Prism Violet|53357D
+19-3737|Heliotrope|4F3872
+19-3632|Petunia|4F3466
+18-3828|Corsican Blue|646093
+18-3834|Veronica|6D6695
+18-3943|Blue Iris|5A5B9F
+18-3840|Purple Opulence|60569A
+19-3730|Gentian Violet|544275
+19-3850|Liberty|4D448A
+19-3847|Deep Blue|44377D
+18-3930|Bleached Denim|646F9B
+18-3817|Heron|62617E
+19-3936|Skipper Blue|484A72
+19-3832|Navy Blue|403F6F
+19-3842|Deep Wisteria|443F6F
+19-3839|Blue Ribbon|3A395F
+19-3830|Astral Aura|363151
+13-4105|Lilac Hint|D0D0DA
+15-3807|Misty Lilac|BCB4C4
+14-3905|Lavender Blue|C5C0D0
+14-3911|Purple Heather|BAB8D3
+15-3909|Cosmic Sky|AAAAC4
+15-3910|Languid Lavender|A2A1BA
+16-3907|Dapple Gray|9C9BA7
+16-3931|Sweet Lavender|9A9BC1
+16-3925|Easter Egg|919BC9
+17-3930|Jacaranda|848DC5
+17-3932|Deep Periwinkle|7C83BC
+18-3833|Dusted Peri|696BA0
+18-3944|Violet Storm|5C619D
+18-3946|Baja Blue|5F6DB0
+16-3930|Thistle Down|9499BB
+17-3925|Persian Violet|8C8EB2
+18-3820|Twilight Purple|66648B
+19-3947|Orient Blue|47457A
+19-3951|Clematis Blue|363B7C
+19-3955|Royal Blue|3D428B
+18-3963|Spectrum Blue|3D3C7C
+17-3924|Lavender Violet|767BA5
+17-3922|Blue Ice|70789B
+18-3927|Velvet Morning|60688D
+18-3932|Marlin|515B87
+19-3939|Blueprint|2D3359
+19-3940|Blue Depths|263056
+19-3933|Medieval Blue|29304E
+16-3911|Lavender Aura|9F99AA
+17-3917|Stonewash|74809A
+19-3919|Nightshadow Blue|4E5368
+19-3928|Blue Indigo|49516D
+19-3915|Graystone|4D495B
+19-3926|Crown Blue|464B65
+19-3935|Deep Cobalt|404466
+13-4110|Arctic Ice|BFC7D6
+14-4106|Gray Dawn|BBC1CC
+14-4110|Heather|B7C0D6
+16-3919|Eventide|959EB7
+17-4030|Silver Lake Blue|618BB9
+17-3936|Blue Bonnet|6384B8
+18-3937|Blue Yonder|5A77A8
+16-3920|Lavender Lustre|8C9CC1
+17-3919|Purple Impression|858FB1
+16-3929|Grapemist|8398CA
+15-3930|Vista Blue|81A0D4
+16-4031|Cornflower Blue|7391C8
+17-3934|Persian Jewel|6E81BE
+18-3935|Wedgewood|6479B3
+14-4112|Skyway|ADBED3
+14-4115|Cashmere Blue|A5B8D0
+14-4121|Blue Bell|93B4D7
+15-3920|Placid Blue|8CADD3
+16-4020|Della Robbia Blue|7A9DCB
+16-4032|Provence|658DC6
+17-4037|Ultramarine|5B7EBD
+16-4021|Allure|7291B4
+17-3923|Colony Blue|65769A
+18-4027|Moonlight Blue|506886
+18-3928|Dutch Blue|4A638D
+19-4039|Delft|3D5E8C
+19-4044|Limoges|243F6C
+19-4027|Estate Blue|233658
+17-4015|Infinity|6E7E99
+18-3921|Bijou Blue|4E5E7F
+18-3920|Coastal Fjord|505D7E
+19-4030|True Navy|3F5277
+19-4026|Ensign Blue|384C67
+19-4118|Dark Denim|35465E
+19-4028|Insignia Blue|2F3E55
+15-4319|Air Blue|77ACC7
+16-4127|Heritage Blue|5D96BC
+15-4323|Ethereal Blue|5CA6CE
+16-4134|Bonnie Blue|539CCC
+17-4131|Cendre Blue|3E7FA5
+18-4036|Parisian Blue|4F7CA4
+18-4232|Faience|2A6A8B
+15-4225|Alaskan Blue|6DA9D2
+16-4132|Little Boy Blue|6EA2D5
+17-4139|Azure Blue|4D91C6
+17-4027|Riviera|5879A2
+18-4029|Federal Blue|43628B
+18-4041|Star Sapphire|386192
+19-4037|Bright Cobalt|385D8D
+16-4120|Dusk Blue|7BA0C0
+18-4039|Regatta|487AB7
+18-4043|Palace Blue|346CB0
+18-4051|Strong Blue|1F5DA0
+19-4053|Turkish Sea|195190
+19-4056|Olympian Blue|1A4C8B
+19-4052|Classic Blue|0F4C81
+17-4041|Marina|4F84C4
+18-4141|Campanula|3272AF
+18-4045|Daphne|0F5F9A
+18-4148|Victoria Blue|08589D
+19-4049|Snorkel Blue|034F84
+19-4050|Nautical Blue|1A5091
+19-4150|Princess Blue|00539C
+18-3949|Dazzling Blue|3850A0
+18-3945|Amparo Blue|4960A8
+19-3950|Deep Ultramarine|384883
+19-3952|Surf The Web|203C7F
+19-3864|Mazarine Blue|273C76
+19-4057|True Blue|1E4477
+19-3938|Twilight Blue|313D64
+15-3915|Kentucky Blue|A5B3CC
+15-4020|Cerulean|9BB7D4
+14-4214|Powder Blue|96B3D2
+16-4019|Forever Blue|899BB8
+17-3915|Tempest|79839B
+17-3918|Country Blue|717F9B
+17-3920|English Manor|7181A4
+13-4103|Illusion Blue|C9D3DC
+13-4304|Ballad Blue|C0CEDA
+13-4308|Baby Blue|B5C7D3
+14-4210|Celestial Blue|A3B4C4
+15-4008|Blue Fog|9BABBB
+18-3916|Flint Stone|677283
+18-3910|Folkstone Gray|626879
+14-4206|Pearl Blue|B0B7BE
+17-4405|Monument|84898C
+19-4220|Dark Slate|46515A
+19-4110|Midnight Navy|34414E
+19-4010|Total Eclipse|2C313D
+19-4015|Blue Graphite|323137
+19-4013|Dark Navy|232F36
+13-4404|Ice Flow|C6D2D2
+15-4305|Quarry|98A0A5
+17-5102|Griffin|8D8F8F
+19-3906|Dark Shadow|4A4B4D
+19-4014|Ombre Blue|434854
+19-4019|India Ink|3C3F4A
+19-4104|Ebony|41424A
+19-3925|Patriot Blue|363756
+19-3810|Eclipse|343148
+19-4025|Mood Indigo|353A4C
+19-3920|Peacoat|2B2E43
+19-3921|Black Iris|2B3042
+19-4024|Dress Blues|2A3244
+19-4023|Blue Nights|363B48
+15-4105|Angel Falls|A3BDD3
+15-4005|Dream Blue|A0BCD0
+16-4013|Ashley Blue|8699AB
+16-4010|Dusty Blue|8C9DAD
+19-4227|Indian Teal|3C586B
+19-4316|Stargazer|39505C
+19-4229|Orion Blue|3E4F5C
+15-4312|Forget Me Not|8FADBD
+17-4021|Faded Denim|798EA4
+17-4020|Blue Shadow|66829A
+18-3922|Coronet Blue|59728E
+18-4020|Captains Blue|557088
+18-4025|Copen Blue|516B84
+18-3918|China Blue|546477
+17-4320|Adriatic Blue|5C899B
+18-4220|Provincial Blue|5C798E
+17-4123|Niagara|5487A4
+17-4023|Blue Heaven|5B7E98
+18-4026|Stellar|46647E
+18-4018|Real Teal|405D73
+19-4125|Majolica Blue|274357
+12-4609|Starlight Blue|B5CED4
+14-4307|Winter Sky|A9C0CB
+14-4508|Stratosphere|9EC1CC
+15-4309|Sterling Blue|A2B9C2
+16-4109|Arona|879BA3
+17-4111|Citadel|748995
+18-4215|Blue Mirage|5C6D7C
+14-4306|Cloud Blue|A2B6B9
+14-4506|Ether|9EB6B8
+16-4414|Cameo Blue|769DA6
+16-4114|Stone Blue|829CA5
+16-4411|Tourmaline|86A1A9
+17-4412|Smoke Blue|6D8994
+18-4217|Bluestone|577284
+14-4313|Aquamarine|9DC3D4
+14-4318|Sky Blue|8ABAD3
+15-4415|Milky Blue|72A8BA
+15-4421|Blue Grotto|5CACCE
+15-4427|Norse Blue|4CA5C7
+16-4530|Aquarius|3CADD4
+16-4525|Maui Blue|52A2B4
+16-4421|Blue Mist|5BACC3
+15-4720|River Blue|38AFCD
+16-4529|Cyan Blue|14A3C7
+16-4427|Horizon Blue|289DBE
+17-4328|Blue Moon|3686A0
+17-4427|Bluejay|157EA0
+18-4334|Mediterranian Blue|1478A7
+14-4522|Bachelor Button|4ABBD5
+16-4535|Blue Atoll|00B1D2
+17-4432|Vivid Blue|0088B0
+17-4540|Hawaiian Ocean|008DB9
+17-4440|Blue Danube|0087B6
+18-4535|Blue Jewel|007BAA
+18-4537|Methyl Blue|0074A8
+17-4435|Malibu Blue|008CC1
+17-4336|Blithe|0084BD
+18-4330|Swedish Blue|007EB1
+17-4433|Dresden Blue|0086BB
+17-4247|Diva Blue|007BB2
+18-4252|Blue Aster|0077B3
+18-4440|Cloisonne|0075AF
+18-4140|French Blue|0072B5
+18-4247|Brilliant Blue|0075B3
+18-4244|Directoire Blue|0061A3
+19-4151|Skydiver|00589B
+19-4245|Imperial Blue|005A92
+18-4032|Deep Water|266691
+19-4035|Dark Blue|305679
+12-4607|Pastel Blue|BCD3D5
+12-4608|Clearwater|AAD5DB
+13-4409|Blue Glow|B2D4DD
+13-4809|Plume|A5CFD5
+14-4512|Porcelain Blue|95C0CB
+13-4411|Crystal Blue|A1C8DB
+14-4516|Petit Four|87C2D4
+12-4805|Wan Blue|CBDCDF
+12-4610|Whispering Blue|C9DCDC
+12-4604|Skylight|C8E0E0
+14-4510|Aquatic|99C1CC
+15-4712|Marine Blue|76AFB6
+16-4612|Reef Waters|6F9FA9
+17-4911|Arctic|648589
+12-4806|Chalk Blue|CCDAD7
+13-4804|Pale Blue|C4D6D3
+13-4405|Misty Blue|BFCDCC
+14-4504|Sky Gray|BCC8C6
+14-4807|Surf Spray|B4C8C2
+15-4706|Gray Mist|99AEAE
+15-5207|Aquifer|89ACAC
+12-5206|Blue Glass|C6E3E1
+13-5306|Icy Morn|B0D3D1
+14-4810|Canal Blue|9CC2C5
+13-5309|Pastel Turquoise|99C5C4
+15-5209|Aqua Haze|87B9BC
+15-4715|Aqua Sea|6BAAAE
+16-5121|Meadowbrook|60A0A3
+12-5505|Glacier|C3DBD4
+12-5409|Fair Aqua|B8E2DC
+12-5209|Soothing Sea|C3E9E4
+12-5410|Bleached Aqua|BCE3DF
+13-4909|Blue Light|ACDFDD
+13-4910|Blue Tint|9FD9D7
+14-4811|Aqua Sky|7BC4C4
+12-5204|Morning Mist|CFDFDB
+14-4908|Harbor Gray|A8C0BB
+14-4809|Eggshell Blue|A3CCC9
+16-5114|Dusty Turquoise|649B9E
+16-4719|Porcelain|5D9CA4
+18-5610|Brittany Blue|4C7E86
+18-4718|Hydro|426972
+15-4707|Blue Haze|A5BCBB
+15-5210|Nile Blue|76A7AB
+16-4712|Mineral Blue|6D9192
+17-4818|Bristol Blue|558F91
+17-4919|Teal|478589
+18-5308|Blue Spruce|486B67
+18-5612|Sagebrush Green|567572
+16-5806|Green Milieu|8A9992
+16-5304|Jadeite|95A69F
+16-5106|Blue Surf|90A8A4
+17-5111|Oil Blue|658C88
+17-5110|Trellis|6A8988
+18-4612|North Atlantic|536D70
+18-5112|Sea Pine|4C6969
+16-4408|Slate|8C9FA1
+16-4706|Silver Blue|8A9A9A
+16-4404|Abyss|8F9E9D
+17-4408|Lead|7A898F
+18-4711|Stormy Sea|6E8082
+18-4510|Trooper|697A7E
+18-4011|Goblin Blue|5F7278
+16-5804|Slate Gray|8A9691
+17-5107|Chinois Green|7C8C87
+18-5611|Dark Forest|556962
+18-5606|Balsam Green|576664
+19-0312|Beetle|55584C
+19-5004|Urban Chic|464E4D
+19-5212|Darkest Spruce|303D3C
+19-4318|Mallard Blue|3A5C6E
+18-4530|Celestial|006380
+18-4225|Saxony Blue|1F6680
+19-4340|Lyons Blue|005871
+19-4234|Ink Blue|0B5369
+19-4329|Corsair|18576C
+19-4324|Legion Blue|1F495B
+18-4320|Aegean Blue|4E6E81
+18-4222|Bluesteel|35637C
+18-4023|Blue Ashes|3B5F78
+19-4127|Midnight|325B74
+18-4231|Blue Sapphire|09577B
+19-4342|Seaport|005E7D
+19-4241|Moroccan Blue|0F4E67
+19-4535|Ocean Depths|006175
+19-4526|Blue Coral|1B5366
+19-4826|Dragonfly|2A5C6A
+19-4916|Pacific|1F595C
+19-4820|Balsam|33565E
+19-4517|Mediterranea|32575D
+19-4726|Atlantic Deep|274E55
+15-4717|Aqua|64A1AD
+16-4610|Stillwater|70A4B0
+16-4519|Delphinium Blue|6198AE
+17-4421|Larkspur|3C7D90
+17-4716|Storm Blue|47788A
+18-4417|Tapestry|436573
+18-4522|Colonial Blue|2D6471
+16-4728|Peacock Blue|00A0B0
+17-4735|Capri Breeze|008799
+17-4728|Algiers Blue|00859C
+17-4730|Caneel Bay|00849F
+18-4525|Caribbean Sea|00819D
+18-4528|Mosaic Blue|00758F
+18-4432|Turkish Tile|00698B
+14-4814|Angel Blue|83C5CD
+14-4816|Blue Radiance|58C9D4
+15-4722|Capri|44BBCA
+15-4825|Blue Curacao|32BECC
+16-4725|Scuba Blue|00ABC0
+16-4834|Bluebird|009DAE
+18-4733|Enamel Blue|007A8E
+15-5218|Pool Blue|67BCB3
+15-5217|Blue Turquoise|53B0AE
+16-5123|Baltic|279D9F
+17-4928|Lake Blue|008C96
+18-4735|Tile Blue|008491
+17-4724|Pagoda Blue|1A7F8E
+18-4726|Biscay Bay|097988
+13-5313|Aruba Blue|81D7D3
+16-5127|Ceramic|00AAA9
+17-5126|Viridian Green|009499
+18-4930|Tropical Green|008786
+17-5025|Navigate|008583
+17-5029|Deep Peacock Blue|008381
+17-5034|Lapis|008684
+15-5519|Turquoise|45B5AA
+15-5516|Waterfall|3AB0A2
+16-5418|Lagoon|4D9E9A
+16-5422|Bright Aqua|30A299
+17-5421|Porcelain Green|108780
+18-5128|Blue Grass|007C7A
+18-4936|Fanfare|006D70
+15-5425|Atlantis|00AF9F
+16-5425|Pool Green|00AF9D
+17-5330|Dynasty Green|008E80
+17-5335|Spectra Green|009B8C
+17-5130|Columbia|009288
+17-5024|Teal Blue|007F7C
+18-5020|Parasailing|00736C
+16-5109|Wasabi|73A89E
+16-5515|Beryl Green|619187
+17-5513|Deep Sea|4F7C74
+17-5722|Bottle Green|427D6D
+18-5725|Galapagos Green|29685F
+18-5418|Antique Green|29675C
+19-5217|Storm|035453
+16-5721|Marine Green|40A48E
+16-5421|Sea Green|149C88
+17-5528|Greenlake|007D69
+18-5619|Tidepool|0A6F69
+18-5620|Ivy|226C63
+18-5424|Cadmium Green|00675B
+18-5322|Alpine Green|005F56
+16-5112|Canton|6DA29E
+16-5412|Agate Green|599F99
+16-5119|Sea Blue|549F98
+17-5122|Latigo Bay|379190
+17-5117|Green Blue Slate|358082
+18-5121|Bayou|20706F
+18-5115|North Sea|316C6B
+18-5618|Deep Jungle|36716F
+19-5226|Everglade|005B5D
+19-4922|Teal Green|006361
+18-4728|Harbor Blue|00656E
+18-4834|Deep Lake|00656B
+19-4524|Shaded Spruce|00585E
+19-4914|Deep Teal|18454B
+18-5410|Silver Pine|4E6866
+19-4818|Mallard Green|405E5C
+19-5408|Bistro Green|395551
+19-5413|Jasper|335959
+18-5315|Bayberry|255958
+19-5414|June Bug|264A48
+19-5320|Ponderosa Pine|203B3D
+12-5407|Aqua Glass|D2E8E0
+12-5406|Opal Blue|C3DDD6
+12-5506|Dusty Aqua|C0DCCD
+14-5711|Ocean Wave|8EC5B6
+14-5413|Holiday|81C3B4
+14-5713|Cascade|76C1B2
+15-5711|Dusty Jade Green|7BB5A3
+12-5808|Honeydew|BAE1D3
+13-6009|Brook Green|AFDDCC
+13-5714|Cabbage|87D7BE
+14-5714|Lucite Green|7ACCB8
+14-5718|Opal|77CFB7
+15-5718|Biscay Green|55C6A9
+15-5819|Spearmint|64BFA4
+12-5408|Moonlight Jade|C7E5DF
+12-5507|Bay|BAE5D6
+13-5409|Yucca|A1D7C9
+13-5412|Beach Glass|96DFCE
+13-5414|Ice Green|87D8C3
+14-5420|Cockatoo|58C8B6
+15-5416|Florida Keys|56BEAB
+14-5416|Bermuda|60C9B3
+14-5721|Electric Green|4BC3A8
+15-5421|Aqua Green|00B89F
+16-5427|Billiard|00AA92
+16-5533|Arcadia|00A28A
+17-5430|Alhambra|008778
+17-5633|Deep Green|009276
+15-5728|Mint Leaf|00B694
+16-5431|Peacock Green|00A78B
+17-5638|Vivid Green|009E82
+17-5641|Emerald|009473
+17-5734|Viridis|00846B
+18-5624|Shady Glade|006E5B
+18-5338|Ultramarine Green|006B54
+14-5706|Silt Green|A9BDB1
+15-5706|Frosty Green|A3B5A6
+16-5808|Iceberg Green|8C9C92
+16-5907|Granite Green|86A293
+16-5810|Green Bay|7E9285
+16-5807|Lily Pad|818F84
+17-6009|Laurel Wreath|616F65
+16-5820|Green Spruce|589F7E
+18-6216|Comfrey|5B7961
+17-5912|Dark Ivy|5B7763
+18-6018|Foliage Green|3E6F58
+18-6114|Myrtle|4F6B58
+18-5616|Posy Green|325B51
+19-5920|Pineneedle|334D41
+17-6212|Sea Spray|717E6F
+18-6011|Duck Green|53665C
+18-5622|Frosty Spruce|578270
+18-5621|Fir|3A725F
+19-5420|Evergreen|11574A
+19-5511|Hunter Green|335749
+19-5513|Dark Green|314F40
+16-5815|Feldspar|729B8B
+18-5718|Smoke Pine|3E6257
+19-5411|Trekking Green|355048
+18-5913|Garden Topiary|3E524B
+19-5914|Jungle Green|3C4E47
+19-5917|Sycamore|35463D
+19-4906|Green Gables|324241
+17-0613|Vetiver|807D6F
+18-0312|Deep Lichen Green|6E6E5C
+19-0309|Thyme|50574C
+19-0417|Kombu Green|3A4032
+19-6110|Deep Forest|37413A
+19-0414|Forest Night|434237
+19-0509|Rosin|36362D
+13-6108|Celadon|B8CCBA
+13-5305|Pale Aqua|C1CCC2
+14-4505|Smoke|BFC8C3
+13-4305|Foggy Dew|D1D5D0
+14-4502|Mercury|BAC2BA
+15-5704|Mineral Gray|B2B6AC
+15-5205|Aqua Gray|A5B2AA
+12-6206|Fairest Jade|D8E3D7
+11-0304|Water Lily|DDE3D5
+12-0108|Canary Green|D6DEC9
+13-6006|Almost Aqua|CAD3C1
+13-6106|Green Tint|C5CCC0
+14-6007|Sea Foam|B7C2B2
+16-0110|Desert Sage|A7AE9E
+12-5404|Whisper Green|E0E6D7
+13-6105|Celadon Tint|CBCEBE
+13-0107|Dewkist|C4D1C2
+13-6107|Green Lily|C1CEC1
+14-6312|Cameo Green|AAC0AD
+16-6008|Seagrass|959889
+17-6206|Shadow|888D82
+12-5504|Clearly Aqua|CEE1D4
+13-6008|Misty Jade|BCD9C8
+14-6008|Subtle Green|B5CBBB
+14-5707|Aqua Foam|ADC3B4
+13-5907|Gossamer Green|B2CFBE
+15-5812|Lichen|9BC2B1
+14-6011|Grayed Jade|9BBEA9
+12-6205|Milky Green|CFDBD1
+12-6208|Phantom Green|DCE4D7
+13-6110|Mist Green|AACEBC
+13-5911|Birds Egg Green|AACCB9
+13-6208|Bok Choy|BCCAB3
+15-6315|Smoke Green|A8BBA2
+16-5917|Malachite Green|709A89
+16-0220|Mistletoe|8AA282
+16-6216|Basil|879F84
+16-6318|Mineral Green|7A9B78
+16-0224|Green Eyes|7D956D
+17-0119|Turf Green|6F8C69
+17-0220|Watercress|748C69
+18-0121|Elm Green|547053
+17-6323|Hedge Green|768A75
+17-0210|Loden Frost|788F74
+16-6116|Shale Green|739072
+17-6319|Kashmir|6F8D6A
+17-0123|Stone Green|658E67
+18-0110|English Ivy|61845B
+17-6219|Deep Grass Green|558367
+17-0235|Piquant Green|769358
+17-0230|Forest Green|6B8D53
+17-0133|Fluorite Green|699158
+18-0130|Cactus|53713D
+19-0230|Garden Green|495E35
+18-0125|Artichoke Green|4B6D41
+18-0119|Willow Bough|59754D
+17-0215|Aspen Green|7E9B76
+17-6229|Medium Green|3C824E
+18-6330|Juniper|3D7245
+18-6320|Fairway|477050
+18-0117|Vineyard Green|5F7355
+18-0108|Dill|6F7755
+19-6311|Greener Pastures|37503D
+18-0420|Four Leaf Clover|616652
+18-0317|Bronze Green|525F48
+19-0323|Chive|4A5335
+18-0322|Cypress|545A3E
+19-0315|Black Forest|414F3C
+19-0419|Rifle Green|414832
+19-0415|Duffel Bag|394034
+12-0109|Ambrosia|D2E7CA
+13-6007|Spray|BED3BB
+13-0116|Pastel Green|B4D3B2
+15-6114|Hemlock|97C1A1
+14-6316|Sprucestone|9FC09C
+14-6319|Meadow|8BBA94
+16-6324|Jadesheen|77A276
+13-0117|Green Ash|A0DAA9
+14-0127|Greengage|8BC28C
+15-6120|Ming|7CB08A
+14-6327|Zephyr Green|7CB083
+14-6324|Peapod|82B185
+15-6322|Light Grass Green|7CB68E
+14-6329|Absinthe Green|76B583
+14-6017|Neptune Green|7FBB9E
+16-5919|Creme De Menthe|70A38D
+16-5924|Winter Green|4F9E81
+16-5825|Gumdrop Green|2EA785
+16-5932|Holly Green|0F9D76
+17-5735|Parakeet|008C69
+18-5642|Golf Green|008763
+14-6330|Spring Bud|6BCD9C
+16-6030|Katydid|66BC91
+15-6123|Jade Cream|60B892
+16-5930|Ming Green|3AA278
+16-6127|Greenbriar|4B9B69
+18-6022|Leprechaun|378661
+17-5923|Pine Green|3A795E
+16-5942|Blarney|00A776
+16-5938|Mint|00A170
+17-5937|Deep Mint|009E6D
+17-5936|Simply Green|009B75
+18-5841|Pepper Green|007D60
+18-5633|Bosphorus|007558
+19-6026|Verdant Green|12674A
+13-0111|Seacrest|BFD1B3
+12-0317|Gleam|BFD1AD
+14-0121|Nile Green|A7C796
+15-6317|Quiet Green|9EBC97
+15-6316|Fair Green|92AF88
+15-6423|Forest Shade|91AC80
+16-0228|Jade Green|759465
+12-0225|Patina Green|B9EAB3
+13-0221|Pistachio Green|A9D39E
+14-0123|Arcadian Green|A3C893
+15-6437|Grass Green|7BB369
+15-6442|Bud Green|79B465
+15-6428|Green Tea|86A96F
+16-0123|Tendril|89A06B
+13-0220|Paradise Green|B2E79F
+14-0452|Lime Green|9FC131
+15-0545|Jasmine Green|7EC845
+15-0146|Green Flash|79C753
+16-6340|Classic Green|39A845
+17-0145|Online Lime|44883C
+18-0135|Treetop|476A30
+14-0156|Summer Green|7ED37F
+14-6340|Spring Bouquet|6DCE87
+16-6240|Island Green|2BAE66
+15-6340|Irish Green|45BE76
+15-6432|Shamrock|6FA26B
+16-6329|Peppermint|699E6D
+17-6333|Mint Green|487D49
+16-6444|Poison Green|4DB560
+16-6339|Vibrant Green|55A860
+16-6138|Kelly Green|339C5E
+15-5534|Bright Green|009B5C
+17-6153|Fern Green|008C45
+17-6030|Jelly Bean|008658
+18-6024|Amazon|1F7349
+13-0442|Green Glow|B0C965
+14-0244|Bright Lime Green|97BC62
+15-0343|Greenery|88B04B
+16-0237|Foliage|75A14F
+17-0336|Peridot|819548
+16-0233|Meadow Green|739957
+18-0538|Woodbine|7B7F32
+14-0232|Jade Lime|A1CA7B
+15-0336|Herbal Garden|9CAD60
+15-0332|Leaf Green|9FAF6C
+15-0341|Parrot Green|8DB051
+16-0435|Dark Citron|A0AC4F
+16-0230|Macaw Green|9BB53E
+16-0235|Kiwi|7AAB55
+13-0535|Sharp Green|C6EC7A
+12-0435|Daiquiri Green|C9D77E
+13-0540|Wild Lime|C3D363
+15-0533|Linden Green|C4BF71
+14-0445|Bright Chartreuse|B5BF50
+14-0446|Tender Shoots|B5CC39
+13-0550|Lime Punch|C0D725
+12-0741|Sunny Lime|DFEF87
+13-0645|Limeade|D3D95F
+13-0650|Sulphur Spring|D5D717
+15-0548|Citronelle|B8AF23
+15-0543|Apple Green|B5B644
+15-0646|Warm Olive|C7B63C
+16-0840|Antique Moss|B9A023
+12-0312|Lime Cream|D7E8BC
+13-0319|Shadow Lime|CFE09D
+13-0530|Lime Sherbet|CDD78A
+13-0324|Lettuce Green|BED38E
+13-0331|Sap Green|AFCB80
+14-0226|Opaline Green|A3C57D
+15-0523|Winter Pear|B0B487
+11-0410|Sylvan Green|E7EACB
+11-0205|Glass Green|ECEAD0
+12-0607|Green Essence|E9EAC8
+11-0609|Ethereal Green|F1ECCA
+13-0614|Garden Glade|DCD8A8
+12-0418|Hay|D3CCA3
+13-0522|Pale Green|CBCE91
+12-0521|Young Wheat|E1E3A9
+12-0524|Citron|DFDE9B
+12-0525|Luminary Green|E3EAA5
+12-0520|Pale Lime Yellow|DFE69F
+13-0633|Chardonnay|E7DF99
+13-0333|Lima Bean|E1D590
+12-0530|Charlock|E5E790
+12-0426|Mellow Green|D5D593
+14-0627|Shadow Green|CFC486
+13-0532|Celery Green|C5CC7B
+14-0434|Green Banana|BABC72
+15-0538|Green Oasis|B0B454
+15-0628|Leek Green|B7B17A
+15-0525|Weeping Willow|B3B17B
+15-0535|Palm|AFAF5E
+16-0639|Golden Olive|AF9841
+16-0540|Oasis|A3A04E
+16-0532|Moss|A09D59
+17-0840|Amber Green|9A803A
+17-0836|Ecru Olive|927B3C
+17-0636|Green Moss|857946
+16-0726|Khaki|A39264
+17-0929|Fennel Seed|998456
+16-0632|Willow|9A8B4F
+17-0843|Bronze Mist|9C7E41
+18-0835|Dried Tobacco|997B38
+18-0840|Tapenade|805D24
+18-0832|Plantation|7A6332
+13-0210|Fog Green|C2CBB4
+13-0212|Tender Greens|C5CFB6
+13-0608|Aloe Wash|D0D3B7
+14-0114|Celadon Green|B5C1A5
+15-6313|Laurel Green|ADBBA1
+15-6310|Swamp|A8B197
+15-6414|Reseda|A1AD92
+12-0106|Meadow Mist|D3DEC4
+12-0322|Butterfly|CADEA5
+12-0315|White Jade|D4DBB2
+12-0313|Seafoam Green|CBD5B1
+13-0215|Reed|C3D3A8
+14-0217|Seedling|C0CBA1
+14-0115|Foam Green|B4C79C
+13-0317|Lily Green|C5CF98
+14-0425|Beechnut|C2C18D
+14-0223|Nile|B4BB85
+15-0531|Sweet Pea|A3A969
+16-0439|Spinach Green|909B4C
+16-0430|Fern|9AA067
+17-0535|Green Olive|8D8B55
+17-0324|Epsom|849161
+18-0332|Grasshopper|77824A
+17-0330|Turtle Green|81894E
+18-0324|Calliste Green|757A4E
+18-0435|Calla Green|6A6F34
+18-0328|Cedar Green|5E6737
+18-0228|Pesto|595F34
+15-0326|Tarragon|A4AE77
+16-0421|Sage|91946E
+18-0525|Iguana|818455
+17-0115|Oil Green|80856D
+18-0422|Loden Green|6E7153
+18-0426|Capulet Olive|656344
+18-0316|Olivine|666B54
+14-0216|Lint|B6BA99
+15-0522|Pale Olive Green|B5AD88
+15-0318|Sage Green|B2AC88
+16-0518|Gray Green|A49A79
+16-1118|Sponge|A49775
+17-0618|Mermaid|817A65
+17-0517|Dusky Green|746C57
+16-0213|Tea|999B85
+17-0510|Silver Sage|938B78
+16-0713|Slate Green|A0987C
+16-0613|Elm|A39F86
+17-0525|Mosstone|858961
+17-0620|Aloe|817A60
+18-0622|Olive Drab|756D47
+16-0526|Cedar|928E64
+17-0625|Boa|8E855F
+17-0627|Dried Herb|847A59
+18-0527|Olive Branch|646A45
+18-0629|Lizard|71643E
+18-0430|Avocado|676232
+18-0627|Fir Green|67592A
+14-0418|Bog|BAB696
+17-1019|Elmwood|8C7C61
+18-0724|Gothic Olive|7C6E4F
+18-0830|Butternut|7A643F
+18-0825|Nutria|75663E
+19-0622|Military Olive|63563B
+19-0516|Dark Olive|574D35
+15-6410|Moss Gray|AFAB97
+14-6408|Abbey Stone|ABA798
+18-0521|Burnt Olive|646049
+18-0515|Dusty Olive|646356
+19-0512|Ivy Green|585442
+19-0515|Olive Night|535040
+19-0511|Grape Leaf|545144
+15-3800|Porpoise|A7A19E
+16-3800|Satellite|9F8D89
+18-1210|Driftwood|847A75
+18-1304|Falcon|6D625B
+19-0808|Morel|685C53
+18-1108|Fallen Rock|807669
+16-0205|Vintage Khaki|9A9186
+16-1104|Crockery|A49887
+16-1109|Greige|928475
+17-1311|Desert Taupe|8D7E71
+15-1307|White Pepper|B6A893
+15-1304|Humus|B7A793
+17-1316|Portabella|937B6A
+18-1017|Caribou|816D5E
+15-1114|Travertine|AE997D
+16-1120|Starfish|B09A77
+15-1218|Semolina|CEB899
+16-0920|Curds And Whey|BCA483
+17-1038|Tigers Eye|977C61
+18-1029|Toasted Coconut|8B6A4F
+19-0916|Rain Drum|5F4C40
+11-0615|Pear Sorbet|F3EAC3
+12-0718|Pineapple Slice|E7D391
+12-0758|Yarrow|FACE6D
+12-0717|Anise Flower|F4E3B5
+11-0619|Flan|F6E3B4
+12-0729|Sundress|EBCF89
+12-0709|Macadamia|E4CFB6
+12-0711|Lemon Meringue|F6E199
+11-0622|Yellow Iris|EEE78E
+12-0737|Goldfinch|F8DC6C
+13-0756|Lemon Zest|F9D857
+13-0759|Solar Power|F4BF3A
+14-0851|Samoan Sun|FBC85F
+16-1149|Desert Sun|C87629
+18-1163|Pumpkin Spice|A05C17
+16-1164|Orange Pepper|DF7500
+17-1140|Marmalade|C16512
+18-1249|Hawaiian Sunset|BB5C14
+17-1342|Autumnal|A15325
+18-1246|Umber|944A1F
+17-1349|Exuberance|E86800
+16-1363|Puffins Bill|E95C20
+18-1148|Caramel Cafe|864C24
+16-1449|Gold Flame|B45422
+18-1345|Cinnamon Stick|9B4722
+18-1340|Potters Clay|9E4624
+18-1355|Rooibos Tea|A23C26
+17-1360|Celosia Orange|E8703A
+17-1461|Orangeade|E2552C
+17-1449|Pureed Pumpkin|C34121
+17-1463|Tangerine Tango|DD4124
+18-1564|Poinciana|CA3422
+17-1452|Koi|D15837
+19-1662|Samba|A2242F
+19-1757|Barbados Cherry|AA0A27
+19-1758|Haute Red|A11729
+18-1657|Salsa|AA182B
+19-1559|Scarlet Sage|9D202F
+19-1863|Scooter|941E32
+19-1555|Red Dahlia|7D2027
+19-1531|Sun Dried Tomato|752329
+19-1337|Fired Brick|6A2E2A
+19-1652|Rhubarb|77202F
+19-1535|Syrah|6A282C
+19-1930|Pomegranate|6C2831
+19-1724|Cabernet|64242E
+13-2807|Ballerina|F2CFDC
+13-2802|Fairy Tale|F2C1D1
+15-1506|Etherea|A5958F
+16-1710|Foxglove|B98391
+17-1609|Mesa Rose|A66E7A
+18-1950|Jazzy|B61C50
+19-2039|Granita|A52350
+19-2041|Cherries Jubilee|A22452
+18-2140|Cabaret|CB3373
+19-2045|Vivacious|A32857
+18-3628|Bellflower|9469A2
+17-3617|English Lavender|9D7BB0
+16-3817|Rhapsody|9F86AA
+19-3628|Acai|46295A
+19-3638|Tillandsia Purple|563474
+18-3635|Picasso Lily|634878
+18-3620|Mystical|5F4E72
+15-3908|Icelandic Blue|A9ADC2
+15-3912|Aleutian|9A9EB3
+17-3933|Silver Bullet|81839A
+18-3933|Blue Granite|717388
+19-3815|Evening Blue|2A293E
+19-3713|Deep Well|2C2A33
+19-3924|Night Sky|2A2A35
+16-3921|Blue Heron|96A3C7
+16-4030|Hydrangea|849BCC
+14-3949|Xenon Blue|B7C0D7
+16-3922|Brunnera Blue|9BA9CA
+19-3922|Sky Captain|262934
+19-3923|Navy Blazer|282D3C
+19-4020|Dark Sapphire|262B37
+13-4111|Plein Air|BFCAD6
+13-3920|Halogen Blue|BDC6DC
+15-4030|Chambray Blue|9EB4D3
+15-3932|Bel Air Blue|819AC1
+19-3929|Vintage Indigo|4A556B
+19-3953|Sodalite Blue|253668
+19-4022|Parisian Night|323441
+19-3964|Monaco Blue|274374
+18-4034|Vallarta Blue|30658E
+19-4011|Salute|282B34
+19-4009|Outer Space|2F3441
+19-4021|Blueberry|2C333E
+19-4012|Carbon|272F38
+19-4218|Vulcan|2D3036
+13-4200|Omphalodes|B5CEDF
+14-4317|Cool Blue|A5C5D9
+18-4028|Bering Sea|4B5B6E
+19-4121|Blue Wing Teal|2C4053
+19-4033|Poseidon|123955
+18-4434|Mykonos Blue|005780
+19-4326|Reflecting Pond|203E4A
+14-4311|Corydalis Blue|A9CADA
+14-4310|Blue Topaz|78BDD4
+14-4511|Gulf Stream|88C3D0
+15-4714|Aquarelle|61AAB1
+14-4812|Aqua Splash|85CED1
+19-5220|Botanical Garden|12403C
+19-5350|Scarab|23312D
+13-4108|Nimbus Cloud|D5D5D8
+14-4105|Micro Chip|BABCC0
+16-5101|Wet Weather|929090
+17-4014|Titanium|807D7F
+18-4016|December Sky|767275
+19-3900|Pavement|524D50
+19-3901|Magnet|4D4B4F
+16-3850|Silver Sconce|A19FA5
+17-3911|Silver Filigree|7F7C81
+17-3907|Quicksilver|7E7D88
+17-1503|Storm Front|787376
+18-3907|Tornado|5E5B60
+18-5210|Eiffel Tower|5C5658
+19-3927|Graphite|3B3B48
+16-3915|Alloy|98979A
+16-3916|Sleet|92949B
+15-4307|Tradewinds|7F8793
+18-3912|Grisaille|585E6F
+19-3918|Periscope|46444C
+18-4006|Quiet Shade|66676D
+19-4215|Turbulence|4E545B
+18-4214|Stormy Weather|58646D
+19-3910|Iron Gate|4E5055
+19-3907|Forged Iron|48464A
+19-0201|Asphalt|434447
+16-4703|Ghost Gray|9C9B98
+18-5102|Brushed Nickel|73706F
+16-4400|Mourning Dove|94908B
+15-4306|Belgian Block|A3A9A6
+18-5806|Agave Green|6B7169
+19-5621|Cilantro|43544B
+19-5406|Pine Grove|213631
+19-6050|Eden|264E36
+18-6030|Jolly Green|007844
+19-5918|Mountain View|2E3D30
+14-0116|Margarita|B5C38E
+18-0523|Winter Moss|5B5A41
+19-0307|Climbing Ivy|444940
+19-0840|Delicioso|3F352F
+19-0910|Mulch|433937
+19-1106|Mole|392D2B
+19-1109|Chocolate Torte|382E2D
+19-1018|Ganache|34292A
+19-3909|Black Bean|2E272A
+19-1103|Espresso|363031
+19-4008|Meteorite|2B2929
+19-4004|Tap Shoe|2A2B2D
+11-1001|White Alyssum|EFEBE7
+11-0605|Jet Stream|EDE6DE
+11-0106|Sweet Corn|F0EAD6
+11-0110|Buttercream|EFE0CD
+11-0515|Lemon Icing|F6EBC8
+11-0607|Sugar Swizzle|F3EEE7
+11-0608|Coconut Milk|F0EDE5
+11-0623|Yellow Pear|ECE99B
+11-1302|Sea Salt|F1E6DE
+11-4001|Brilliant White|EDF1FE
+11-4302|Cannoli Cream|F0EFE2
+11-4801|Tofu|E8E3D9
+12-0110|Pistachio Shell|D7CFBB
+12-0646|Celandine|EBDF67
+12-0742|Lemon Verbena|F3E779
+12-1110|Creme De Peche|F5D6C6
+12-1813|Marys Rose|F7D1D4
+12-2901|Morganite|DFCDC6
+12-2907|Rose Water|F8E0E7
+12-4301|Almond Milk|D6CEBE
+13-0443|Lime Popsicle|C0DB3A
+13-0644|Golden Kiwi|F3DD3E
+13-0646|Meadowlark|EAD94E
+13-0651|Evening Primrose|CCDB1E
+13-0849|Habanero Gold|FED450
+13-0851|Minion Yellow|FED55D
+13-0919|Soybean|D2C29D
+13-0946|Jurassic Gold|E7AA56
+13-1105|Brown Rice|C7BBA4
+13-1125|Peach Quartz|F5B895
+13-1208|Peachy Keen|E2BDB3
+13-1308|Brazilian Sand|DACAB7
+13-1511|Pink Salt|F7CDC7
+13-1520|Rose Quartz|F7CAC9
+13-2808|Ballet Slipper|EBCED5
+13-3207|Cherry Blossom|F7CEE0
+13-4104|Antarctica|C6C5C6
+13-4201|Oyster Mushroom|C3C6C8
+13-4720|Tanager Turquoise|91DCE8
+13-4810|Limpet Shell|98DDDE
+13-5410|Iced Aqua|ABD3DB
+14-0340|Acid Lime|BADF30
+14-0952|Spicy Mustard|D8AE47
+14-1052|Kumquat|FBAA4C
+14-1208|Irish Cream|C0AC92
+14-1241|Orange Chiffon|F9AA7D
+14-1315|Hazelnut|CFB095
+14-1803|Sepia Rose|D4BAB6
+14-3906|Raindrops|B1AAB3
+14-3912|Zen Blue|9FA9BE
+14-4107|Quiet Gray|B9BABD
+14-4122|Airy Blue|92B6D5
+14-4202|Harbor Mist|AFB1B4
+14-4315|Sea Angel|98BFCA
+14-4320|Baltic Sea|79B5DB
+14-4615|Antigua Sand|83C2CD
+14-4620|Island Paradise|95DEE3
+14-4710|Tibetan Stone|82C2C7
+15-0960|Mango Mojito|D69C2F
+15-1020|Ginger Root|BFA58A
+15-1040|Iced Coffee|B18F6A
+15-1045|Autumn Blaze|D9922E
+15-1051|Golden Orange|D7942D
+15-1125|Porcini|CCA580
+15-1151|Iceland Poppy|F4963A
+15-1243|Papaya|FEA166
+15-1262|Carrot Curl|FE8C18
+15-1264|Turmeric|FE840E
+15-1335|Tangelo|FE7E03
+15-1425|Fenugreek|C0916C
+15-1429|Dusted Clay|CC7357
+15-1430|Pastry Shell|BD8C66
+15-1520|Blooming Dahlia|EB9687
+15-3520|Crocus Petal|B99BC5
+15-3716|Purple Rose|B09FCA
+15-3720|Lilac Breeze|B3A0C9
+15-3919|Serenity|91A8D0
+15-4428|Crystal Seas|5DAFCE
+16-0543|Golden Lime|9A9738
+16-0545|Split Pea|9C9A40
+16-0550|Lentil Sprout|ABA44D
+16-1103|Pure Cashmere|ADA396
+16-1345|Sun Baked|D27F63
+16-1347|Peach Caramel|C5733D
+16-1348|Tomato Cream|C57644
+16-1358|Orange Tiger|F96714
+16-1438|Meerkat|A46F44
+16-1453|Exotic Orange|F96531
+16-1460|Dragon Fire|FC642D
+16-1545|Coral Quartz|F77464
+16-1548|Peach Echo|F7786B
+16-1606|Purple Dove|98878C
+16-3720|Sand Verbena|9F90C1
+16-3905|Lilac Gray|9896A4
+16-4033|Granada Sky|5D81BB
+17-0630|Tree House|988C75
+17-0949|Chai Tea|B1832F
+17-1052|Roasted Pecan|93592B
+17-1105|Roasted Cashew|918579
+17-1108|Winter Twig|948A7A
+17-1115|Petrified Oak|8D7960
+17-1142|Argan Oil|8B593E
+17-1145|Autumn Maple|C46215
+17-1314|Sepia Tint|897560
+17-1345|Spice Route|B95B3F
+17-1361|Scarlet Ibis|F45520
+17-1450|Summer Fig|BE4B3B
+17-1708|Moonscape|725F69
+17-1926|Fruit Dove|CE5B78
+17-2034|Pink Yarrow|CE3175
+17-2411|Toadstool|988088
+17-3240|Bodacious|B76BA3
+17-3520|Diffused Orchid|9879A2
+17-3640|Fairy Wren|9479AF
+17-3735|Sunlit Allium|9787BB
+17-3914|Sharkskin|838487
+17-3929|Pale Iris|8895C5
+17-3940|Iolite|707BB4
+17-4016|Gray Flannel|848182
+17-4028|Riverside|4C6A92
+17-4029|Quiet Harbor|5A789A
+17-4032|Lichen Blue|5D89B3
+17-4033|Pacific Coast|5480AC
+17-4245|Ibiza Blue|007CB7
+17-4429|Navagio Bay|3183A0
+17-4530|Barrier Reef|0084A1
+17-0530|Guacamole|797B3A
+18-0107|Kale|5A7247
+18-0220|Mayfly|65663F
+18-0330|Twist Of Lime|4E632C
+18-0625|Martini Olive|716A4D
+18-1028|Emperador|684832
+18-1049|Thai Curry|AB6819
+18-1050|Honey Ginger|A86217
+18-1155|Sugar Almond|935529
+18-1325|Spiced Apple|783937
+18-1440|Chili Oil|8E3C36
+18-1506|Plum Truffle|675657
+18-1541|Brandy Brown|73362A
+18-1549|Valiant Poppy|BC322C
+18-1551|Aura Orange|B4262A
+18-1653|Toreador|B61032
+18-1654|Lychee|BA0B32
+18-1659|Goji Berry|B91228
+18-1705|Arctic Dusk|735B6A
+18-1708|Ephemera|6F5965
+18-1759|Jalapeno Red|B2103C
+18-1951|Love Potion|C01352
+18-2045|Pink Peacock|C62168
+18-3014|Grape Kiss|7B4368
+18-3120|Willowherb|8E4483
+18-3340|Charisma|632A60
+18-3521|Plum Jam|624076
+18-3530|Lavender Crystal|936A98
+18-3540|Purple Sapphire|6F4685
+18-3634|Chive Blossom|7D5D99
+18-3839|Purple Corallite|5A4E8F
+18-3908|Volcanic Glass|615C60
+18-3917|Gray Blue|4D587A
+18-3929|Blue Horizon|4E6482
+18-3950|Iris Bloom|5B609E
+18-4048|Nebulas Blue|2D62A3
+18-4250|Indigo Bunting|006CA9
+18-4430|Fjord Blue|007290
+18-4538|Hawaiian Surf|0078A7
+18-4630|Tahitian Tide|006B7E
+18-5025|Quetzal Green|006865
+18-5204|Granite Gray|615E5F
+18-5845|Lush Meadow|006E51
+19-0203|Gray Pinstripe|49494D
+19-0403|Sea Turtle|5E5749
+19-0413|Deep Depths|46483C
+19-0510|Kalamata|5F5B4C
+19-0823|Crocodile|5D5348
+19-1110|Chocolate Plum|3C2D2E
+19-1214|Chocolate Lab|5C3E35
+19-1215|Shaved Chocolate|543B35
+19-1224|Fondue Fudge|5D4236
+19-1233|Tiramisu|634235
+19-1234|Rocky Road|5A3E36
+19-1419|Chicory Coffee|4A342E
+19-1429|Smoked Paprika|6E362C
+19-1432|Chocolate Fondant|56352D
+19-1435|Cherry Mahogany|66352B
+19-1534|Merlot|72262C
+19-1536|Red Pear|7B3539
+19-2420|Pickled Beet|4D233D
+19-2429|Plum Caspia|61224A
+19-2620|Winter Bloom|47243B
+19-3425|Spiced Plum|6D4773
+19-3750|Violet Indigo|3E285C
+19-3831|Maritime Blue|27293D
+19-3902|Obsidian|3A363B
+19-3911|Black Beauty|26262A
+19-3917|Blackened Pearl|4D4B50
+19-3930|Odyssey Gray|434452
+19-4003|Black Onyx|2B272B
+19-4029|Navy Peony|223A5E
+19-4031|Sargasso Sea|35435A
+19-4034|Sailor Blue|0E3A53
+19-4038|Gibraltar Sea|123850
+19-4045|Lapis Blue|004B8D
+19-4048|Baleine Blue|155187
+19-4055|Galaxy Blue|2A4B7C
+19-4120|Blue Opal|0F3B57
+19-4122|Moonlit Ocean|293B4D
+19-4126|Deep Dive|29495C
+19-4536|Crystal Teal|00637C
+19-4540|Deep Lagoon|005265
+19-5030|Sea Moss|254445
+19-5230|Forest Biome|184A45
+19-5232|Rain Forest|15463E
+17-5104|Ultimate Gray|939597
+13-0647|Illuminating|F5DF4D
+17-3938|Very Peri|6667AB
+18-1750|Viva Magenta|BB2649`;
+const PANTONE_PMS_DATA = `100|F6EB61|FEF380
+101|F7EA48|FFF166
+102|FCE300|FFEC2D
+103|C5A900|B49F29
+104|AF9800|9B8D39
+105|897A27|7D7547
+7401|F5E1A4|FEE5A5
+7402|ECD898|F3DA9A
+7403|EED484|F4CF81
+7404|F4DA40|FDCF41
+7405|F2CD00|E6B10E
+7406|F1C400|F1B828
+7407|CBA052|CCA36E
+106|F9E547|FFEB68
+107|FBE122|FFE552
+108|FEDB00|FFDD35
+109|FFD100|FFC700
+110|DAAA00|CC9F26
+111|AA8A00|9C873B
+112|9C8412|8A7A3E
+113|FAE053|FFE15E
+114|FBDD40|FFD94A
+115|FDDA24|FFCE2E
+116|FFCD00|FFB511
+117|C99700|B78C30
+118|AC8400|9E8139
+119|897322|847748
+127|F3DD6D|FCE385
+128|F3D54E|FCCF61
+129|F3D03E|FAAF3F
+130|F2A900|F79B2E
+131|CC8A00|BA8032
+132|A07400|977A3C
+133|6C571B|7C7047
+1205|F8E08E|FFE495
+1215|FBD872|FFDA7E
+1225|FFC845|FFBB4F
+1235|FFB81C|FFAE3B
+1245|C69214|BB8B41
+1255|AD841F|A08246
+1265|886B25|887549
+120|FBDB65|FFD96A
+121|FDD757|FFCC52
+122|FED141|FFC03F
+123|FFC72C|FFAC2A
+124|EAAA00|D79133
+125|B58500|A6813D
+126|9A7611|8E7742
+7548|FFC600|FFC915
+7549|FFB500|FFB838
+7550|D19000|CE973D
+7551|B47E00|AE8643
+7552|73531D|826F4B
+7553|5A4522|70654B
+7554|4B3D2A|6C6558
+7555|D29F13|D7A95A
+7556|B78B20|BC995D
+7557|9F7D23|A58D5F
+7558|967126|9B835E
+7559|8F6A2A|977F5E
+7560|7D622E|8E7E62
+7561|6C5D34|807964
+134|FDD26E|FFD378
+135|FFC658|FFC267
+136|FFBF3F|FFAD4A
+137|FFA300|FF9F37
+138|DE7C00|D37C32
+139|AF6D04|9D6F3C
+140|74531C|7F6A45
+1345|FDD086|FFD591
+1355|FFC56E|FFC87E
+1365|FFB549|FFAD5B
+1375|FF9E1B|FF9940
+1385|D57800|CD7E3E
+1395|996017|946E43
+1405|6E4C1E|796648
+141|F2C75C|F9C16E
+142|F1BE48|F8B05D
+143|F1B434|F6A04D
+144|ED8B00|F38B3C
+145|CF7F00|C97F3A
+146|A76D11|9D7441
+147|715C2A|76694A
+7408|F6BE00|EE9D26
+7409|F0B323|F7AD50
+7410|FEAD77|FFA06E
+7411|E6A65D|E9A16F
+7412|D38235|D08C60
+7413|DC8633|DE8958
+7414|C16C18|C07F53
+7562|BD9B60|BDA078
+7563|D69A2D|DAA563
+7564|DB8A06|DE9858
+7565|CD7925|C98659
+7566|AD6433|AE7B5E
+7567|89532F|90705C
+7568|775135|826D5E
+7569|D78825|D28E56
+7570|D3832B|D18D5B
+7571|C67D30|C3895D
+7572|B67233|B17F5B
+7573|A7662B|A87B59
+7574|9E6A38|99775B
+7575|835D32|86715A
+712|FCC89B|FFCA9D
+713|FDBE87|FFC190
+714|FDAA63|FFB07B
+715|F68D2E|F99963
+716|EA7600|EA8651
+717|D45D00|D77540
+718|BE4D00|C76C3D
+148|FECB8B|FFC688
+149|FFC27B|FFB575
+150|FFB25B|FF9955
+151|FF8200|FF883E
+152|E57200|E07A3F
+153|BE6A14|AC6F42
+154|9B5A1A|926844
+155|EFD19F|F7C995
+156|EFBE7D|F7B984
+157|ECA154|F39662
+158|E87722|EE7F4B
+159|CB6015|C97146
+160|A1561C|9D6B47
+161|603D20|786249
+1485|FFAE62|FFA563
+1495|FF8F1C|FF9351
+1505|FF6900|FF8038
+1525|B94700|BD6439
+1535|94450B|976241
+1545|653819|7A5F48
+1555|FFB990|FFC29E
+1565|FFA06A|FFAA81
+1575|FF7F32|FF9665
+1585|FF6A13|FF8450
+1595|D86018|D37046
+1605|A65523|A76C4C
+1615|8B4720|93654A
+162|FFBE9F|FFBB9B
+163|FF9D6E|FF9C76
+164|FF7F41|FF865F
+165|FF671F|FF7548
+166|E35205|E16740
+167|BE531C|B46547
+168|73381D|8A614B
+7576|DB864E|DA8E6B
+7577|E07E3C|E18B63
+7578|DC6B2F|DB7D59
+7579|DC582A|DF7357
+7580|C05131|C06D59
+7581|864A33|916B5D
+7582|674736|7A685E
+1625|FFA38B|FFA891
+1635|FF8D6D|FF967E
+1645|FF6A39|FF7F61
+1655|FC4C02|FF6F4C
+1665|DC4405|E56849
+1675|A9431E|AB614A
+1685|833921|95614D
+169|FFB3AB|FFB7AE
+170|FF8674|FF8D7E
+171|FF5C39|FF7865
+172|FA4616|FF674D
+173|CF4520|CE614A
+174|963821|9C5B4B
+175|6B3529|7D594D
+7583|C4622D|CA7D5F
+7584|BA5826|C07759
+7585|AF5C37|B67965
+7586|9E5330|A2715D
+7587|924C2E|996E5C
+7588|7B4D35|896E61
+7589|5C4738|756A63
+7590|D4B59E|DBBCA9
+7591|C07D59|C68D78
+7592|B15533|B47260
+7593|9D432C|A26859
+7594|7C3A2D|8B645A
+7595|6B3D2E|80665C
+7596|5C3D31|776760
+7597|D14124|D66756
+7598|BD472A|C36D5C
+7599|B33D26|BD695A
+7600|8D3F2B|9B6A5E
+7601|83412C|92695C
+7602|7B4931|8D6E61
+7603|674230|7C675D
+7604|E4D5D3|EAD8D6
+7605|E1BBB4|EAC4BE
+7606|D6938A|DEA09A
+7607|C26E60|CB867F
+7608|A4493D|AB6E67
+7609|823B34|926660
+7610|683431|80615E
+7611|DDBCB0|E7C8BE
+7612|CA9A8E|D4AAA0
+7613|BC8A7E|C89F97
+7614|A37F74|AE928C
+7615|866761|978480
+7616|6B4C4C|867474
+7617|583D3E|756667
+7520|EABEB0|F3C4BF
+7521|C09C83|C4A195
+7522|B46A55|AF7871
+7523|AB5C57|A97576
+7524|A45248|A36D6A
+7525|9A6A4F|997970
+7526|8A391B|925F52
+489|ECC3B2|F5C7B8
+488|ECBAA8|F4B9A9
+487|EAA794|F3A293
+486|E8927C|F08D80
+485|DA291C|E45D50
+484|9A3324|A05B4E
+483|653024|7D5B4F
+176|FFB1BB|FFB1BA
+177|FF808B|FF8C91
+178|FF585D|FF7677
+179|E03C31|E15F55
+180|BE3A34|BF6059
+181|81312F|8B5952
+1765|FFA3B5|FFA7B6
+1775|FF8DA1|FF8B9A
+1785|F8485E|FE6672
+1788|EE2737|F95D62
+1795|D22630|DA5959
+1805|AF272F|B45858
+1815|7C2529|8F5652
+1767|FCAFC0|FFBAC9
+1777|FB637E|FF8091
+1787|F4364C|FC6371
+1797|CB333B|CB4F53
+1807|A4343A|A75154
+1817|643335|795453
+7618|C66E4E|D08A77
+7619|C04C36|C87164
+7620|B7312C|C0615B
+7621|AB2328|BA5D5A
+7622|93272C|A55D5C
+7623|8A2A2B|9B5C57
+7624|802F2D|8D5A54
+7625|E1523D|EA776C
+7626|C63527|D2625F
+7627|A72B2A|AD5857
+7628|9E2A2B|A85959
+7629|6D3332|805B5A
+7630|633231|765957
+7631|572D2D|6E5555
+7415|E6BAA8|EBB5A5
+7416|E56A54|EA746A
+7417|E04E39|E76B61
+7418|CD545B|BF6366
+7419|B04A5A|A6626B
+7420|9B2242|A45768
+7421|651D32|7D4E5B
+182|FABBCB|FFB8CA
+183|FC9BB3|FF8DA3
+184|F65275|FC6E83
+185|E4002B|F15060
+186|C8102E|D2515E
+187|A6192E|AE535C
+188|76232F|895559
+196|ECC7CD|F4C3CB
+197|E89CAE|F2A1B2
+198|DF4661|E76B7C
+199|D50032|DD5061
+200|BA0C2F|BD4F5C
+201|9D2235|A15760
+202|862633|90585E
+189|F8A3BC|FFABC2
+190|F67599|FE87A3
+191|EF426F|F87089
+192|E40046|EE536B
+193|BF0D3E|C55265
+194|9B2743|A35965
+195|782F40|885A61
+1895|F5B6CD|FEB3CD
+1905|F59BBB|FD9CBA
+1915|EF4A81|F66F92
+1925|E0004D|E9506E
+1935|C5003E|C94C63
+1945|A6093D|B05468
+1955|8A1538|975361
+705|F5DADF|FFDDE2
+706|F7CED7|FFCAD4
+707|F9B5C4|FFB0BF
+708|F890A5|FE99A8
+709|EF6079|F47C8A
+710|E03E52|E4636F
+711|CB2C30|CE5055
+698|F2D4D7|FAD7DA
+699|F4C3CC|FCC2CC
+700|F2ACB9|F8AAB6
+701|E68699|E98F9D
+702|D25B73|D87987
+703|B83A4B|B45A65
+704|9E2A2F|A24F56
+203|ECB3CB|F5B1CC
+204|E782A9|EE82A4
+205|E0457B|E56284
+206|CE0037|D84465
+207|A50034|AF4C64
+208|861F41|905567
+209|6F263D|825864
+210|F99FC9|FFA2CB
+211|F57EB6|FC85B6
+212|F04E98|F56D9E
+213|E31C79|E95485
+214|CE0F69|D1517A
+215|AC145A|AE5171
+216|7D2248|8A5566
+7422|F4CDD4|FDD4DA
+7423|E06287|E2758F
+7424|E24585|D9577D
+7425|B52555|BB5A73
+7426|A4123F|B1556A
+7427|971B2F|A5525C
+7428|6A2C3E|805C67
+7632|D6C9CA|DDCFD0
+7633|C4A4A7|C9AAAE
+7634|C16784|C77D92
+7635|C63663|CD627D
+7636|BC204B|C3566D
+7637|912F46|955864
+7638|7E2D40|855660
+217|EABEDB|F4C1E1
+218|E56DB1|EF84B9
+219|DA1884|E45C96
+220|A50050|B04C75
+221|910048|9E4C6E
+222|6C1D45|82566B
+7639|936D73|A0858A
+7640|934054|9B6673
+7641|8E2C48|9A5D6D
+7642|732E4A|7E5867
+7643|672E45|7A5A67
+7644|582D40|715862
+7645|502B3A|6C5760
+223|EF95CF|F9A4D8
+224|EB6FBD|F587C7
+225|DF1995|EA60A7
+226|D0006F|DC4588
+227|AA0061|AF4879
+228|890C58|8D4D6D
+229|672146|7A5466
+230|F4A6D7|FEB2E0
+231|F277C6|F984CA
+232|E93CAC|F16AB7
+233|C6007E|C84687
+234|A20067|AA4C7D
+235|840B55|914E72
+670|EAD3E2|F3D6E5
+671|E6BCD8|EFC3DD
+672|DFA0C9|E8A7CD
+673|D986BA|DF8CBA
+674|C6579A|CD72A1
+675|AE2573|BD618E
+676|960051|A85079
+677|E5CEDB|EDD2E0
+678|E3C8D8|E5C0D4
+679|DEBED2|DAACC6
+680|C996B6|C08BA9
+681|B06C96|A5708D
+682|994878|905D78
+683|7C2855|805268
+684|E4C6D4|ECCBD9
+685|DCB6C9|E4BDD0
+686|D0A1BA|D5A6BE
+687|BE84A3|BD8CA6
+688|A76389|A2738C
+689|893B67|8E6178
+690|612141|7C5060
+510|EBBECB|F2BFCB
+509|E8B3C3|EAAEBE
+508|E4A9BB|DF9CAE
+507|D592AA|CF8FA4
+506|84344E|9A6372
+505|6F2C3F|8A5C66
+504|572932|7F5D62
+7429|E2BCCB|EECCD9
+7430|DCA9BF|E6B5C9
+7431|C9809E|DCA2B9
+7432|B55C80|C5819A
+7433|A73A64|B96F89
+7434|9B3259|A8677D
+7435|872651|8C566B
+691|E9CDD0|F1D3D5
+692|E4BEC3|E9C0C5
+693|D7A3AB|DAA5AD
+694|C48490|C38D96
+695|B46B7A|AC7680
+696|984856|98656C
+697|893C47|87565B
+496|F2C6CF|F9C2CC
+495|F1BDC8|F1AFBC
+494|E9A2B2|E59AA8
+493|DC8699|C77C89
+492|8F3237|9D5D60
+491|7F3035|8E595A
+490|5D2A2C|775554
+503|E9C4C7|F2CDCF
+502|E5BAC1|E6B7BD
+501|DAA5AD|D8A5AC
+500|C6858F|BD898F
+499|7A3E3A|8D615F
+498|6A3735|805D5B
+497|512F2E|715956
+5035|DFC2C3|E6C6C7
+5025|DBB7BB|DCB6BA
+5015|CCA1A6|CAA1A6
+5005|B07C83|B28A90
+4995|9C6169|9F787F
+4985|874B52|8F6A6F
+4975|3F2021|745654
+236|F1A7DC|F8A6DE
+237|EC86D0|F28DD2
+238|E45DBF|E971C0
+239|DB3EB1|DB55AA
+240|C5299B|C15598
+241|AF1685|AF548B
+242|80225F|8D5977
+2365|EFBAE1|F8BFE7
+2375|E277CD|EA88D2
+2385|D539B5|E06FC2
+2395|C800A1|D557AF
+2405|B0008E|BB569D
+2415|9E007E|AB5491
+2425|830065|975381
+243|EAB8E4|F1B2E6
+244|E59BDC|EB9ADE
+245|DD7FD3|E07FD0
+246|C724B1|CE57B3
+247|BB16A3|BD51A2
+248|A51890|A14F8C
+249|80276C|885779
+7646|A56E87|B08799
+7647|A83D72|B16889
+7648|991E66|9E537B
+7649|8A1B61|935379
+7650|722257|835573
+7651|6A2A5B|7F5C78
+7652|5E2751|73556C
+250|E7BAE4|EEBAE9
+251|DD9CDF|E096DF
+252|C964CF|CE70CC
+253|AD1AAC|B456AE
+254|981D97|9E549A
+255|72246C|83577D
+517|EBC6DF|F2C8E3
+516|E6BEDD|E8B6DC
+515|E2ACD7|E2A5D4
+514|D48BC8|CE89C3
+513|93328E|9E5F98
+512|833177|8A587F
+511|612C51|745568
+7436|EEDAEA|F3D5ED
+7437|CCAED0|D4B6D6
+7438|D59ED7|D79BD7
+7439|B288B9|C09CC6
+7440|A277A6|B796BA
+7441|9F5CC0|AE7ECA
+7442|963CBD|9E62BE
+2562|D7A9E3|DDAEE9
+2572|C98BDB|CD90DE
+2582|AC4FC6|BB76CF
+2592|9B26B6|AA60BF
+2602|87189D|9757A6
+2612|772583|86578D
+2622|653165|7B5B7A
+7653|948794|9E95A0
+7654|A2789C|AA8AA5
+7655|A15A95|A978A0
+7656|8E3A80|96648D
+7657|6E2B62|7E5978
+7658|6A3460|7C5E77
+7659|5D3754|6E5A6B
+524|D5C2D8|DAC5DC
+523|C9B1D0|D0B7D5
+522|BA9CC5|BC9FC6
+521|A57FB2|A98BB5
+520|642F6C|815F87
+519|59315F|775D7A
+518|4B3048|6C5969
+5245|DBCDD3|E0CFD6
+5235|D0BEC7|D6C3CC
+5225|C6B0BC|C2ACB9
+5215|AF95A6|A28C9C
+5205|86647A|907B8A
+5195|66435A|816C78
+5185|4A3041|756069
+5175|D8C8D1|DAC5D0
+5165|D3C0CD|CCB4C4
+5155|BFA5B8|B99EB2
+5145|9B7793|A4899F
+5135|7E5475|8C7287
+5125|693C5E|7D6378
+5115|512A44|6F5564
+531|DFC8E7|E4C7EB
+530|D7B9E4|DBB9E8
+529|CAA2DD|CEA5E1
+528|B580D1|B889D2
+527|8031A7|9361B0
+526|702F8A|805791
+525|572C5F|735775
+256|D6BFDD|D4B4DA
+257|C6A1CF|C29BCB
+258|8C4799|A276AE
+259|6D2077|94679C
+260|642667|8A658D
+261|5D285F|7F6282
+262|51284F|755E74
+2563|CBA3D8|CDA2D9
+2573|B884CB|B989CB
+2583|A05EB5|A372B5
+2593|84329B|8E5DA0
+2603|702082|845991
+2613|671E75|7D5787
+2623|5F2167|75557A
+7660|9991A4|9C97A8
+7661|8D6E97|947F9D
+7662|7A4183|84668C
+7663|6B3077|7A5C83
+7664|653279|765D84
+7665|5E366E|725E7C
+7666|5C4E63|706977
+2567|C1A0DA|C09FDB
+2577|A77BCA|A47EC6
+2587|8246AF|936DB7
+2597|5C068C|825AA4
+2607|500778|7A5896
+2617|470A68|735489
+2627|3C1053|6E527C
+263|D7C6E6|DCC6EA
+264|C1A7E2|BFA1E3
+265|9063CD|9D7AD2
+266|753BBD|8A65C4
+267|5F259F|7F5DAE
+268|582C83|735990
+269|512D6D|6E587F
+2635|C5B4E3|C9B7E8
+2645|AD96DC|B9A3E3
+2655|9678D3|A288D9
+2665|7D55C7|8C6FCA
+2685|330072|765BA7
+2695|2E1A47|6C5D80
+270|B4B5DF|ADAEDE
+271|9595D2|9A9BD4
+272|7474C1|8586C6
+273|24135F|645D9B
+274|211551|5F578B
+275|201747|5D5683
+276|221C35|5C556F
+2705|A7A4E0|BAB6E9
+2715|8B84D7|9F98DF
+2725|685BC7|8980D4
+2735|2E008B|6857B2
+2745|280071|61559A
+2755|250E62|5D538B
+2765|201547|574F77
+7667|6E7CA0|828CA8
+7668|686E9F|7B81A4
+7669|615E9B|7878A2
+7670|565294|706E9A
+7671|514689|6E6993
+7672|4C4184|6B668E
+7673|535486|6C6D8D
+7443|DDDAE8|DDD8EB
+7444|B6B8DC|BCBDE2
+7445|A7A2C3|ACA8C7
+7446|8986CA|9493CF
+7447|5D4777|7F7392
+7448|4B384C|726874
+7449|41273B|63515C
+7674|878CB4|9296B8
+7675|7C7FAB|888CAF
+7676|7566A0|827AA3
+7677|6F5091|7C6D96
+7678|68478D|766691
+7679|563D82|6E628B
+7680|523178|695981
+663|E5E1E6|E2D9E3
+664|E0DBE3|DACFDD
+665|C6BCD0|C5B8CE
+666|A192B2|AEA1BC
+667|7C6992|9083A1
+668|614B79|817391
+669|3F2A56|71637F
+5315|D8D7DF|DBD8E1
+5305|C6C4D2|C5C2D2
+5295|B3B0C4|B1AFC3
+5285|8D89A5|9694AC
+5275|595478|7B7992
+5265|403A60|6D6B82
+5255|1E1A34|5D566C
+538|C5CFDA|CDD7E1
+537|BBC7D6|BDCADA
+536|A2B2C8|A4B5CB
+535|8E9FBC|8C9DB8
+534|1B365D|5B6983
+533|1F2A44|5E6578
+532|1C1F2A|5B5C64
+7541|D9E1E2|DDE4E6
+7542|A4BCC2|B0C5CC
+7543|98A4AE|AEB8C0
+7544|768692|9AA5AF
+7545|425563|78838E
+7546|253746|67707A
+7547|131E29|51545D
+552|B9D3DC|B0D0DC
+551|A3C7D2|96C0CE
+550|8DB9CA|7AAABE
+549|6BA4B8|6899AE
+548|003D4C|3E5E6F
+547|00313C|415866
+546|072B31|465058
+5455|BFCED6|C7D7E0
+5445|B7C9D3|B4C7D3
+5435|A6BBC8|9DB4C4
+5425|7A99AC|7993A5
+5415|5B7F95|677F91
+5405|4F758B|5B6F80
+5395|081F2C|464C59
+642|D1DDE6|D3E0EA
+643|C6D6E3|BFD2E4
+644|9BB8D3|9DB9D5
+645|7DA1C4|84A3C4
+646|5E8AB4|6E8DB0
+647|236192|5F7A9D
+648|002E5D|4E6282
+649|DBE2E9|E1E7EE
+650|CED9E5|D7E0EB
+651|A7BCD6|AFC3DC
+652|7D9BC1|89A2C4
+653|326295|6780A4
+654|003A70|55688B
+655|002554|4E5D7F
+656|DDE5ED|E2EAF2
+657|C8D8EB|D6E2F2
+658|B1C9E8|B8CFEE
+659|7BA4DB|96B6E5
+660|407EC9|658BCC
+661|003594|4967AA
+662|001A70|425390
+7450|BDC5DB|C3CBE0
+7451|89ABE3|94B3EA
+7452|8094DD|91A0E4
+7453|7BA6DE|88ADE3
+7454|5F8FB4|7599BB
+7455|3A5DAE|6B7DB9
+7456|606EB2|8089C0
+2706|CBD3EB|CCD4F1
+2716|9FAEE5|A2AFE9
+2726|485CC7|717ACF
+2736|1E22AA|5E60BA
+2746|171C8F|595CA5
+2756|151F6D|585C8C
+2766|141B4D|575A7C
+2708|B8CCEA|B2C9EF
+2718|5C88DA|6A87D8
+2728|0047BB|5268C2
+2738|06038D|474DA4
+2748|001871|484F8C
+2758|001E62|484D7A
+2768|071D49|4A4E6D
+2707|C3D7EE|C7DBF4
+2717|A7C6ED|A9C8F4
+2727|307FE2|6490E8
+2747|001A72|424F90
+2757|001E60|454F7E
+2767|13294B|4A4C64
+277|ABCAE9|ADCFF1
+278|8BB8E8|8DBAEE
+279|418FDE|5B8EDB
+280|012169|3C4981
+281|00205B|3F4A75
+282|041E42|434967
+283|92C1E9|9BC7EE
+284|6CACE4|7AB1E8
+285|0072CE|4982CF
+286|0033A0|3255A4
+287|003087|3C5896
+288|002D72|3D5588
+289|0C2340|434F69
+7681|94A9CB|9DB0D0
+7682|6787B7|8097BF
+7683|426DA9|6982B0
+7684|385E9D|6276A3
+7685|2C5697|5E719D
+7686|1D4F91|556995
+7687|1D428A|525F8D
+545|C6DAE7|AECFE6
+544|BDD6E6|97C1DF
+543|A4C8E1|79ABD2
+542|7BAFD4|699CC6
+541|003C71|3A557C
+540|003057|3F526F
+539|00263A|465062
+290|B9D9EB|A7D4EE
+291|9BCBEB|7FBEEB
+292|69B3E7|62A8E5
+293|003DA5|235BA8
+294|002F6C|385988
+295|002855|375172
+296|041C2C|435060
+2905|8DC8E8|8AC9ED
+2915|62B5E5|64B3E8
+2925|009CDE|4097DB
+2935|0057B8|1B5FAA
+2945|004C97|29588C
+2955|003865|395775
+2965|00263E|3D5265
+297|71C5E8|7ECCEE
+298|41B6E6|4CB4E7
+299|00A3E0|1295D8
+300|005EB8|006EB6
+301|004B87|28628E
+302|003B5C|375E77
+303|002A3A|3F5666
+7688|4698CB|5E9ACA
+7689|298FC2|5693C1
+7690|0076A8|4C7FA7
+7691|006298|467198
+7692|005587|4C6B8B
+7693|004976|4D6480
+7694|01426A|4D6179
+2975|99D6EA|8BD5EE
+2985|5BC2E7|48B8E7
+2995|00A9E0|0D9DDB
+3005|0077C8|0078BF
+3015|00629B|216A95
+3025|004F71|37617A
+3035|003E51|405866
+7695|7BA7BC|82A8BD
+7696|6399AE|719BAF
+7697|4E87A0|698FA4
+7698|41748D|637F92
+7699|34657F|5E7688
+7700|165C7D|557288
+7701|005776|496B80
+7457|BBDDE6|BFE3ED
+7458|71B2C9|67A5BF
+7459|4298B5|518EAA
+7460|0086BF|008EC0
+7461|007DBA|4492C6
+7462|00558C|547AA3
+7463|002B49|51657D
+304|9ADBE8|8EDDED
+305|59CBE8|53CAEC
+306|00B5E2|00B4E4
+307|006BA6|0074A2
+308|00587C|266782
+309|003B49|3F5864
+635|A4DBE8|ACE3EF
+636|8BD3E6|8AD8ED
+637|4EC3E0|5EC8E5
+638|00AFD7|32B8DF
+639|0095C8|009ECC
+640|0082BA|008ABA
+641|0067A0|0078A7
+7702|48A9C5|5DABC6
+7703|009CBD|46A0BF
+7704|0085AD|348BAC
+7705|007096|3C7D9A
+7706|006A8E|437A94
+7707|00617F|477388
+7708|005670|456B7D
+628|B8DDE1|B4E0E6
+629|9BD3DD|8DD0DE
+630|77C5D5|74C4D7
+631|3EB1C8|56B2CB
+632|0093B2|3998B5
+633|007396|27829E
+634|005F83|226E8A
+310|6AD1E3|5BD0E6
+311|05C3DE|01BEDB
+312|00A9CE|00AFD0
+313|0092BC|008DB1
+314|007FA3|007D99
+315|00677F|206779
+316|004851|3E5A62
+3105|68D2DF|4CCEDE
+3115|00C1D5|00BFD3
+3125|00AEC7|00ABC2
+3135|008EAA|008EA6
+3145|00778B|007788
+3155|006272|1B6875
+3165|004F59|2F5C66
+7709|63B1BC|6EB2BD
+7710|00A7B5|40AAB8
+7711|0097A9|179DAB
+7712|00859B|228B9D
+7713|007D8A|2D8692
+7714|007680|358189
+7715|006269|417178
+317|B1E4E3|AEE9E8
+318|88DBDF|6BD9DE
+319|2DCCD3|25C9D0
+320|009CA6|009DA5
+321|008C95|00838A
+322|007377|167378
+323|005F61|2F6165
+7464|A0D1CA|AADBD7
+7465|40C1AC|55C7B5
+7466|00B0B9|00B4BC
+7467|00A3AD|00A8B0
+7468|007398|3F7793
+7469|005F86|3C6E89
+7470|005A70|437083
+7471|7EDDD3|7FE2D8
+7472|5CB8B2|6BBDB9
+7473|279989|5EA59A
+7474|007681|458A94
+7475|487A7B|6B8B8D
+7476|0D5257|5A777B
+7477|244C5A|5D7079
+5523|B6CFD0|BCD5D6
+5513|ABC7CA|ACCACD
+5503|94B7BB|94B7BC
+5493|7FA9AE|769CA3
+5483|4F868E|5F8289
+5473|115E67|516D75
+5463|07272D|3E4E56
+7716|00968F|499996
+7717|00857D|3E8E8B
+7718|007672|358282
+7719|006D68|417B7B
+7720|00635B|477675
+7721|005E5D|497375
+7722|005151|4A6B6E
+324|9CDBD9|82D8D5
+325|64CCC9|40C1BB
+326|00B2A9|00AAA1
+327|008675|008F85
+328|007367|137D79
+329|00685E|2E7572
+330|00534C|446463
+3242|71DBD4|5DDBD3
+3252|2AD2C9|00CDC2
+3262|00BFB3|00BAAE
+3272|00A499|00A49A
+3282|008578|008780
+3292|00594F|346E6A
+3302|004C45|41615F
+3245|7CE0D3|4EDCCA
+3255|2CD5C4|00CFBB
+3265|00C7B1|00C0AA
+3275|00B398|00AA93
+3285|009681|009081
+3295|007864|237E74
+3305|004E42|466964
+3248|6DCDB8|6ACEB9
+3258|49C5B1|48C1AC
+3268|00AB8E|28B29A
+3278|009B77|009C82
+3288|008264|208776
+3298|006A52|387469
+3308|034638|48615B
+566|B9DCD2|B4E1D6
+565|A1D6CA|91D1C5
+564|86C8BC|88C6BC
+563|6BBBAE|76B9AF
+562|006F62|43807A
+561|00594C|466D69
+560|1D3C34|4B5E5B
+573|B5E3D8|BBE9DE
+572|A5DFD3|95DECF
+571|98DBCE|85D8C8
+570|6BCABA|62C2B1
+569|00816D|2C8F82
+568|006C5B|458075
+567|173F35|4A635D
+559|ADCAB8|B5D1C0
+558|9ABEAA|9AC0AE
+557|85B09A|88B29F
+556|6FA287|719E8B
+555|28724F|567E6A
+554|205C40|577565
+553|284734|5A685D
+5595|BFCEC2|C1D2C7
+5585|A7BDB1|A2B9AF
+5575|92ACA0|9DB4AB
+5565|7F9C90|8AA29A
+5555|5C7F71|768E87
+5545|43695B|60766F
+5535|183028|485956
+5665|BAC5B9|BCC8BD
+5655|B0BDB0|B3C0B6
+5645|A3B2A4|9FAFA5
+5635|94A596|8D9D94
+5625|708573|798981
+5615|5E7461|6A7970
+5605|22372B|5E695E
+5527|BCC9C5|B8C7C4
+5517|B1C0BC|A9BAB7
+5507|9DB0AC|96A9A7
+5497|829995|819595
+5487|5D7975|697C7D
+5477|3E5D58|5F7070
+5467|18332F|545F5F
+621|D1E0D7|CADFD4
+622|B7CDC2|B3CBC1
+623|9AB9AD|96B5AB
+624|789F90|82A198
+625|507F70|6C8A82
+626|285C4D|59756F
+627|13322B|455D58
+331|A7E6D7|93E8D3
+332|8CE2D0|70E2CB
+333|3CDBC0|00D2B3
+334|009775|00957E
+335|007B5F|247E6F
+336|00664F|3A7267
+337|8FD6BD|82D5BA
+338|6ECEB2|4CC1A1
+339|00B388|22AE8A
+340|00965E|009E77
+341|007A53|347963
+342|006747|407060
+343|115740|48655B
+7723|50A684|6BAC92
+7724|00966C|4E9B80
+7725|008755|379272
+7726|007B4B|348569
+7727|006F44|3E7C65
+7728|006845|457865
+7729|005844|486F67
+3375|7AE1BF|5FE0B7
+3385|47D7AC|3AD4A7
+3395|00C389|00C795
+3405|00AF66|00B27A
+3415|007749|308167
+3425|006341|417764
+3435|154734|4B675B
+344|A0DAB3|8ED8AC
+345|91D6AC|6ECD9C
+346|71CC98|4EBD88
+347|009A44|169B62
+348|00843D|34855B
+349|046A38|477258
+350|2C5234|546758
+351|A2E4B8|93E6B4
+352|8FE2B0|70E0A3
+353|80E0A7|50D691
+354|00B140|00A95C
+355|009639|19975D
+356|007A33|397E58
+357|215732|516E5A
+7478|9BE3BF|A0EAC5
+7479|26D07C|29CB7E
+7480|00BF6F|00C281
+7481|00B74F|00BA6E
+7482|009F4D|27A770
+7483|275D38|587762
+7484|00573F|456E60
+7730|4B9560|689C7A
+7731|228848|58926B
+7732|007A3E|498564
+7733|007041|4B7C63
+7734|286140|597765
+7735|36573B|5F7163
+7736|395542|5C6B62
+7737|6BA539|7BAC66
+7738|48A23F|65A969
+7739|319B42|5CA369
+7740|3A913F|5E9865
+7741|44883E|659267
+7742|4A773C|688564
+7743|44693D|5E745D
+358|ADDC91|97D88A
+359|A1D884|7DCC77
+360|6CC24A|5DB860
+361|43B02A|4DAA50
+362|509E2F|56944F
+363|4C8C2B|57854E
+364|4A7729|5B794E
+7485|D0DEBB|D5E4C0
+7486|BCE194|B7E394
+7487|8EDD65|8BE076
+7488|78D64B|63D05A
+7489|74AA50|7AAB6D
+7490|719949|7B9E6B
+7491|79863C|818C61
+365|C2E189|C2E692
+366|B7DD79|A8DC7D
+367|A4D65E|8FD16A
+368|78BE20|67B346
+369|64A70B|62A044
+370|658D1B|698A48
+371|546223|68724D
+372|D4EB8E|D1F08F
+373|CDEA80|B9E972
+374|C5E86C|A6E35F
+375|97D700|73C92D
+376|84BD00|70AB37
+377|7A9A01|728F41
+378|59621D|747B4D
+580|C4D6A4|C9DCAC
+579|BCD19B|BAD29E
+578|B7CE95|A7C58E
+577|A9C47F|93B479
+576|789D4A|7A9B62
+575|67823A|6F8456
+574|4E5B31|6A7355
+5807|D0D1AB|D1D3A9
+5797|C6C89B|C7CA9C
+5787|BABD8B|BABE8F
+5777|A2A569|A6A97B
+5767|8A8D4A|94986C
+5757|6D712E|81855C
+5747|3D441E|70744E
+5875|D2CE9E|D7D3A1
+5865|CBC793|CCC895
+5855|C0BB87|BDB889
+5845|AFA96E|A7A375
+5835|A09958|938F66
+5825|89813D|8B865D
+5815|555025|736F4C
+5803|C3C6A8|CFD3B8
+5793|B3B995|C5CAAF
+5783|A3AA83|B5BB9F
+5773|899064|9AA184
+5763|737B4C|7E876D
+5753|5E6738|747C61
+5743|3E4827|636A51
+7492|BFCC80|BCCA87
+7493|BBC592|B7C194
+7494|9CAF88|9EB091
+7495|8F993E|838E59
+7496|76881D|758448
+7497|7A7256|8C8778
+7498|5B6236|777D64
+7744|BABC16|B9BE56
+7745|ABAD23|AFB35D
+7746|999B30|9B9F60
+7747|888D30|909661
+7748|7C8034|878C62
+7749|727337|808363
+7750|656635|777A61
+379|E2E868|E7EE7B
+380|DBE442|D4E458
+381|CEDC00|BAD739
+382|C4D600|99C221
+383|A8AD00|8E9A36
+384|949300|868B3C
+385|787121|7E7B4B
+386|E9EC6B|EFF178
+387|E3E935|E3ED55
+388|E0E721|D5E739
+389|D0DF00|BDDC04
+390|B5BD00|97A926
+391|9A9500|888A3B
+392|827A04|7E7D41
+587|E3E48D|EAEC97
+586|E0E27C|E7E988
+585|DBDE70|E3E685
+584|D2D755|CED665
+583|B7BF10|A6B340
+582|8E8C13|919145
+581|625D20|78754A
+393|F0EC74|F8F283
+394|EDE939|F2EE56
+395|ECE81A|EDEC3F
+396|E1E000|DBE200
+397|BFB800|A8AA31
+398|ADA400|959539
+399|A09200|8A8537
+3935|F3EA5D|FCF389
+3945|F3E500|FCF05F
+3955|EFDF00|FAEB37
+3965|EEDC00|F8E815
+3975|BBA600|B6A72D
+3985|9A8700|9C903F
+3995|685C20|837B4A
+600|F1EB9C|F9F29D
+601|F0E991|F7EF8F
+602|F0E87B|F7EE83
+603|EDE04B|F3E564
+604|EADA24|EDDC4D
+605|E1CD00|E0CC39
+606|CFB500|CEB829
+607|EBE49A|F3EAA1
+608|E9E186|F0E691
+609|E6DE77|EBE081
+610|E1D555|E0D268
+611|D7C826|C8B94E
+612|C4B000|B7A73F
+613|B39B00|A29438
+461|E9DF97|EEE29F
+460|E4D77E|E8D98B
+459|DECD63|DDCB77
+458|D9C756|CEB964
+457|B89D18|AD9844
+456|A28E2A|908145
+455|695B24|776F48
+614|DCD59A|E1D9A1
+615|D6CF8D|D8D096
+616|D0C883|CDC588
+617|C0B561|BBB275
+618|AC9F3C|A69D62
+619|9F912A|968D54
+620|8A7B19|877F49
+7751|CAB64B|D1BD71
+7752|CFB023|D5B961
+7753|C1A01E|C6AA5D
+7754|A08629|A4915E
+7755|897630|90855F
+7756|736635|837D62
+7757|675E33|7A755F
+7758|D4C304|DAC958
+7759|C4B200|C8B852
+7760|91852C|968F5E
+7761|747136|828162
+7762|5D6439|747A63
+7763|585C3B|717463
+7764|535435|6C6E60
+7765|BBB323|C0BA5E
+7766|B4A91F|BBB35F
+7767|AA9D2E|B1A763
+7768|8F7E35|958B62
+7769|716135|81775F
+7770|635939|777161
+7771|4E4934|67655A
+4545|D5CB9F|D6CCA6
+4535|CFC493|CABE96
+4525|C5B783|C1B58C
+4515|B3A369|B1A57E
+4505|998542|A39771
+4495|8C7732|90845F
+4485|614F25|7B6F4B
+454|CAC7A7|CAC8AC
+453|BFBB98|BCB999
+452|B0AA7E|A8A687
+451|9B945F|929172
+450|594A25|7E785A
+449|524727|716B54
+448|4A412A|66614E
+7499|F1E6B2|FAEDBC
+7500|DFD1A7|E6D5AB
+7501|D9C89E|DECBA5
+7502|CEB888|C7AF87
+7503|A89968|9D9272
+7504|94795D|948272
+7505|816040|887566
+468|DDCBA4|E0CEAA
+467|D3BC8D|D2BA92
+466|C6AA76|C1A67F
+465|B9975B|B0946F
+464|8B5B29|9B7C56
+463|744F28|856F51
+462|5C462B|70624D
+7506|EFDBB2|F9E1B7
+7507|FCD299|FFDDAA
+7508|E1B87F|E0B384
+7509|D6A461|D2A273
+7510|C6893F|BE8B60
+7511|B77729|A77750
+7512|A6631B|966B47
+719|EDC8A3|F2C6A2
+720|E7B78A|ECBA93
+721|DDA46F|DFA880
+722|C88242|CA916C
+723|B36924|B9825F
+724|934D11|A57350
+725|7D3F16|946747
+475|F3CFB3|FACCAD
+474|F1C6A7|F6BD9D
+473|F0BF9B|EEAB88
+472|E59E6D|DB9271
+471|B86125|BE7B54
+470|A45A2A|A37052
+469|693F23|7B604B
+726|E0C09F|E8C6A9
+727|D9B48F|DCB596
+728|CDA077|CAA182
+729|B58150|BB9275
+730|9E652E|A57E62
+731|774212|957156
+732|623412|88674D
+4685|E0C6AD|E6CAB4
+4675|DCBFA6|DAB9A1
+4665|CDA788|CAA58E
+4655|BF9474|B28E7B
+4645|AD7C59|A07D6B
+4635|946037|92715E
+4625|4F2C1D|715845
+7513|E1B7A7|E7BBB4
+7514|D5A286|DAAB9C
+7515|C58B68|C2907F
+7516|99552B|A07462
+7517|85431E|936957
+7518|6D4F47|817172
+7519|5E4B3C|756B66
+4755|D7C4B7|DCC6BB
+4745|CDB5A7|CEB4A9
+4735|C0A392|BDA195
+4725|AE8A79|AE9188
+4715|956C58|997D73
+4705|7C4D3A|8B6F66
+4695|5B3427|775C50
+482|DBC8B6|DFC8B7
+481|D3BBA8|D3B7A7
+480|C6A992|C3A492
+479|AA8066|AC8C7E
+478|703F2A|8E6E5C
+477|623B2A|7D6556
+476|4E3629|6E5E52
+7527|D6D2C4|DCD7D2
+7528|C5B9AC|D2C7C4
+7529|B7A99A|BBAFA9
+7530|A39382|A99C95
+7531|7A6855|8B7F79
+7532|63513D|786E66
+7533|473729|6E645C
+7534|D1CCBD|D0CBC3
+7535|B7B09C|C0BAB0
+7536|A69F88|AFA89D
+7537|A7ACA2|B4B8B6
+7538|949A90|A5AAA8
+7539|8E9089|9C9EA0
+7540|4B4F54|70747C
+427|D0D3D4|C2C7CA
+428|C1C6C8|ACB3B8
+429|A2AAAD|91999F
+430|7C878E|808991
+431|5B6770|737B82
+432|333F48|676C73
+433|1D252D|5B5D62
+420|C7C9C7|BDBEBD
+421|B2B4B2|B3B5B5
+422|9EA2A2|9EA1A2
+423|898D8D|909496
+424|707372|88898A
+425|54585A|7C7E7F
+426|25282A|686869
+441|BEC6C4|B9C2C1
+442|A2ACAB|ACB6B6
+443|919D9D|8F9A9B
+444|717C7D|7E8689
+445|505759|6B7173
+446|3F4444|636968
+447|373A36|5F625F
+413|BABBB1|BCBDB4
+414|A8A99E|ABACA5
+415|919388|9D9F99
+416|7E7F74|91928C
+417|65665C|82847F
+418|51534A|7A7B75
+419|212322|595955
+400|C4BFB6|C7C1BA
+401|AFA9A0|B4AEA7
+402|9D968D|A39E98
+403|8C857B|928D88
+404|776E64|8B8681
+405|696158|77726D
+406|C4BCB7|C7BEBA
+407|B2A8A2|ABA2A0
+408|978C87|9D9594
+409|857874|948B8A
+410|746661|8A8280
+411|5E514D|7A726F
+412|382F2D|645C59
+434|D0C4C5|D6CACB
+435|C1B2B6|B7A9AD
+436|AB989D|A99B9F
+437|7B6469|8D7F83
+438|584446|817275
+439|453536|736869
+440|382E2C|69615F
+warm-gray-1|D7D2CB|DBD5CD
+warm-gray-2|CBC4BC|CFC7C0
+warm-gray-3|BFB8AF|BEB6AF
+warm-gray-4|B6ADA5|B4ACA6
+warm-gray-5|ACA39A|A9A19C
+warm-gray-6|A59C94|A29B96
+warm-gray-7|968C83|968F8B
+warm-gray-8|8C8279|8F8884
+warm-gray-9|83786F|867F7C
+warm-gray-10|796E65|827C78
+warm-gray-11|6E6259|7D7773
+cool-gray-1|D9D9D6|DAD9D6
+cool-gray-2|D0D0CE|CACAC8
+cool-gray-3|C8C9C7|C5C5C5
+cool-gray-4|BBBCBC|B7B8B9
+cool-gray-5|B1B3B3|ADAEB0
+cool-gray-6|A7A8AA|A4A6A8
+cool-gray-7|97999B|9B9EA0
+cool-gray-8|888B8D|939598
+cool-gray-9|75787B|898B8E
+cool-gray-10|63666A|818387
+cool-gray-11|53565A|7A7D81
+black-2|332F21|646052
+black-3|212721|595D59
+black-4|31261D|696056
+black-5|3E2B2E|685A5C
+black-6|101820|4C4E56
+black-7|3D3935|6C6864
+yellow|FEDD00|FFE800
+yellow-012|FFD700|FFE000
+orange-021|FE5000|FF6C2F
+warm-red|F9423A|FF665E
+red-032|EF3340|F65058
+rubine-red|CE0058|DB487E
+rhodamine-red|E10098|E44C9A
+purple|BB29BB|BF53B6
+violet|440099|7758B3
+blue-072|10069F|3F43AD
+reflex-blue|001489|39499C
+process-blue|0085CA|0083C3
+green|00AB84|00AC8C
+black|2D2926|615D59
+yellow-0131|F2F0A1|FBF59B
+red-0331|FCAEBB|FFB1BE
+magenta-0521|F1B2DC|F8AADD
+violet-0631|BF9BDE|BA93DF
+blue-0821|74D1EA|6CD1EF
+green-0921|9DE7D7|78E6D0
+black-0961|9E978E|9D9994
+801|009ACE|009CCD
+802|44D62C|3BD23D
+803|FFE900|FFE916
+804|FFAA4D|FFAA52
+805|FF7276|FF7477
+806|FF3EB5|FF48B0
+807|EA27C2|E838BF
+871|84754E|AD986E
+872|85714D|AC936E
+873|866D4B|AE906F
+874|8B6F4E|AE8F6F
+875|87674F|B18B74
+876|8B634B|B08770
+877|8A8D8F|B4B7B9
+medium-yellow|FFD900|FFE100
+bright-orange|FF5E00|FF7133
+bright-red|F93822|FE5442
+strong-red|CE0056|D23B6A
+pink|D62598|D1428D
+medium-purple|4E008E|65428A
+dark-blue|00239C|444795
+medium-blue|0084CA|0087C7
+bright-green|00B08B|00AE8F
+neutral-black|222223|4C4845`;
 
-function nearestPantone(r,g,b){
-  const lab = rgbToLab(r,g,b);
+// Un código de guía gráfica puede ser un número (100) o un nombre de tinta base (reflex-blue,
+// red-032): se muestra como lo imprime Pantone, con cada palabra en mayúscula inicial.
+function pmsCodeLabel(code){
+  return /^\d/.test(code) ? code
+    : code.split('-').map(w=> w[0].toUpperCase()+w.slice(1)).join(' ');
+}
+
+const PANTONE_COY = {'15-4020':2000,'17-2031':2001,'19-1664':2002,'14-4811':2003,'17-1456':2004,'15-5217':2005,'13-1106':2006,'19-1557':2007,'18-3943':2008,'14-0848':2009,'15-5519':2010,'18-2120':2011,'17-1463':2012,'17-5641':2013,'18-3224':2014,'18-1438':2015,'13-1520':2016,'15-3919':2016,'15-0343':2017,'18-3838':2018,'16-1546':2019,'19-4052':2020,'17-5104':2021,'13-0647':2021,'17-3938':2022,'18-1750':2023,'13-1023':2024,'17-1230':2025,'11-4201':2026};
+
+// Un puñado de códigos de las guías gráficas que vale la pena reconocer cuando salen.
+const PANTONE_PMS_NOTES = {
+  '802':{en:'Fluorescent green', es:'Verde flúor'},
+  '803':{en:'Fluorescent yellow', es:'Amarillo flúor'},
+  '804':{en:'Fluorescent orange', es:'Naranja flúor'},
+  '805':{en:'Fluorescent red',    es:'Rojo flúor'},
+  '806':{en:'Fluorescent pink',   es:'Rosa flúor'},
+  '807':{en:'Fluorescent magenta',es:'Magenta flúor'},
+  '877':{en:'Silver', es:'Plata'}, '871':{en:'Gold', es:'Oro'},
+  '448':{en:'The "ugliest color in the world"', es:'El "color más feo del mundo"'},
+};
+
+const PANTONE_LIBS = [
+  {
+    key:'tcx', label:'libTcx', hint:'libTcxHint', suffix:'TCX',
+    colors: PANTONE_TCX_DATA.split('\n').map(line=>{
+      const [code,name,hex] = line.split('|');
+      const rgb = hexToRgb(hex);
+      return { code, name, hex:'#'+hex, year: PANTONE_COY[code] || null, lab: rgbToLab(rgb.r,rgb.g,rgb.b) };
+    }),
+  },
+  {
+    key:'c', label:'libGraphics', hint:'libCoated', suffix:'C',
+    colors: PANTONE_PMS_DATA.split('\n').map(line=>{
+      const [code,hexC] = line.split('|');
+      const rgb = hexToRgb(hexC);
+      return { code: pmsCodeLabel(code), note: PANTONE_PMS_NOTES[code] || null, hex:'#'+hexC, year:null, lab: rgbToLab(rgb.r,rgb.g,rgb.b) };
+    }),
+  },
+  {
+    key:'u', label:'libGraphics', hint:'libUncoated', suffix:'U',
+    colors: PANTONE_PMS_DATA.split('\n').map(line=>{
+      const [code,,hexU] = line.split('|');
+      const rgb = hexToRgb(hexU);
+      return { code: pmsCodeLabel(code), note: PANTONE_PMS_NOTES[code] || null, hex:'#'+hexU, year:null, lab: rgbToLab(rgb.r,rgb.g,rgb.b) };
+    }),
+  },
+];
+
+// Distancia CIEDE2000: la misma que usa la industria para decidir si dos colores "son el mismo".
+// Con bibliotecas de miles de colores la distancia simple en Lab elige mal en azules y en grises
+// —exagera lo primero y aplana lo segundo—, y aquí el número también se enseña (ΔE), así que
+// tiene que significar lo que significa en una medición real.
+function deltaE2000(a,b){
+  const rad = Math.PI/180, deg = 180/Math.PI;
+  const avgC = (Math.hypot(a.a,a.b) + Math.hypot(b.a,b.b)) / 2;
+  const g = 0.5*(1 - Math.sqrt(Math.pow(avgC,7)/(Math.pow(avgC,7)+Math.pow(25,7))));
+  const a1p = (1+g)*a.a, a2p = (1+g)*b.a;
+  const C1 = Math.hypot(a1p,a.b), C2 = Math.hypot(a2p,b.b);
+  const h1 = (Math.atan2(a.b,a1p)*deg+360)%360, h2 = (Math.atan2(b.b,a2p)*deg+360)%360;
+  const dL = b.L-a.L, dC = C2-C1;
+  let dh = 0;
+  if(C1*C2 !== 0){
+    dh = h2-h1;
+    if(dh > 180) dh -= 360; else if(dh < -180) dh += 360;
+  }
+  const dH = 2*Math.sqrt(C1*C2)*Math.sin(dh/2*rad);
+  const Lm = (a.L+b.L)/2, Cm = (C1+C2)/2;
+  let hm;
+  if(C1*C2 === 0) hm = h1+h2;
+  else if(Math.abs(h1-h2) <= 180) hm = (h1+h2)/2;
+  else hm = (h1+h2 < 360) ? (h1+h2+360)/2 : (h1+h2-360)/2;
+  const T = 1 - 0.17*Math.cos((hm-30)*rad) + 0.24*Math.cos(2*hm*rad)
+              + 0.32*Math.cos((3*hm+6)*rad) - 0.20*Math.cos((4*hm-63)*rad);
+  const Sl = 1 + (0.015*Math.pow(Lm-50,2))/Math.sqrt(20+Math.pow(Lm-50,2));
+  const Sc = 1 + 0.045*Cm;
+  const Sh = 1 + 0.015*Cm*T;
+  const Rt = -2*Math.sqrt(Math.pow(Cm,7)/(Math.pow(Cm,7)+Math.pow(25,7)))
+               * Math.sin(60*Math.exp(-Math.pow((hm-275)/25,2))*rad);
+  return Math.sqrt(Math.pow(dL/Sl,2) + Math.pow(dC/Sc,2) + Math.pow(dH/Sh,2)
+                   + Rt*(dC/Sc)*(dH/Sh));
+}
+
+function nearestInLib(lab, lib){
   let best=null, bestDist=Infinity;
-  for(const c of PANTONE_COLORS){
-    const d = Math.hypot(lab.L-c.lab.L, lab.a-c.lab.a, lab.b-c.lab.b);
+  for(const c of lib.colors){
+    const d = deltaE2000(lab, c.lab);
     if(d<bestDist){ bestDist=d; best=c; }
   }
   return { ...best, distance: bestDist };
+}
+
+function nearestPantones(r,g,b){
+  const lab = rgbToLab(r,g,b);
+  return PANTONE_LIBS.map(lib=> ({ lib, match: nearestInLib(lab, lib) }));
 }
 
 // Real artwork, exported from Illustrator as one row of 7 bare marks
@@ -899,8 +4692,7 @@ const cInput=document.getElementById('cInput'), mInput=document.getElementById('
 const sbField=document.getElementById('satBrightField'), sbCursor=document.getElementById('sbCursor');
 const hueSlider=document.getElementById('hueSlider'), hueCursor=document.getElementById('hueCursor');
 const toggleVisualPicker=document.getElementById('toggleVisualPicker'), hsbPicker=document.getElementById('hsbPicker');
-const pantoneSwatch=document.getElementById('pantoneSwatch'), pantoneCode=document.getElementById('pantoneCode'), pantoneName=document.getElementById('pantoneName');
-const pantoneMatch=document.getElementById('pantoneMatch');
+const pantoneRows=document.getElementById('pantoneRows');
 const togglePantone=document.getElementById('togglePantone'), pantoneBody=document.getElementById('pantoneBody');
 const pantoneArrow=togglePantone.querySelector('.collapsible-arrow');
 const toggleCmyk=document.getElementById('toggleCmyk'), cmykBody=document.getElementById('cmykBody');
@@ -972,7 +4764,7 @@ function render(){
   const fam = classifyFamily(hsl.h, hsl.s, hsl.l, okH);
   const nearest = nearestColorName(r,g,b);
   outFamily.textContent = familyLabel(fam, hsl.h, okH);
-  outName.textContent = nearest ? nearest.name : '';
+  outName.textContent = nearest ? (nearest[lang] || nearest.en) : '';
   familyIcon.innerHTML = generateFamilyIconSVG(fam, hex, toneOf(fam, hsl.l));
 
   const hsb = rgbToHsb(r,g,b);
@@ -982,22 +4774,7 @@ function render(){
   sbCursor.style.top = ((100-hsb.b)/100*sbField.clientHeight) + 'px';
   hueCursor.style.top = ((360-hsb.h)/360*hueSlider.clientHeight) + 'px';
 
-  const pantone = nearestPantone(r,g,b);
-  pantoneSwatch.style.background = pantone.hex;
-  pantoneCode.textContent = `PANTONE® ${pantone.code}`;
-  pantoneName.textContent = pantone.name
-    ? pantone.name + (pantone.year ? ` · Color del Año ${pantone.year}` : '')
-    : (pantone.year ? `Color del Año ${pantone.year}` : '');
-  pantoneMatch.className = 'pantone-match';
-  if(pantone.distance < 10){
-    pantoneMatch.textContent = 'Coincidencia cercana';
-    pantoneMatch.classList.add('near');
-  }else if(pantone.distance > 30){
-    pantoneMatch.textContent = 'Coincidencia lejana — no hay nada parecido en esta muestra reducida';
-    pantoneMatch.classList.add('far');
-  }else{
-    pantoneMatch.textContent = 'Coincidencia aproximada';
-  }
+  renderPantone(r,g,b);
 
   satSlider.style.background = `linear-gradient(to bottom, ${hslToHex(hsl.h,100,hsl.l)}, ${hslToHex(hsl.h,0,hsl.l)})`;
   satCursor.style.top = ((100-hsl.s)/100*satSlider.clientHeight) + 'px';
@@ -1081,16 +4858,158 @@ document.querySelectorAll('button.copy').forEach(btn=>{
       : key==='m' ? mInput.value
       : key==='y' ? yInput.value
       : key==='k' ? kInput.value
-      : key==='pantone' ? pantoneCode.textContent
       : `rgb(${current.r}, ${current.g}, ${current.b})`;
     try{
       await navigator.clipboard.writeText(text);
       const original = btn.textContent;
-      btn.textContent = '¡Copiado!';
+      btn.textContent = t('copied');
       setTimeout(()=>{ btn.textContent = original; }, 1200);
     }catch(e){}
   });
 });
+
+// Cada biblioteca se dibuja una sola vez; después solo se reescriben sus valores, para no
+// rehacer los botones de copiar en cada movimiento del selector.
+const pantoneCells = PANTONE_LIBS.map(lib=>{
+  const row = document.createElement('div');
+  row.className = 'pantone-row';
+  row.innerHTML = `<div class="pantone-swatch"></div>
+    <div class="pantone-text">
+      <div class="pantone-lib"></div>
+      <div class="pantone-code"></div>
+      <div class="pantone-name"></div>
+      <div class="pantone-match"></div>
+    </div>`;
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'copy';
+  copyBtn.type = 'button';
+  copyBtn.textContent = t('copy');
+  const cell = {
+    copyBtn,
+    lib: row.querySelector('.pantone-lib'),
+    swatch: row.querySelector('.pantone-swatch'),
+    code: row.querySelector('.pantone-code'),
+    name: row.querySelector('.pantone-name'),
+    match: row.querySelector('.pantone-match'),
+  };
+  copyBtn.addEventListener('click', async ()=>{
+    try{
+      await navigator.clipboard.writeText(cell.code.textContent);
+      copyBtn.textContent = t('copied');
+      setTimeout(()=>{ copyBtn.textContent = t('copy'); }, 1200);
+    }catch(e){}
+  });
+  row.appendChild(copyBtn);
+  pantoneRows.appendChild(row);
+  return cell;
+});
+
+// --- Buscar un Pantone por nombre o por código ---
+// Todo se reduce a letras y números: "17-1230", "171230", "PANTONE 185 C", "185c" y "classic
+// blue" son la misma búsqueda. Así no hay que acordarse de guiones, espacios ni acentos.
+function searchKey(str){
+  return String(str||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+}
+// El nombre se guarda partido en palabras: así "oro" encuentra el Pantone Oro y no cualquier
+// nombre que lleve esas tres letras dentro ("Vaporous", "Coronet"). El nombre pegado sin espacios
+// queda como segunda opción, para que "classicblue" también funcione.
+function nameWords(c){
+  const text = [c.name || '', c.note ? c.note.en + ' ' + c.note.es : ''].join(' ');
+  return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').split(/[^a-z0-9]+/).filter(Boolean);
+}
+const PANTONE_INDEX = PANTONE_LIBS.flatMap(lib=> lib.colors.map(c=>{
+  const words = nameWords(c);
+  return {
+    lib, color: c,
+    codeKey: searchKey(c.code + lib.suffix),
+    codeOnly: searchKey(c.code),
+    words,
+    nameFlat: words.join(''),
+  };
+}));
+
+function searchPantone(query){
+  let q = searchKey(query).replace(/^pantone/,'');
+  if(q.length < 2) return [];
+  const hits = [];
+  for(const item of PANTONE_INDEX){
+    let score = -1;
+    if(item.codeKey === q || item.codeOnly === q) score = 0;
+    else if(item.codeKey.startsWith(q)) score = 1;
+    else if(item.codeOnly.startsWith(q)) score = 2;
+    else if(item.words.includes(q)) score = 3;
+    else if(item.words.some(w=> w.startsWith(q))) score = 3.5;
+    else if(q.length >= 4 && item.nameFlat.includes(q)) score = 4;
+    if(score >= 0) hits.push({ ...item, score });
+  }
+  hits.sort((a,b)=> a.score - b.score || a.codeOnly.length - b.codeOnly.length);
+  return hits.slice(0, 12);
+}
+
+const pantoneSearch=document.getElementById('pantoneSearch');
+const pantoneResults=document.getElementById('pantoneResults');
+const pantoneNoResults=document.getElementById('pantoneNoResults');
+
+function renderPantoneSearch(){
+  const hits = searchPantone(pantoneSearch.value);
+  pantoneResults.innerHTML = '';
+  pantoneNoResults.hidden = !(searchKey(pantoneSearch.value).length >= 2 && hits.length === 0);
+  hits.forEach(({lib,color})=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pantone-result';
+    const note = color.note ? (color.note[lang] || color.note.en) : (color.name || '');
+    btn.innerHTML = `<span class="chip" style="background:${color.hex}"></span>
+      <span>
+        <span class="code">PANTONE® ${color.code} ${lib.suffix}</span>
+        <span class="sub">${[note, color.year ? t('coy')+' '+color.year : ''].filter(Boolean).join(' · ') || t(lib.hint)}</span>
+      </span>
+      <span class="hex">${color.hex.toUpperCase()}</span>`;
+    // Elegir un resultado es como haber apuntado a ese color: cambia el color actual y con él
+    // toda la página (familia, nombre, CMYK, esquemas).
+    btn.addEventListener('click', ()=>{
+      const rgb = hexToRgb(color.hex);
+      if(rgb) setColor(rgb);
+    });
+    pantoneResults.appendChild(btn);
+  });
+}
+pantoneSearch.addEventListener('input', renderPantoneSearch);
+pantoneSearch.addEventListener('keydown', e=>{
+  if(e.key === 'Enter'){
+    e.preventDefault();
+    const first = pantoneResults.querySelector('.pantone-result');
+    if(first) first.click();
+  }
+  if(e.key === 'Escape'){ pantoneSearch.value = ''; renderPantoneSearch(); }
+});
+
+function renderPantone(r,g,b){
+  nearestPantones(r,g,b).forEach(({lib,match}, i)=>{
+    const cell = pantoneCells[i];
+    cell.lib.textContent = `${t(lib.label)} · ${t(lib.hint)}`;
+    cell.swatch.style.background = match.hex;
+    cell.code.textContent = `PANTONE® ${match.code} ${lib.suffix}`;
+    const note = match.note ? (match.note[lang] || match.note.en) : (match.name || '');
+    cell.name.textContent = [note, match.year ? `${t('coy')} ${match.year}` : '']
+      .filter(Boolean).join(' · ');
+    cell.name.hidden = !cell.name.textContent;
+    const dE = match.distance;
+    cell.match.className = 'pantone-match';
+    if(dE < 1){
+      cell.match.textContent = `ΔE ${dE.toFixed(1)} — ${t('deSame')}`;
+      cell.match.classList.add('near');
+    }else if(dE < 3){
+      cell.match.textContent = `ΔE ${dE.toFixed(1)} — ${t('deClose')}`;
+      cell.match.classList.add('near');
+    }else if(dE < 8){
+      cell.match.textContent = `ΔE ${dE.toFixed(1)} — ${t('deApprox')}`;
+    }else{
+      cell.match.textContent = `ΔE ${dE.toFixed(1)} — ${t('deFar')}`;
+      cell.match.classList.add('far');
+    }
+  });
+}
 
 function updateFromSBField(clientX,clientY){
   const rect = sbField.getBoundingClientRect();
@@ -1119,7 +5038,7 @@ hueSlider.addEventListener('pointermove', e=>{ if(hueDragging) updateFromHueSlid
 
 toggleFineTune.addEventListener('click', ()=>{
   fineTunePanel.hidden = !fineTunePanel.hidden;
-  toggleFineTune.textContent = fineTunePanel.hidden ? 'Ajuste preciso de S y L ▾' : 'Ajuste preciso de S y L ▴';
+  toggleFineTune.textContent = fineTunePanel.hidden ? t('showFine') : t('hideFine');
 });
 togglePantone.addEventListener('click', ()=>{
   pantoneBody.hidden = !pantoneBody.hidden;
@@ -1140,7 +5059,7 @@ toggleHarmony.addEventListener('click', ()=>{
 
 function setVisualPickerHidden(hide){
   hsbPicker.hidden = hide;
-  toggleVisualPicker.textContent = hide ? 'Mostrar selector visual ▾' : 'Ocultar selector visual ▴';
+  toggleVisualPicker.textContent = hide ? t('showPicker') : t('hidePicker');
   try{ localStorage.setItem('milo-color-picker-hide-visual', hide ? '1' : '0'); }catch(e){}
 }
 toggleVisualPicker.addEventListener('click', ()=> setVisualPickerHidden(!hsbPicker.hidden));
@@ -1148,7 +5067,7 @@ try{ setVisualPickerHidden(localStorage.getItem('milo-color-picker-hide-visual')
 
 function setHslHidden(hide){
   hslWrap.hidden = hide;
-  toggleHsl.textContent = hide ? 'Mostrar HSL ▾' : 'Ocultar HSL ▴';
+  toggleHsl.textContent = hide ? t('showHsl') : t('hideHsl');
   try{ localStorage.setItem('milo-color-picker-hide-hsl', hide ? '1' : '0'); }catch(e){}
 }
 toggleHsl.addEventListener('click', ()=> setHslHidden(!hslWrap.hidden));
@@ -1212,7 +5131,7 @@ const toggleImageUpload=document.getElementById('toggleImageUpload'), imageUploa
 
 function setImageUploadHidden(hide){
   imageUploadWrap.hidden = hide;
-  toggleImageUpload.textContent = hide ? 'Subir imagen ▾' : 'Subir imagen ▴';
+  toggleImageUpload.textContent = hide ? t('showUpload') : t('hideUpload');
   try{ localStorage.setItem('milo-color-picker-hide-upload', hide ? '1' : '0'); }catch(e){}
 }
 toggleImageUpload.addEventListener('click', ()=> setImageUploadHidden(!imageUploadWrap.hidden));
@@ -1315,8 +5234,8 @@ function renderSwatches(){
     const chip = document.createElement('div');
     chip.className = 'swatch-chip';
     chip.innerHTML = `
-      <button type="button" class="swatch-remove" aria-label="Quitar ${hex}">×</button>
-      <button type="button" class="swatch-color" style="background:${hex}" title="Usar ${hex.toUpperCase()}"></button>
+      <button type="button" class="swatch-remove" aria-label="${t('removeSwatch')} ${hex}">×</button>
+      <button type="button" class="swatch-color" style="background:${hex}" title="${t('useSwatch')} ${hex.toUpperCase()}"></button>
       <span class="swatch-hex">${hex.toUpperCase()}</span>
     `;
     chip.querySelector('.swatch-color').addEventListener('click', ()=>{
@@ -1341,15 +5260,42 @@ addSwatchBtn.addEventListener('click', ()=>{
   }
 });
 clearSwatchesBtn.addEventListener('click', ()=>{
-  if(swatches.length && confirm('¿Vaciar todos los colores guardados?')){
+  if(swatches.length && confirm(t('confirmClear'))){
     swatches = [];
     saveSwatches();
     renderSwatches();
   }
 });
 
+// Reaplica todo el texto: lo fijo del HTML por data-i18n, y lo que arma el JS llamando otra vez
+// a quien lo escribe. Los botones que muestran/ocultan conservan su estado, solo cambian de idioma.
+const toggleLang = document.getElementById('toggleLang');
+function applyLang(){
+  document.documentElement.lang = lang;
+  toggleLang.textContent = t('langButton');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{ el.innerHTML = t(el.dataset.i18nHtml); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{ el.placeholder = t(el.dataset.i18nPlaceholder); });
+  document.querySelectorAll('[data-i18n-title]').forEach(el=>{ el.title = t(el.dataset.i18nTitle); });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el=>{ el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+  toggleVisualPicker.textContent = hsbPicker.hidden ? t('showPicker') : t('hidePicker');
+  toggleHsl.textContent = hslWrap.hidden ? t('showHsl') : t('hideHsl');
+  toggleImageUpload.textContent = imageUploadWrap.hidden ? t('showUpload') : t('hideUpload');
+  toggleFineTune.textContent = fineTunePanel.hidden ? t('showFine') : t('hideFine');
+  pantoneCells.forEach(cell=>{ cell.copyBtn.textContent = t('copy'); });
+  renderPantoneSearch();
+  renderSwatches();
+  render();
+}
+toggleLang.addEventListener('click', ()=>{
+  lang = lang === 'es' ? 'en' : 'es';
+  try{ localStorage.setItem('milo-color-picker-lang', lang); }catch(e){}
+  applyLang();
+});
+
 renderSwatches();
 setColor(current);
+applyLang();
 </script>
 </body>
 </html>
