@@ -1061,6 +1061,36 @@
   .ecom-strip img { height: 170px; width: auto; border: 1px solid var(--line-strong); cursor: zoom-in; flex: none; }
   @media (max-width: 560px) { .stat { border-right: none; border-bottom: 1px solid var(--line); } }
 
+  /* ---- barra de identidad y permisos ---- */
+  .yo-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; max-width: 1080px; margin: 0 auto; padding: 8px clamp(16px, 4vw, 48px) 0; font-size: 0.82rem; color: var(--ink-soft); }
+  .yo-bar button { font: inherit; font-size: 0.78rem; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); padding: 4px 10px; border-radius: 0; }
+  .yo-bar button:hover { border-color: var(--accent); color: var(--accent); }
+  .yo-estado { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border: 1px solid var(--line-strong); }
+  .yo-estado.aprobado { color: var(--done); border-color: var(--done); background: var(--done-soft); }
+  .yo-estado.pendiente { color: var(--warn); border-color: var(--warn); background: var(--warn-soft); }
+  .yo-estado.bloqueado { color: var(--paper); border-color: var(--ink); background: var(--ink); }
+  .yo-cuota { font-family: 'IBM Plex Mono', monospace; font-size: 0.74rem; }
+  .yo-aviso { margin-left: auto; font-size: 0.76rem; color: var(--warn); }
+
+  .pendiente-aviso { background: var(--warn-soft); border: 1px solid var(--warn); color: var(--warn); padding: 12px 16px; font-size: 0.87rem; margin-bottom: 20px; }
+
+  /* ---- fotos compartidas de cada look ---- */
+  .look-thumb-wrap .look-autor { position: absolute; left: 0; right: 0; bottom: 0; font-family: 'IBM Plex Mono', monospace; font-size: 0.56rem; letter-spacing: 0.04em; text-transform: uppercase; color: #fff; background: rgba(22,27,34,0.72); padding: 1px 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .look-vacio { font-size: 0.78rem; color: var(--ink-faint); font-style: italic; align-self: center; }
+
+  /* ---- producción ---- */
+  .prod-caja { background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); padding: 18px; margin-bottom: 24px; }
+  .prod-caja h3 { font-size: 1.1rem; margin-bottom: 10px; }
+  .prod-caja input[type="text"], .prod-caja input[type="password"] { font: inherit; font-size: 0.9rem; padding: 8px 10px; border: 1px solid var(--line-strong); background: var(--surface); border-radius: 0; }
+  .prod-caja button { font: inherit; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; border: 2px solid var(--ink); background: var(--ink); color: var(--paper); padding: 8px 14px; border-radius: 0; }
+  .prod-caja button.sec { background: none; color: var(--ink); border-width: 1px; font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .disp-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); font-size: 0.88rem; }
+  .disp-row:first-of-type { border-top: none; }
+  .disp-meta { font-size: 0.76rem; color: var(--ink-faint); }
+  .hist-row { display: grid; grid-template-columns: 140px 1fr; gap: 10px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 0.82rem; }
+  .hist-row:first-of-type { border-top: none; }
+  .hist-fecha { font-family: 'IBM Plex Mono', monospace; font-size: 0.74rem; color: var(--ink-faint); }
+
 </style>
 </head>
 <body>
@@ -1120,7 +1150,9 @@
     <button class="tab active" data-view="d1">Día 1 · Estudio <span class="count mono">9 nov</span></button>
     <button class="tab" data-view="d2">Día 2 · Lifestyle <span class="count mono">10 nov</span></button>
     <button class="tab" data-view="refs">Referentes <span class="count mono">foto</span></button>
+    <button class="tab" data-view="prod">Producción <span class="count mono">permisos</span></button>
   </div>
+  <div class="yo-bar" id="yo-bar"></div>
 </div>
 
 <main>
@@ -1151,6 +1183,10 @@
   <section id="view-refs" class="view">
     <div id="refs-content"></div>
   </section>
+
+  <section id="view-prod" class="view">
+    <div id="prod-content"></div>
+  </section>
 </main>
 
 <div class="lightbox-overlay" id="lightbox">
@@ -1173,6 +1209,142 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
 
   var IMG = window.SO_IMAGES || {};
   var UREF = window.SO_USER_REFS || { ecom: [], lifestyle: [] };
+
+  // ---------- el servidor: un script en el Drive de Milo ----------
+  // Nada de lo que se hace aquí se queda en el aparato: las fotos van a su carpeta de Drive y
+  // los campos a una hoja de cálculo, y por eso todos ven lo mismo. Lo de localStorage que
+  // queda abajo es solo para pintar algo mientras llega la primera respuesta.
+  var API = "https://script.google.com/macros/s/AKfycbzgXAy8vvf0bo79AP3lHhLUWLCg7DVGjoNa7dkDoRPtvxTu42GCsG1-nwDI4hNLXJyQ9g/exec";
+  var CLAVE_ENLACE = "hxwe5pexw7twyvfzwijy36c9";
+
+  function guardarLocal(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function leerLocal(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  // No hay cuentas: el navegador se inventa un código la primera vez y ese es el que lo
+  // identifica mientras no borre sus datos. Es también con lo que se cuenta el tope de fotos.
+  var dispositivo = leerLocal("milo-smoke-oak-dispositivo");
+  if (!dispositivo) {
+    dispositivo = "d" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+    guardarLocal("milo-smoke-oak-dispositivo", dispositivo);
+  }
+  var autor = leerLocal("milo-smoke-oak-nombre") || "";
+  var permiso = "desconocido";
+  var cuota = { fotos: 0, limite: 100 };
+  var versionServidor = 0;
+  var fotosRemotas = [];
+  var camposRemotos = {};
+  var dispositivosRemotos = null;
+  var sinConexion = false;
+
+  // La clave de producción no se guarda en el disco: vive mientras la pestaña esté abierta.
+  var codigoProd = "";
+  try { codigoProd = sessionStorage.getItem("milo-smoke-oak-codigo") || ""; } catch (e) {}
+
+  function api(accion, datos) {
+    var cuerpo = { accion: accion, clave: CLAVE_ENLACE, dispositivo: dispositivo, autor: autor };
+    if (codigoProd) cuerpo.codigo = codigoProd;
+    for (var k in (datos || {})) cuerpo[k] = datos[k];
+    // Texto plano a propósito: con application/json el navegador mandaría primero una
+    // petición OPTIONS, que Apps Script no contesta, y la llamada fallaría.
+    return fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(cuerpo)
+    }).then(function (r) { return r.json(); }).then(function (res) {
+      if (sinConexion) { sinConexion = false; pintarBarra(); }
+      return res;
+    }).catch(function () {
+      sinConexion = true; pintarBarra();
+      return { ok: false, error: "sin-conexion" };
+    });
+  }
+
+  function puedoEscribir() { return permiso === "aprobado"; }
+
+  function avisarSiNoPuede(res) {
+    if (res.ok) return false;
+    if (res.error === "sin-permiso") alert("Todavía no te han aprobado para editar. Pídele a producción que te apruebe en la pestaña Producción.");
+    else if (res.error === "limite") alert("Llegaste al tope de " + cuota.limite + " fotos desde este aparato.");
+    else if (res.error === "codigo") alert("Esa no es la clave de producción.");
+    else if (res.error === "sin-conexion") alert("No hubo conexión con el Drive. Revisa la señal y vuelve a intentar.");
+    return true;
+  }
+
+  // ---------- estado compartido ----------
+  var camposDOM = {};   // clave -> cómo volver a pintar ese campo cuando cambia en el servidor
+  var fotosDOM = {};    // look -> cómo volver a pintar sus fotos
+  var pendientesDeGuardar = {};
+
+  function valorCampo(clave) {
+    if (camposRemotos[clave] != null) return camposRemotos[clave];
+    return state[clave] != null ? state[clave] : "";
+  }
+
+  function guardarCampo(clave, valor) {
+    var texto = valor === true ? "1" : (valor === false ? "" : String(valor == null ? "" : valor));
+    camposRemotos[clave] = texto;
+    state[clave] = (texto === "1" || texto === "") ? (texto === "1") : texto;
+    if (texto === "") delete state[clave];
+    save();
+    if (!puedoEscribir()) return;
+    // Escribir letra por letra sería un viaje al servidor por tecla: se espera a que pare.
+    clearTimeout(pendientesDeGuardar[clave]);
+    pendientesDeGuardar[clave] = setTimeout(function () {
+      api("guardar", { campo: clave, valor: texto }).then(function (res) {
+        if (res.ok) versionServidor = res.version; else avisarSiNoPuede(res);
+      });
+    }, 500);
+  }
+
+  function aplicarCampos() {
+    Object.keys(camposDOM).forEach(function (clave) {
+      var ref = camposDOM[clave];
+      var valor = camposRemotos[clave] != null ? camposRemotos[clave] : "";
+      if (ref.tipo === "texto" || ref.tipo === "select") {
+        state[clave] = valor;
+        if (document.activeElement !== ref.input) ref.input.value = valor;
+      } else {
+        var marcado = valor === "1";
+        state[clave] = marcado;
+        if (!marcado) delete state[clave];
+        ref.input.checked = marcado;
+        if (ref.chip) ref.chip.classList.toggle("checked", marcado);
+        if (ref.fila) ref.fila.classList.toggle("checked", marcado);
+        if (ref.refrescarFila) ref.refrescarFila();
+      }
+    });
+    save();
+    updateProgress();
+  }
+
+  function sincronizar() {
+    return api("estado", {}).then(function (res) {
+      if (!res.ok) return res;
+      versionServidor = res.version;
+      fotosRemotas = res.fotos || [];
+      camposRemotos = {};
+      Object.keys(res.campos || {}).forEach(function (k) { camposRemotos[k] = res.campos[k].valor; });
+      if (res.yo) { permiso = res.yo.estado; cuota = { fotos: res.yo.fotos, limite: res.yo.limite }; }
+      dispositivosRemotos = res.dispositivos || null;
+      aplicarCampos();
+      Object.keys(fotosDOM).forEach(function (look) { fotosDOM[look](); });
+      pintarBarra();
+      avisoPendiente();
+      pintarProduccion();
+      return res;
+    });
+  }
+
+  // Preguntar "¿cambió algo?" es mucho más barato que traerse todo, y así el script de Google
+  // no se queda sin cuota por tener la página abierta todo el día.
+  function latido() {
+    if (document.hidden) return;
+    api("version").then(function (res) {
+      if (res.ok && res.version !== versionServidor) sincronizar();
+    });
+  }
+  setInterval(latido, 20000);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) sincronizar(); });
 
   var ICONS = {
     ecom: '<rect x="5" y="2.5" width="10" height="15" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="7" r="1.7" fill="currentColor"/><path d="M7 15v-4h6v4" fill="none" stroke="currentColor" stroke-width="1.6"/>',
@@ -1340,13 +1512,14 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
     if (state[id]) row.classList.add("checked");
     var cb = document.createElement("input");
     cb.type = "checkbox";
-    cb.checked = !!state[id];
+    cb.checked = valorCampo(id) === "1" || state[id] === true;
     cb.setAttribute("aria-label", "Marcar " + id);
     cb.addEventListener("change", function () {
-      state[id] = cb.checked;
       row.classList.toggle("checked", cb.checked);
-      save(); updateProgress();
+      guardarCampo(id, cb.checked);
+      updateProgress();
     });
+    camposDOM[id] = { tipo: "check", input: cb, fila: row };
     var body = el("div", "row-body");
     var top = el("div", "row-top");
     var badge = el("span", "shot-badge");
@@ -1359,16 +1532,19 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
     return { row: row, body: body };
   }
 
-  // ---------- fotos subidas de los looks (IndexedDB, caben muchas sin llenar localStorage) ----------
+  // ---------- fotos de cada look ----------
+  // Las fotos viven en el Drive de Milo. Aquí solo se guarda una copia pequeña de la
+  // miniatura, para que volver a abrir la página no tenga que bajarlas todas otra vez.
   var dbp = null;
   function getDB() {
     if (dbp) return dbp;
     dbp = new Promise(function (res) {
       try {
-        var r = indexedDB.open("milo-smoke-oak", 1);
+        var r = indexedDB.open("milo-smoke-oak", 2);
         r.onupgradeneeded = function () {
-          var st = r.result.createObjectStore("imgs", { keyPath: "id" });
-          st.createIndex("look", "look");
+          var db = r.result;
+          if (!db.objectStoreNames.contains("cache")) db.createObjectStore("cache", { keyPath: "id" });
+          if (db.objectStoreNames.contains("imgs")) db.deleteObjectStore("imgs");
         };
         r.onsuccess = function () { res(r.result); };
         r.onerror = function () { res(null); };
@@ -1376,44 +1552,44 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
     });
     return dbp;
   }
-  function dbList(look) {
+  function cacheGet(id) {
     return getDB().then(function (db) {
-      if (!db) return [];
+      if (!db) return null;
       return new Promise(function (res) {
-        var q = db.transaction("imgs").objectStore("imgs").index("look").getAll(look);
-        q.onsuccess = function () { res((q.result || []).sort(function (a, b) { return a.t - b.t; })); };
-        q.onerror = function () { res([]); };
+        var q = db.transaction("cache").objectStore("cache").get(id);
+        q.onsuccess = function () { res(q.result ? q.result.datos : null); };
+        q.onerror = function () { res(null); };
       });
     });
   }
-  function dbPut(rec) {
+  function cachePut(id, datos) {
     return getDB().then(function (db) {
       if (!db) return;
       return new Promise(function (res) {
-        var tx = db.transaction("imgs", "readwrite"); tx.objectStore("imgs").put(rec);
+        var tx = db.transaction("cache", "readwrite");
+        tx.objectStore("cache").put({ id: id, datos: datos });
         tx.oncomplete = function () { res(); }; tx.onerror = function () { res(); };
       });
     });
   }
-  function dbDel(id) {
-    return getDB().then(function (db) {
-      if (!db) return;
-      return new Promise(function (res) {
-        var tx = db.transaction("imgs", "readwrite"); tx.objectStore("imgs").delete(id);
-        tx.oncomplete = function () { res(); }; tx.onerror = function () { res(); };
+
+  var enMemoria = {};
+  function traerImagen(accion, id) {
+    var llave = accion + "|" + id;
+    if (enMemoria[llave]) return Promise.resolve(enMemoria[llave]);
+    return cacheGet(llave).then(function (guardada) {
+      if (guardada) { enMemoria[llave] = guardada; return guardada; }
+      return api(accion, { id: id }).then(function (res) {
+        if (!res.ok) return null;
+        var url = "data:image/jpeg;base64," + res.datos;
+        enMemoria[llave] = url;
+        if (accion === "miniatura") cachePut(llave, url);
+        return url;
       });
     });
   }
-  function dbClear() {
-    return getDB().then(function (db) {
-      if (!db) return;
-      return new Promise(function (res) {
-        var tx = db.transaction("imgs", "readwrite"); tx.objectStore("imgs").clear();
-        tx.oncomplete = function () { res(); }; tx.onerror = function () { res(); };
-      });
-    });
-  }
-  function compressToBlob(file, maxDim, quality) {
+
+  function comprimirABase64(file, maxDim, calidad) {
     return new Promise(function (resolve, reject) {
       var url = URL.createObjectURL(file);
       var img = new Image();
@@ -1424,16 +1600,25 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
         c.height = Math.max(1, Math.round(img.height * sc));
         c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
         URL.revokeObjectURL(url);
-        c.toBlob(function (b) { b ? resolve(b) : reject(); }, "image/jpeg", quality);
+        resolve(c.toDataURL("image/jpeg", calidad).split(",")[1]);
       };
       img.onerror = function () { URL.revokeObjectURL(url); reject(); };
       img.src = url;
     });
   }
 
+  function pedirCodigo(motivo) {
+    if (codigoProd) return true;
+    var c = prompt(motivo + "\n\nClave de producción:");
+    if (!c) return false;
+    codigoProd = c.trim().toUpperCase();
+    try { sessionStorage.setItem("milo-smoke-oak-codigo", codigoProd); } catch (e) {}
+    return true;
+  }
+
   var SHOTS = [["a", "Cuerpo entero"], ["b", "Plano medio"], ["c", "Detalle"]];
 
-  function lookUploads(id, title) {
+  function lookUploads(lookId, title) {
     var wrap = document.createElement("div");
     wrap.appendChild(el("div", "look-photos-label", "Fotos del look"));
     var row = el("div", "look-photos");
@@ -1445,40 +1630,67 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
     var input = document.createElement("input");
     input.type = "file"; input.accept = "image/*"; input.multiple = true;
     add.appendChild(input);
+
     input.addEventListener("change", function () {
       var files = Array.prototype.slice.call(input.files || []);
       if (!files.length) return;
+      if (!puedoEscribir()) { input.value = ""; return avisarSiNoPuede({ error: "sin-permiso" }); }
       add.classList.add("uploading");
-      files.reduce(function (p, f, i) {
+      files.reduce(function (p, f) {
         return p.then(function () {
-          return compressToBlob(f, 1100, 0.82).then(function (blob) {
-            return dbPut({ id: id + "|" + Date.now() + "-" + i, look: id, t: Date.now() + i, blob: blob });
-          }).catch(function () {});
+          // La grande sirve para revisar un look; el original se queda en la cámara.
+          return Promise.all([comprimirABase64(f, 1400, 0.82), comprimirABase64(f, 320, 0.7)])
+            .then(function (par) {
+              return api("subir", { look: lookId, foto: par[0], miniatura: par[1] }).then(function (res) {
+                if (res.ok) { cuota.fotos = res.fotos; versionServidor = res.version; }
+                else avisarSiNoPuede(res);
+              });
+            }).catch(function () {});
         });
       }, Promise.resolve()).then(function () {
-        input.value = ""; add.classList.remove("uploading"); render();
+        input.value = "";
+        add.classList.remove("uploading");
+        pintarBarra();
+        return sincronizar();
       });
     });
 
-    function render() {
+    function pintar() {
+      var mias = fotosRemotas.filter(function (f) { return String(f.look) === String(lookId); })
+        .sort(function (a, b) { return a.fecha - b.fecha; });
       row.innerHTML = "";
-      dbList(id).then(function (items) {
-        items.forEach(function (it) {
-          var url = URL.createObjectURL(it.blob);
-          var w = el("div", "look-thumb-wrap");
-          var im = document.createElement("img");
-          im.src = url; im.alt = title;
-          im.addEventListener("click", function () { openLightbox(url, title); });
-          var del = el("button", "look-del", "×");
-          del.type = "button"; del.title = "Quitar esta foto";
-          del.addEventListener("click", function () { dbDel(it.id).then(render); });
-          w.appendChild(im); w.appendChild(del);
-          row.appendChild(w);
+      mias.forEach(function (f) {
+        var w = el("div", "look-thumb-wrap");
+        var im = document.createElement("img");
+        im.alt = title;
+        w.appendChild(im);
+        traerImagen("miniatura", f.id).then(function (url) { if (url) im.src = url; });
+        im.addEventListener("click", function () {
+          openLightbox(im.src, title + (f.autor ? " · " + f.autor : ""));
+          traerImagen("foto", f.id).then(function (url) {
+            if (url && document.getElementById("lightbox").classList.contains("open")) {
+              document.getElementById("lightbox-img").src = url;
+            }
+          });
         });
-        row.appendChild(add);
+        if (f.autor) w.appendChild(el("span", "look-autor", f.autor));
+        var del = el("button", "look-del", "×");
+        del.type = "button"; del.title = "Quitar esta foto (solo producción)";
+        del.addEventListener("click", function () {
+          if (!pedirCodigo("Borrar una foto es cosa de producción.")) return;
+          api("borrar", { id: f.id }).then(function (res) {
+            if (res.ok) sincronizar(); else { codigoProd = ""; avisarSiNoPuede(res); }
+          });
+        });
+        w.appendChild(del);
+        row.appendChild(w);
       });
+      if (!mias.length) row.appendChild(el("span", "look-vacio", "Sin fotos todavía."));
+      if (puedoEscribir()) row.appendChild(add);
     }
-    render();
+
+    fotosDOM[lookId] = pintar;
+    pintar();
     return wrap;
   }
 
@@ -1500,20 +1712,22 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
 
     var chips = el("div", "tone-checklist tone-checklist-row");
     function refreshRow() {
-      row.classList.toggle("checked", SHOTS.every(function (s) { return state[id + ":" + s[0]]; }));
+      row.classList.toggle("checked", SHOTS.every(function (s) { return valorCampo(id + ":" + s[0]) === "1"; }));
     }
     SHOTS.forEach(function (s) {
       var key = id + ":" + s[0];
       d1Ids.push(key);
       var chip = el("label", "tone-chip");
-      if (state[key]) chip.classList.add("checked");
+      var marcado = valorCampo(key) === "1" || state[key] === true;
+      if (marcado) chip.classList.add("checked");
       var cb = document.createElement("input");
-      cb.type = "checkbox"; cb.checked = !!state[key];
+      cb.type = "checkbox"; cb.checked = marcado;
       cb.addEventListener("change", function () {
-        state[key] = cb.checked;
         chip.classList.toggle("checked", cb.checked);
-        save(); refreshRow(); updateProgress();
+        guardarCampo(key, cb.checked);
+        refreshRow(); updateProgress();
       });
+      camposDOM[key] = { tipo: "chip", input: cb, chip: chip, refrescarFila: refreshRow };
       chip.appendChild(cb);
       chip.appendChild(el("span", null, s[1]));
       chips.appendChild(chip);
@@ -1528,8 +1742,9 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
   function textField(key, placeholder) {
     var inp = document.createElement("input");
     inp.type = "text"; inp.placeholder = placeholder; inp.setAttribute("aria-label", placeholder);
-    inp.value = state[key] || "";
-    inp.addEventListener("input", function () { state[key] = inp.value; save(); });
+    inp.value = valorCampo(key) || "";
+    inp.addEventListener("input", function () { guardarCampo(key, inp.value); });
+    camposDOM[key] = { tipo: "texto", input: inp };
     return inp;
   }
   function selectField(key, label, options) {
@@ -1537,8 +1752,9 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
     s.setAttribute("aria-label", label);
     var o0 = document.createElement("option"); o0.value = ""; o0.textContent = label; s.appendChild(o0);
     options.forEach(function (o) { var op = document.createElement("option"); op.value = o; op.textContent = o; s.appendChild(op); });
-    s.value = state[key] || "";
-    s.addEventListener("change", function () { state[key] = s.value; save(); });
+    s.value = valorCampo(key) || "";
+    s.addEventListener("change", function () { guardarCampo(key, s.value); });
+    camposDOM[key] = { tipo: "select", input: s };
     return s;
   }
 
@@ -1698,18 +1914,176 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
   updateProgress();
 
   // ---------- reset ----------
-  function resetDay(ids, clearPhotos) {
-    var msg = "¿Reiniciar este checklist? Se borran las casillas y los campos de este día" + (clearPhotos ? " y las fotos de los looks que subiste." : ".");
-    if (!confirm(msg)) return;
-    var bases = ids.map(function (i) { return i.split(":")[0]; });
-    Object.keys(state).forEach(function (k) {
-      if (bases.indexOf(k.split(":")[0]) > -1) delete state[k];
+  // Reiniciar le cambia el checklist a todo el mundo, así que pide la clave de producción.
+  // Las fotos no se tocan: para quitar una se borra una por una, y queda en _borradas.
+  function resetDay(ids) {
+    var bases = {};
+    ids.forEach(function (i) { bases[i.split(":")[0]] = true; });
+    var prefijos = Object.keys(bases);
+    if (!pedirCodigo("Reiniciar el checklist se lo cambia a todo el equipo.")) return;
+    if (!confirm("¿Reiniciar este checklist para todos? Se borran las casillas y los campos de este día. Las fotos no se tocan.")) return;
+    api("reiniciar", { prefijos: prefijos }).then(function (res) {
+      if (!res.ok) { codigoProd = ""; return avisarSiNoPuede(res); }
+      prefijos.forEach(function (pre) {
+        Object.keys(camposRemotos).forEach(function (k) { if (k.indexOf(pre) === 0) delete camposRemotos[k]; });
+      });
+      sincronizar();
     });
-    save();
-    (clearPhotos ? dbClear() : Promise.resolve()).then(function () { location.reload(); });
   }
-  document.getElementById("reset-d1").addEventListener("click", function () { resetDay(d1Ids, true); });
+  document.getElementById("reset-d1").addEventListener("click", function () { resetDay(d1Ids); });
   document.getElementById("reset-d2").addEventListener("click", function () { resetDay(d2Ids); });
+
+  // ---------- quién soy y qué puedo hacer ----------
+  var barra = document.getElementById("yo-bar");
+
+  function pedirNombre(forzar) {
+    var n = prompt("¿Cómo te llamas? Sale en el historial, para saber quién subió o cambió cada cosa.", autor || "");
+    if (n == null) return false;
+    n = n.trim().slice(0, 40);
+    if (!n && !forzar) return false;
+    autor = n || "Sin nombre";
+    guardarLocal("milo-smoke-oak-nombre", autor);
+    return true;
+  }
+
+  function pintarBarra() {
+    barra.innerHTML = "";
+    var quien = el("span", null, autor ? autor : "Sin nombre");
+    quien.style.fontWeight = "700";
+    barra.appendChild(quien);
+
+    var cambiar = el("button", null, "Cambiar nombre");
+    cambiar.type = "button";
+    cambiar.addEventListener("click", function () {
+      if (pedirNombre(true)) api("hola", {}).then(sincronizar);
+    });
+    barra.appendChild(cambiar);
+
+    var etiquetas = { aprobado: "Puede subir y editar", pendiente: "Pendiente de aprobación", bloqueado: "Bloqueado", desconocido: "Conectando…" };
+    var est = el("span", "yo-estado " + permiso, etiquetas[permiso] || permiso);
+    barra.appendChild(est);
+
+    if (permiso === "aprobado") {
+      barra.appendChild(el("span", "yo-cuota", "Fotos: " + cuota.fotos + " / " + cuota.limite));
+    }
+    if (sinConexion) barra.appendChild(el("span", "yo-aviso", "Sin conexión con el Drive — lo que escribas ahora no se está guardando."));
+  }
+
+  function avisoPendiente() {
+    ["view-d1", "view-d2"].forEach(function (id) {
+      var vista = document.getElementById(id);
+      var viejo = vista.querySelector(".pendiente-aviso");
+      if (permiso === "aprobado" || permiso === "desconocido") { if (viejo) viejo.remove(); return; }
+      if (viejo) return;
+      var txt = permiso === "bloqueado"
+        ? "Producción bloqueó este aparato: puedes mirar, pero no cambiar nada."
+        : "Puedes mirar todo, pero para subir fotos o escribir hace falta que producción apruebe este aparato en la pestaña Producción.";
+      var aviso = el("div", "pendiente-aviso", txt);
+      vista.insertBefore(aviso, vista.firstChild);
+    });
+  }
+
+  // ---------- producción ----------
+  var prodContent = document.getElementById("prod-content");
+
+  function pintarProduccion() {
+    prodContent.innerHTML = "";
+    if (!codigoProd || !dispositivosRemotos) {
+      var caja = el("div", "prod-caja");
+      caja.appendChild(el("h3", null, "Entrar como producción"));
+      caja.appendChild(el("p", "intro-note", "Con la clave de producción puedes aprobar a quien entre, borrar fotos y ver el historial. La clave no se guarda en el aparato: se olvida al cerrar la pestaña."));
+      var inp = document.createElement("input");
+      inp.type = "password"; inp.placeholder = "Clave de producción";
+      var btn = el("button", null, "Entrar");
+      btn.type = "button";
+      function entrar() {
+        var v = (inp.value || "").trim().toUpperCase();
+        if (!v) return;
+        codigoProd = v;
+        try { sessionStorage.setItem("milo-smoke-oak-codigo", codigoProd); } catch (e) {}
+        sincronizar().then(function () {
+          if (!dispositivosRemotos) { codigoProd = ""; alert("Esa no es la clave de producción."); pintarProduccion(); }
+        });
+      }
+      btn.addEventListener("click", entrar);
+      inp.addEventListener("keydown", function (e) { if (e.key === "Enter") entrar(); });
+      var fila = el("div", "compare-row");
+      fila.appendChild(inp); fila.appendChild(btn);
+      caja.appendChild(fila);
+      prodContent.appendChild(caja);
+      return;
+    }
+
+    var cajaD = el("div", "prod-caja");
+    cajaD.appendChild(el("h3", null, "Quién puede subir y editar"));
+    cajaD.appendChild(el("p", "intro-note", "Cada persona que abre el enlace aparece aquí con el nombre que escribió. Apruébala para que pueda subir fotos y escribir; bloquéala para dejarla solo mirando."));
+    dispositivosRemotos.sort(function (a, b) { return (b.ultimaVez || 0) - (a.ultimaVez || 0); }).forEach(function (d) {
+      var fila = el("div", "disp-row");
+      var txt = el("div");
+      var nombre = el("div", null, d.nombre + (d.id === dispositivo ? " (este aparato)" : ""));
+      nombre.style.fontWeight = "700";
+      txt.appendChild(nombre);
+      txt.appendChild(el("div", "disp-meta", d.estado + " · " + d.fotos + " fotos · visto " +
+        (d.ultimaVez ? new Date(d.ultimaVez).toLocaleString("es-CO", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "—")));
+      fila.appendChild(txt);
+      var acciones = el("div");
+      [["aprobado", "Aprobar"], ["bloqueado", "Bloquear"]].forEach(function (par) {
+        if (d.estado === par[0]) return;
+        var b = el("button", "sec", par[1]);
+        b.type = "button";
+        b.style.marginLeft = "6px";
+        b.addEventListener("click", function () {
+          api("dispositivo", { objetivo: d.id, nuevoEstado: par[0] }).then(function (res) {
+            if (res.ok) sincronizar(); else avisarSiNoPuede(res);
+          });
+        });
+        acciones.appendChild(b);
+      });
+      fila.appendChild(acciones);
+      cajaD.appendChild(fila);
+    });
+    prodContent.appendChild(cajaD);
+
+    var cajaH = el("div", "prod-caja");
+    cajaH.appendChild(el("h3", null, "Historial"));
+    cajaH.appendChild(el("p", "intro-note", "Todo lo que se sube, se edita o se borra queda anotado con quién y cuándo."));
+    var lista = el("div");
+    cajaH.appendChild(lista);
+    var salir = el("button", "sec", "Salir de producción");
+    salir.type = "button";
+    salir.style.marginTop = "14px";
+    salir.addEventListener("click", function () {
+      codigoProd = "";
+      try { sessionStorage.removeItem("milo-smoke-oak-codigo"); } catch (e) {}
+      dispositivosRemotos = null;
+      pintarProduccion();
+    });
+    cajaH.appendChild(salir);
+    prodContent.appendChild(cajaH);
+
+    api("historial", {}).then(function (res) {
+      if (!res.ok) return;
+      res.lineas.forEach(function (h) {
+        var fila = el("div", "hist-row");
+        fila.appendChild(el("span", "hist-fecha", h.fecha ? new Date(h.fecha).toLocaleString("es-CO", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"));
+        fila.appendChild(el("span", null, (h.autor || "Sin nombre") + " · " + h.accion + (h.detalle ? " · " + h.detalle : "")));
+        lista.appendChild(fila);
+      });
+    });
+  }
+
+  // ---------- arranque ----------
+  pintarBarra();
+  pintarProduccion();
+  if (!autor) pedirNombre(true);
+  api("hola", {}).then(function (res) {
+    if (res.ok) { permiso = res.estado; cuota = { fotos: res.fotos, limite: res.limite }; }
+    pintarBarra();
+    return sincronizar();
+  }).then(function () {
+    avisoPendiente();
+    Object.keys(fotosDOM).forEach(function (look) { fotosDOM[look](); });
+  });
 
   // ---------- tabs ----------
   var tabs = document.querySelectorAll(".tab");
