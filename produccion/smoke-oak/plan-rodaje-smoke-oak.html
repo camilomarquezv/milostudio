@@ -218,6 +218,19 @@
     border-color: var(--ink);
     color: var(--paper);
   }
+  .tab-candado { width: 15px; height: 15px; display: block; }
+
+  /* La barra de arriba: mientras algo va o viene del Drive, se mueve. */
+  @keyframes corre { 0% { transform: translateX(-120%); } 100% { transform: translateX(320%); } }
+  #cargando { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 2000; overflow: hidden; display: none; background: rgba(46,92,115,0.18); }
+  #cargando.activa { display: block; }
+  #cargando i { display: block; width: 30%; height: 100%; background: var(--accent); animation: corre 1.1s infinite ease-in-out; }
+
+  .tone-chip.guardando, .row.guardando { opacity: 0.55; }
+  .look-thumb-wrap.subiendo { display: flex; align-items: center; justify-content: center; border: 1.5px dashed var(--accent); background: var(--accent-soft); }
+  .look-thumb-wrap.subiendo span { font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; color: var(--accent); text-align: center; line-height: 1.3; padding: 0 4px; }
+  @keyframes gira { to { transform: rotate(360deg); } }
+  .girando { width: 16px; height: 16px; border: 2px solid var(--accent); border-top-color: transparent; border-radius: 50%; animation: gira 0.8s linear infinite; margin: 0 auto 5px; }
   .tab .count {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.76rem;
@@ -1067,16 +1080,33 @@
   .yo-bar button:hover { border-color: var(--accent); color: var(--accent); }
   .yo-estado { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border: 1px solid var(--line-strong); }
   .yo-estado.aprobado { color: var(--done); border-color: var(--done); background: var(--done-soft); }
-  .yo-estado.pendiente { color: var(--warn); border-color: var(--warn); background: var(--warn-soft); }
+  .yo-estado.pendiente { color: var(--ink-faint); border-color: var(--line-strong); background: var(--surface); }
   .yo-estado.bloqueado { color: var(--paper); border-color: var(--ink); background: var(--ink); }
   .yo-cuota { font-family: 'IBM Plex Mono', monospace; font-size: 0.74rem; }
   .yo-aviso { margin-left: auto; font-size: 0.76rem; color: var(--warn); }
 
-  .pendiente-aviso { background: var(--warn-soft); border: 1px solid var(--warn); color: var(--warn); padding: 12px 16px; font-size: 0.87rem; margin-bottom: 20px; }
+  .pendiente-aviso { background: var(--surface); border: 1px solid var(--line); color: var(--ink-soft); padding: 8px 14px; font-size: 0.84rem; margin-bottom: 18px; }
+  .pendiente-aviso.bloqueado { background: var(--warn-soft); border-color: var(--warn); color: var(--warn); }
+  .pendiente-resumen { cursor: pointer; list-style: none; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+  .pendiente-resumen::-webkit-details-marker { display: none; }
+  .pendiente-resumen::after { content: "\203A"; font-family: 'IBM Plex Mono', monospace; margin-left: auto; transition: transform 0.15s ease; }
+  details.pendiente-aviso[open] .pendiente-resumen::after { transform: rotate(90deg); }
+  .pendiente-aviso p { margin: 10px 0 0; line-height: 1.5; }
 
   /* ---- fotos compartidas de cada look ---- */
   .look-thumb-wrap .look-autor { position: absolute; left: 0; right: 0; bottom: 0; font-family: 'IBM Plex Mono', monospace; font-size: 0.56rem; letter-spacing: 0.04em; text-transform: uppercase; color: #fff; background: rgba(22,27,34,0.72); padding: 1px 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .look-vacio { font-size: 0.78rem; color: var(--ink-faint); font-style: italic; align-self: center; }
+  .look-add.apagado { opacity: 0.4; cursor: not-allowed; }
+  .look-thumb-wrap.por-aprobar img { opacity: 0.55; border-style: dashed; border-color: var(--warn); }
+  .look-estado { position: absolute; left: 0; top: 0; font-family: 'IBM Plex Mono', monospace; font-size: 0.54rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--paper); background: var(--warn); padding: 1px 4px; }
+  .look-ok { position: absolute; top: -6px; left: -6px; width: 18px; height: 18px; border-radius: 50%; background: var(--done); color: #fff; border: none; font-size: 0.72rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .look-add.apagado input { pointer-events: none; }
+  .pendiente-aviso button { font: inherit; font-size: 0.78rem; font-weight: 600; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); padding: 6px 12px; border-radius: 0; margin-top: 10px; }
+  .pendiente-aviso button:hover { border-color: var(--accent); color: var(--accent); }
+  .yo-link { font: inherit; font-size: 0.72rem; background: none; border: none; padding: 0 2px; color: var(--ink-faint); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+  .yo-link:hover { color: var(--accent); }
+  .yo-link svg { width: 11px; height: 11px; vertical-align: -1px; margin-right: 3px; }
+  .yo-guardado { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-faint); }
 
   /* ---- producción ---- */
   .prod-caja { background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); padding: 18px; margin-bottom: 24px; }
@@ -1094,6 +1124,8 @@
 </style>
 </head>
 <body>
+
+<div id="cargando"><i></i></div>
 
 <div class="callsheet">
   <div class="callsheet-brand">
@@ -1150,7 +1182,7 @@
     <button class="tab active" data-view="d1">Día 1 · Estudio <span class="count mono">9 nov</span></button>
     <button class="tab" data-view="d2">Día 2 · Lifestyle <span class="count mono">10 nov</span></button>
     <button class="tab" data-view="refs">Referentes <span class="count mono">foto</span></button>
-    <button class="tab" data-view="prod">Producción <span class="count mono">permisos</span></button>
+    <button class="tab" data-view="prod">Producción <svg class="tab-candado" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 9V6.5a4 4 0 0 1 8 0V9" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="4" y="9" width="12" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="10" cy="13.2" r="1.2" fill="currentColor"/></svg></button>
   </div>
   <div class="yo-bar" id="yo-bar"></div>
 </div>
@@ -1211,7 +1243,7 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
   var UREF = window.SO_USER_REFS || { ecom: [], lifestyle: [] };
 
   // ---------- el servidor: un script en el Drive de Milo ----------
-  // Nada de lo que se hace aquí se queda en el aparato: las fotos van a su carpeta de Drive y
+  // Nada de lo que se hace aquí se queda en el dispositivo: las fotos van a su carpeta de Drive y
   // los campos a una hoja de cálculo, y por eso todos ven lo mismo. Lo de localStorage que
   // queda abajo es solo para pintar algo mientras llega la primera respuesta.
   var API = "https://script.google.com/macros/s/AKfycbzgXAy8vvf0bo79AP3lHhLUWLCg7DVGjoNa7dkDoRPtvxTu42GCsG1-nwDI4hNLXJyQ9g/exec";
@@ -1234,11 +1266,20 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
   var fotosRemotas = [];
   var camposRemotos = {};
   var dispositivosRemotos = null;
+  var entradaAbierta = false;
+  var soyProduccion = false; // la clave de producción vale más que el permiso del dispositivo
   var sinConexion = false;
 
   // La clave de producción no se guarda en el disco: vive mientras la pestaña esté abierta.
   var codigoProd = "";
   try { codigoProd = sessionStorage.getItem("milo-smoke-oak-codigo") || ""; } catch (e) {}
+
+  var enVuelo = 0;
+  function moverBarra(delta) {
+    enVuelo = Math.max(0, enVuelo + delta);
+    var b = document.getElementById("cargando");
+    if (b) b.classList.toggle("activa", enVuelo > 0);
+  }
 
   function api(accion, datos) {
     var cuerpo = { accion: accion, clave: CLAVE_ENLACE, dispositivo: dispositivo, autor: autor };
@@ -1246,25 +1287,33 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
     for (var k in (datos || {})) cuerpo[k] = datos[k];
     // Texto plano a propósito: con application/json el navegador mandaría primero una
     // petición OPTIONS, que Apps Script no contesta, y la llamada fallaría.
+    // El latido de cada veinte segundos no enciende la barra: si no, estaría parpadeando sola.
+    var silencioso = accion === "version";
+    if (!silencioso) moverBarra(1);
     return fetch(API, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(cuerpo)
     }).then(function (r) { return r.json(); }).then(function (res) {
+      if (!silencioso) moverBarra(-1);
       if (sinConexion) { sinConexion = false; pintarBarra(); }
       return res;
     }).catch(function () {
+      if (!silencioso) moverBarra(-1);
       sinConexion = true; pintarBarra();
       return { ok: false, error: "sin-conexion" };
     });
   }
 
-  function puedoEscribir() { return permiso === "aprobado"; }
+  function puedoEscribir() { return permiso === "aprobado" || soyProduccion; }
+  // Subir está abierto a quien tenga el enlace: la foto entra como "por aprobar" y producción
+  // decide. Lo único que lo impide es estar bloqueado.
+  function puedoSubir() { return permiso !== "bloqueado"; }
 
   function avisarSiNoPuede(res) {
     if (res.ok) return false;
     if (res.error === "sin-permiso") alert("Todavía no te han aprobado para editar. Pídele a producción que te apruebe en la pestaña Producción.");
-    else if (res.error === "limite") alert("Llegaste al tope de " + cuota.limite + " fotos desde este aparato.");
+    else if (res.error === "limite") alert("Llegaste al tope de " + cuota.limite + " fotos desde este dispositivo.");
     else if (res.error === "codigo") alert("Esa no es la clave de producción.");
     else if (res.error === "sin-conexion") alert("No hubo conexión con el Drive. Revisa la señal y vuelve a intentar.");
     return true;
@@ -1273,48 +1322,110 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
   // ---------- estado compartido ----------
   var camposDOM = {};   // clave -> cómo volver a pintar ese campo cuando cambia en el servidor
   var fotosDOM = {};    // look -> cómo volver a pintar sus fotos
+  var botonesSubir = []; // los "+ Foto", para poder apagarlos si no hay permiso
   var pendientesDeGuardar = {};
+  var editando = {};       // lo que escribí y todavía no ha confirmado el servidor
+  var camposServidor = {}; // la última verdad del servidor, para poder deshacer
+  var estadoGuardado = "";
 
   function valorCampo(clave) {
     if (camposRemotos[clave] != null) return camposRemotos[clave];
     return state[clave] != null ? state[clave] : "";
   }
 
-  function guardarCampo(clave, valor) {
+  function marcarEstado(txt) { estadoGuardado = txt; pintarBarra(); }
+
+  function aplicarUno(clave) {
+    var ref = camposDOM[clave];
+    if (!ref) return;
+    var valor = camposRemotos[clave] != null ? camposRemotos[clave] : "";
+    if (ref.tipo === "texto" || ref.tipo === "select") {
+      state[clave] = valor;
+      if (document.activeElement !== ref.input) ref.input.value = valor;
+    } else {
+      var marcado = valor === "1";
+      state[clave] = marcado;
+      if (!marcado) delete state[clave];
+      ref.input.checked = marcado;
+      if (ref.chip) ref.chip.classList.toggle("checked", marcado);
+      if (ref.fila) ref.fila.classList.toggle("checked", marcado);
+      if (ref.refrescarFila) ref.refrescarFila();
+    }
+  }
+
+  // Si el servidor no acepta el cambio, el campo vuelve a lo suyo en el acto. Antes se quedaba
+  // puesto y se deshacía solo veinte segundos después: eso era lo que se sentía como que "se
+  // borran los checklist".
+  function deshacerCampo(clave) {
+    camposRemotos[clave] = camposServidor[clave] != null ? camposServidor[clave] : "";
+    aplicarUno(clave);
+    updateProgress();
+  }
+
+  function guardarCampo(clave, valor, inmediato, frase) {
     var texto = valor === true ? "1" : (valor === false ? "" : String(valor == null ? "" : valor));
     camposRemotos[clave] = texto;
     state[clave] = (texto === "1" || texto === "") ? (texto === "1") : texto;
     if (texto === "") delete state[clave];
     save();
-    if (!puedoEscribir()) return;
-    // Escribir letra por letra sería un viaje al servidor por tecla: se espera a que pare.
+
+    if (!puedoEscribir()) {
+      deshacerCampo(clave);
+      marcarEstado("No se guardó: falta permiso");
+      avisoPendiente();
+      return;
+    }
+
+    editando[clave] = true;
+    marcarEstado("Guardando…");
+    var ref = camposDOM[clave];
+    if (ref) {
+      if (ref.chip) ref.chip.classList.add("guardando");
+      if (ref.fila) ref.fila.classList.add("guardando");
+    }
+    // Una casilla se manda de una; el texto espera a que la persona deje de escribir.
     clearTimeout(pendientesDeGuardar[clave]);
     pendientesDeGuardar[clave] = setTimeout(function () {
-      api("guardar", { campo: clave, valor: texto }).then(function (res) {
-        if (res.ok) versionServidor = res.version; else avisarSiNoPuede(res);
+      api("guardar", { campo: clave, valor: texto, frase: frase || "" }).then(function (res) {
+        delete editando[clave];
+        if (ref) {
+          if (ref.chip) ref.chip.classList.remove("guardando");
+          if (ref.fila) ref.fila.classList.remove("guardando");
+        }
+        if (res.ok) {
+          versionServidor = res.version;
+          camposServidor[clave] = texto;
+          marcarEstado("Guardado");
+          return;
+        }
+        if (res.error === "sin-permiso") { permiso = "pendiente"; aplicarPermiso(); avisoPendiente(); }
+        deshacerCampo(clave);
+        marcarEstado(res.error === "sin-conexion" ? "Sin conexión: no se guardó" : "No se guardó");
       });
-    }, 500);
+    }, inmediato ? 0 : 500);
   }
 
   function aplicarCampos() {
     Object.keys(camposDOM).forEach(function (clave) {
-      var ref = camposDOM[clave];
-      var valor = camposRemotos[clave] != null ? camposRemotos[clave] : "";
-      if (ref.tipo === "texto" || ref.tipo === "select") {
-        state[clave] = valor;
-        if (document.activeElement !== ref.input) ref.input.value = valor;
-      } else {
-        var marcado = valor === "1";
-        state[clave] = marcado;
-        if (!marcado) delete state[clave];
-        ref.input.checked = marcado;
-        if (ref.chip) ref.chip.classList.toggle("checked", marcado);
-        if (ref.fila) ref.fila.classList.toggle("checked", marcado);
-        if (ref.refrescarFila) ref.refrescarFila();
-      }
+      // Lo que todavía va en camino no se pisa con la respuesta vieja del servidor.
+      if (editando[clave]) return;
+      camposRemotos[clave] = camposServidor[clave] != null ? camposServidor[clave] : "";
+      aplicarUno(clave);
     });
     save();
     updateProgress();
+  }
+
+  // Sin permiso los campos se ven apagados: así nadie escribe algo que no se va a guardar.
+  function aplicarPermiso() {
+    var puedo = puedoEscribir();
+    Object.keys(camposDOM).forEach(function (clave) { camposDOM[clave].input.disabled = !puedo; });
+    botonesSubir.forEach(function (b) {
+      b.classList.toggle("apagado", !puedoSubir());
+      b.title = puedoSubir()
+        ? "Subir fotos de este look — producción las aprueba"
+        : "Producción bloqueó este dispositivo";
+    });
   }
 
   function sincronizar() {
@@ -1322,11 +1433,15 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
       if (!res.ok) return res;
       versionServidor = res.version;
       fotosRemotas = res.fotos || [];
-      camposRemotos = {};
-      Object.keys(res.campos || {}).forEach(function (k) { camposRemotos[k] = res.campos[k].valor; });
+      camposServidor = {};
+      Object.keys(res.campos || {}).forEach(function (k) { camposServidor[k] = String(res.campos[k].valor); });
+      entradaAbierta = !!res.abierto;
       if (res.yo) { permiso = res.yo.estado; cuota = { fotos: res.yo.fotos, limite: res.yo.limite }; }
       dispositivosRemotos = res.dispositivos || null;
+      // El servidor solo manda la lista de dispositivos si la clave era buena: esa es la prueba.
+      soyProduccion = !!res.dispositivos;
       aplicarCampos();
+      aplicarPermiso();
       Object.keys(fotosDOM).forEach(function (look) { fotosDOM[look](); });
       pintarBarra();
       avisoPendiente();
@@ -1516,7 +1631,8 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
     cb.setAttribute("aria-label", "Marcar " + id);
     cb.addEventListener("change", function () {
       row.classList.toggle("checked", cb.checked);
-      guardarCampo(id, cb.checked);
+      guardarCampo(id, cb.checked, true,
+        (cb.checked ? "marcó" : "desmarcó") + " la foto " + id.toUpperCase() + " como hecha");
       updateProgress();
     });
     camposDOM[id] = { tipo: "check", input: cb, fila: row };
@@ -1613,6 +1729,9 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
     if (!c) return false;
     codigoProd = c.trim().toUpperCase();
     try { sessionStorage.setItem("milo-smoke-oak-codigo", codigoProd); } catch (e) {}
+    // Con la clave puesta se puede todo, no solo borrar: se vuelve a preguntar al servidor
+    // para que los campos y las casillas se enciendan en el acto.
+    sincronizar();
     return true;
   }
 
@@ -1634,8 +1753,25 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
     input.addEventListener("change", function () {
       var files = Array.prototype.slice.call(input.files || []);
       if (!files.length) return;
-      if (!puedoEscribir()) { input.value = ""; return avisarSiNoPuede({ error: "sin-permiso" }); }
+      if (!puedoSubir()) {
+        input.value = "";
+        return alert("Producción bloqueó este dispositivo, así que no puedes subir fotos.");
+      }
       add.classList.add("uploading");
+      var total = files.length, hechas = 0;
+      var huecos = files.map(function () {
+        var h = el("div", "look-thumb-wrap subiendo");
+        h.innerHTML = '<span><span class="girando"></span>Subiendo…</span>';
+        row.insertBefore(h, add);
+        return h;
+      });
+      function marcarProgreso() {
+        huecos.forEach(function (h, i) {
+          if (i < hechas) return;
+          h.querySelector("span").innerHTML = '<span class="girando"></span>Subiendo ' + (hechas + 1) + ' de ' + total;
+        });
+      }
+      marcarProgreso();
       files.reduce(function (p, f) {
         return p.then(function () {
           // La grande sirve para revisar un look; el original se queda en la cámara.
@@ -1644,6 +1780,9 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
               return api("subir", { look: lookId, foto: par[0], miniatura: par[1] }).then(function (res) {
                 if (res.ok) { cuota.fotos = res.fotos; versionServidor = res.version; }
                 else avisarSiNoPuede(res);
+                if (huecos[hechas]) huecos[hechas].remove();
+                hechas++;
+                marcarProgreso();
               });
             }).catch(function () {});
         });
@@ -1660,10 +1799,12 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
         .sort(function (a, b) { return a.fecha - b.fecha; });
       row.innerHTML = "";
       mias.forEach(function (f) {
-        var w = el("div", "look-thumb-wrap");
+        var porAprobar = f.estado === "pendiente";
+        var w = el("div", "look-thumb-wrap" + (porAprobar ? " por-aprobar" : ""));
         var im = document.createElement("img");
         im.alt = title;
         w.appendChild(im);
+        if (porAprobar) w.appendChild(el("span", "look-estado", "Por aprobar"));
         traerImagen("miniatura", f.id).then(function (url) { if (url) im.src = url; });
         im.addEventListener("click", function () {
           openLightbox(im.src, title + (f.autor ? " · " + f.autor : ""));
@@ -1674,6 +1815,17 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
           });
         });
         if (f.autor) w.appendChild(el("span", "look-autor", f.autor));
+        if (porAprobar) {
+          var ok = el("button", "look-ok", "✓");
+          ok.type = "button"; ok.title = "Aprobar esta foto (solo producción)";
+          ok.addEventListener("click", function () {
+            if (!pedirCodigo("Aprobar una foto es cosa de producción.")) return;
+            api("aprobarFoto", { id: f.id }).then(function (res) {
+              if (res.ok) sincronizar(); else { codigoProd = ""; avisarSiNoPuede(res); }
+            });
+          });
+          w.appendChild(ok);
+        }
         var del = el("button", "look-del", "×");
         del.type = "button"; del.title = "Quitar esta foto (solo producción)";
         del.addEventListener("click", function () {
@@ -1685,10 +1837,17 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
         w.appendChild(del);
         row.appendChild(w);
       });
+      mias.sort(function (a, b) {
+        // Primero lo aprobado, y lo que falta por revisar al final, que es donde se busca.
+        if ((a.estado === "pendiente") !== (b.estado === "pendiente")) return a.estado === "pendiente" ? 1 : -1;
+        return a.fecha - b.fecha;
+      });
       if (!mias.length) row.appendChild(el("span", "look-vacio", "Sin fotos todavía."));
-      if (puedoEscribir()) row.appendChild(add);
+      row.appendChild(add);
+      aplicarPermiso();
     }
 
+    botonesSubir.push(add);
     fotosDOM[lookId] = pintar;
     pintar();
     return wrap;
@@ -1706,8 +1865,10 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
     body.appendChild(top);
     body.appendChild(el("div", "row-id", title));
     var f = el("div", "row-fields");
-    f.appendChild(selectField(id + ":m", "Modelo", [RENE, MARIO]));
-    f.appendChild(textField(id + ":w", "Vestuario / prenda"));
+    var bloque = n <= 10 ? "Bloque 1" : "Bloque 3";
+    var donde = title + " (" + bloque + ")";
+    f.appendChild(selectField(id + ":m", "Modelo", [RENE, MARIO], donde));
+    f.appendChild(textField(id + ":w", "Vestuario / prenda", donde));
     body.appendChild(f);
 
     var chips = el("div", "tone-checklist tone-checklist-row");
@@ -1724,7 +1885,8 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
       cb.type = "checkbox"; cb.checked = marcado;
       cb.addEventListener("change", function () {
         chip.classList.toggle("checked", cb.checked);
-        guardarCampo(key, cb.checked);
+        guardarCampo(key, cb.checked, true,
+          (cb.checked ? "marcó" : "desmarcó") + " «" + s[1] + "» en " + title + " (" + bloque + ")");
         refreshRow(); updateProgress();
       });
       camposDOM[key] = { tipo: "chip", input: cb, chip: chip, refrescarFila: refreshRow };
@@ -1739,21 +1901,29 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
     return row;
   }
 
-  function textField(key, placeholder) {
+  function textField(key, placeholder, donde) {
     var inp = document.createElement("input");
     inp.type = "text"; inp.placeholder = placeholder; inp.setAttribute("aria-label", placeholder);
     inp.value = valorCampo(key) || "";
-    inp.addEventListener("input", function () { guardarCampo(key, inp.value); });
+    inp.addEventListener("input", function () {
+      var frase = inp.value
+        ? 'escribió «' + inp.value + '» en ' + placeholder.toLowerCase() + ' de ' + donde
+        : 'borró ' + placeholder.toLowerCase() + ' de ' + donde;
+      guardarCampo(key, inp.value, false, frase);
+    });
     camposDOM[key] = { tipo: "texto", input: inp };
     return inp;
   }
-  function selectField(key, label, options) {
+  function selectField(key, label, options, donde) {
     var s = document.createElement("select");
     s.setAttribute("aria-label", label);
     var o0 = document.createElement("option"); o0.value = ""; o0.textContent = label; s.appendChild(o0);
     options.forEach(function (o) { var op = document.createElement("option"); op.value = o; op.textContent = o; s.appendChild(op); });
     s.value = valorCampo(key) || "";
-    s.addEventListener("change", function () { guardarCampo(key, s.value); });
+    s.addEventListener("change", function () {
+      var frase = s.value ? 'puso a ' + s.value + ' como modelo de ' + donde : 'quitó el modelo de ' + donde;
+      guardarCampo(key, s.value, false, frase);
+    });
     camposDOM[key] = { tipo: "select", input: s };
     return s;
   }
@@ -1849,7 +2019,7 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
       r.body.appendChild(el("div", "row-note", "Mientras el video graba " + p.video));
       if (p.note) r.body.appendChild(el("div", "row-note", p.note));
       var f = el("div", "row-fields");
-      f.appendChild(textField(p.id.toLowerCase() + ":w", "Vestuario"));
+      f.appendChild(textField(p.id.toLowerCase() + ":w", "Vestuario", "la foto " + p.id));
       r.body.appendChild(f);
       card.appendChild(r.row);
     });
@@ -1922,7 +2092,7 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
     var prefijos = Object.keys(bases);
     if (!pedirCodigo("Reiniciar el checklist se lo cambia a todo el equipo.")) return;
     if (!confirm("¿Reiniciar este checklist para todos? Se borran las casillas y los campos de este día. Las fotos no se tocan.")) return;
-    api("reiniciar", { prefijos: prefijos }).then(function (res) {
+    api("reiniciar", { prefijos: prefijos, frase: "reinició el checklist del " + (ids === d1Ids ? "Día 1" : "Día 2") }).then(function (res) {
       if (!res.ok) { codigoProd = ""; return avisarSiNoPuede(res); }
       prefijos.forEach(function (pre) {
         Object.keys(camposRemotos).forEach(function (k) { if (k.indexOf(pre) === 0) delete camposRemotos[k]; });
@@ -1952,20 +2122,44 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
     quien.style.fontWeight = "700";
     barra.appendChild(quien);
 
-    var cambiar = el("button", null, "Cambiar nombre");
+    var cambiar = el("button", null, "Cambiar usuario");
     cambiar.type = "button";
     cambiar.addEventListener("click", function () {
       if (pedirNombre(true)) api("hola", {}).then(sincronizar);
     });
     barra.appendChild(cambiar);
 
-    var etiquetas = { aprobado: "Puede subir y editar", pendiente: "Pendiente de aprobación", bloqueado: "Bloqueado", desconocido: "Conectando…" };
-    var est = el("span", "yo-estado " + permiso, etiquetas[permiso] || permiso);
+    var etiquetas = {
+      aprobado: "Puede subir y editar",
+      pendiente: "Sube fotos",
+      bloqueado: "Bloqueado",
+      desconocido: "Conectando…"
+    };
+    var est = soyProduccion
+      ? el("span", "yo-estado aprobado", "Producción · puede todo")
+      : el("span", "yo-estado " + permiso, etiquetas[permiso] || permiso);
     barra.appendChild(est);
 
     if (permiso === "aprobado") {
       barra.appendChild(el("span", "yo-cuota", "Fotos: " + cuota.fotos + " / " + cuota.limite));
     }
+
+    // Entrar y salir de producción sin irse a la otra pestaña. Va en letra pequeña a propósito:
+    // es para quien ya sabe que existe, no algo que invite a tocarlo.
+    var llave = document.createElement("button");
+    llave.type = "button";
+    llave.className = "yo-link";
+    if (soyProduccion) {
+      llave.textContent = "Salir";
+      llave.title = "Salir de producción en este dispositivo";
+      llave.addEventListener("click", salirDeProduccion);
+    } else {
+      llave.innerHTML = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 9V6.5a4 4 0 0 1 8 0V9" fill="none" stroke="currentColor" stroke-width="2"/><rect x="4" y="9" width="12" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>Entrar';
+      llave.title = "Entrar como producción con la clave";
+      llave.addEventListener("click", function () { pedirCodigo("Entrar como producción."); });
+    }
+    barra.appendChild(llave);
+    if (estadoGuardado) barra.appendChild(el("span", "yo-guardado", estadoGuardado));
     if (sinConexion) barra.appendChild(el("span", "yo-aviso", "Sin conexión con el Drive — lo que escribas ahora no se está guardando."));
   }
 
@@ -1975,10 +2169,29 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
       var viejo = vista.querySelector(".pendiente-aviso");
       if (permiso === "aprobado" || permiso === "desconocido") { if (viejo) viejo.remove(); return; }
       if (viejo) return;
-      var txt = permiso === "bloqueado"
-        ? "Producción bloqueó este aparato: puedes mirar, pero no cambiar nada."
-        : "Puedes mirar todo, pero para subir fotos o escribir hace falta que producción apruebe este aparato en la pestaña Producción.";
-      var aviso = el("div", "pendiente-aviso", txt);
+      // Cerrado dice lo único que importa de un vistazo; el porqué está a un clic, para que no
+      // ocupe media pantalla en el celular mientras se trabaja.
+      var bloqueado = permiso === "bloqueado";
+      var aviso = document.createElement("details");
+      aviso.className = "pendiente-aviso" + (bloqueado ? " bloqueado" : "");
+      var resumen = document.createElement("summary");
+      resumen.className = "pendiente-resumen";
+      resumen.textContent = bloqueado ? "Solo puedes mirar" : "Sube fotos";
+      aviso.appendChild(resumen);
+      aviso.appendChild(el("p", null, bloqueado
+        ? "Producción bloqueó este dispositivo: puedes mirar, pero no subir ni cambiar nada."
+        : "Puedes subir fotos a cualquier look: entran marcadas como «por aprobar» y producción las da por buenas. Las casillas y los campos de modelo y prenda no los puedes tocar, por eso salen apagados: eso lo marca producción."));
+      if (!bloqueado) {
+        var b = el("button", null, "Ya me aprobaron, volver a mirar");
+        b.type = "button";
+        b.addEventListener("click", function () {
+          api("hola", {}).then(function (res) {
+            if (res.ok) { permiso = res.estado; cuota = { fotos: res.fotos, limite: res.limite }; }
+            pintarBarra(); aplicarPermiso(); avisoPendiente(); sincronizar();
+          });
+        });
+        aviso.appendChild(b);
+      }
       vista.insertBefore(aviso, vista.firstChild);
     });
   }
@@ -1986,12 +2199,29 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
   // ---------- producción ----------
   var prodContent = document.getElementById("prod-content");
 
+  /**
+   * Salir no es solo olvidar la clave: este dispositivo vuelve a quedar pendiente, como el de
+   * cualquiera. Si no, se seguiría editando y el "salir" sería de mentira.
+   */
+  function salirDeProduccion() {
+    if (!confirm("¿Salir de producción en este dispositivo? Vas a poder mirar y subir fotos, pero no editar ni borrar, hasta que vuelvas a entrar con la clave.")) return;
+    api("dispositivo", { objetivo: dispositivo, nuevoEstado: "pendiente" }).then(function () {
+      codigoProd = "";
+      try { sessionStorage.removeItem("milo-smoke-oak-codigo"); } catch (e) {}
+      soyProduccion = false;
+      dispositivosRemotos = null;
+      permiso = "pendiente";
+      pintarBarra(); aplicarPermiso(); avisoPendiente(); pintarProduccion();
+      sincronizar();
+    });
+  }
+
   function pintarProduccion() {
     prodContent.innerHTML = "";
     if (!codigoProd || !dispositivosRemotos) {
       var caja = el("div", "prod-caja");
       caja.appendChild(el("h3", null, "Entrar como producción"));
-      caja.appendChild(el("p", "intro-note", "Con la clave de producción puedes aprobar a quien entre, borrar fotos y ver el historial. La clave no se guarda en el aparato: se olvida al cerrar la pestaña."));
+      caja.appendChild(el("p", "intro-note", "Con la clave de producción puedes aprobar a quien entre, borrar fotos y ver el historial. La clave no se guarda en el dispositivo: se olvida al cerrar la pestaña."));
       var inp = document.createElement("input");
       inp.type = "password"; inp.placeholder = "Clave de producción";
       var btn = el("button", null, "Entrar");
@@ -2014,31 +2244,63 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
       return;
     }
 
+    var cajaLibre = el("div", "prod-caja");
+    cajaLibre.appendChild(el("h3", null, "Entrada libre"));
+    cajaLibre.appendChild(el("p", "intro-note", entradaAbierta
+      ? "Está abierta: cualquiera que tenga el enlace puede subir fotos y escribir, sin aprobación. Borrar sigue pidiendo esta clave y el historial sigue anotando quién hizo cada cosa."
+      : "Está cerrada, que es como debe estar: solo producción sube y edita, y cada dispositivo nuevo queda pendiente hasta que lo apruebes aquí abajo. Quien solo mira no necesita aprobación: la página se actualiza sola cada veinte segundos, o con un refresh."));
+    var btnLibre = el("button", null, entradaAbierta ? "Cerrar la entrada" : "Abrir la entrada a todos");
+    btnLibre.type = "button";
+    btnLibre.addEventListener("click", function () {
+      api("ajustes", { abierto: !entradaAbierta }).then(function (res) {
+        if (!res.ok) return avisarSiNoPuede(res);
+        entradaAbierta = res.abierto;
+        api("hola", {}).then(function (r2) {
+          if (r2.ok) permiso = r2.estado;
+          pintarBarra(); aplicarPermiso(); avisoPendiente(); sincronizar();
+        });
+      });
+    });
+    cajaLibre.appendChild(btnLibre);
+    prodContent.appendChild(cajaLibre);
+
     var cajaD = el("div", "prod-caja");
     cajaD.appendChild(el("h3", null, "Quién puede subir y editar"));
-    cajaD.appendChild(el("p", "intro-note", "Cada persona que abre el enlace aparece aquí con el nombre que escribió. Apruébala para que pueda subir fotos y escribir; bloquéala para dejarla solo mirando."));
+    cajaD.appendChild(el("p", "intro-note", "Subir fotos lo puede hacer cualquiera con el enlace, y tú las apruebas una por una en cada look. Aprobar aquí a una persona es otra cosa: le deja además cambiar modelo, prenda y casillas. Borrar la saca de esta lista; si vuelve a abrir el enlace aparece otra vez como pendiente."));
     dispositivosRemotos.sort(function (a, b) { return (b.ultimaVez || 0) - (a.ultimaVez || 0); }).forEach(function (d) {
       var fila = el("div", "disp-row");
       var txt = el("div");
-      var nombre = el("div", null, d.nombre + (d.id === dispositivo ? " (este aparato)" : ""));
+      var nombre = el("div", null, d.nombre + (d.id === dispositivo ? " (este dispositivo)" : ""));
       nombre.style.fontWeight = "700";
+      if (d.estado === "pendiente") nombre.style.color = "var(--warn)";
       txt.appendChild(nombre);
       txt.appendChild(el("div", "disp-meta", d.estado + " · " + d.fotos + " fotos · visto " +
         (d.ultimaVez ? new Date(d.ultimaVez).toLocaleString("es-CO", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "—")));
       fila.appendChild(txt);
       var acciones = el("div");
-      [["aprobado", "Aprobar"], ["bloqueado", "Bloquear"]].forEach(function (par) {
-        if (d.estado === par[0]) return;
-        var b = el("button", "sec", par[1]);
-        b.type = "button";
-        b.style.marginLeft = "6px";
-        b.addEventListener("click", function () {
-          api("dispositivo", { objetivo: d.id, nuevoEstado: par[0] }).then(function (res) {
+      if (d.estado !== "aprobado") {
+        var ap = el("button", "sec", "Aprobar");
+        ap.type = "button";
+        ap.style.marginLeft = "6px";
+        ap.addEventListener("click", function () {
+          api("dispositivo", { objetivo: d.id, nuevoEstado: "aprobado" }).then(function (res) {
             if (res.ok) sincronizar(); else avisarSiNoPuede(res);
           });
         });
-        acciones.appendChild(b);
+        acciones.appendChild(ap);
+      }
+      // Borrar saca a esa persona de la lista. Si vuelve a abrir el enlace aparece otra vez
+      // como pendiente: sirve para quitar de en medio lo que sobra, no para cerrarle la puerta.
+      var bo = el("button", "sec", "Borrar");
+      bo.type = "button";
+      bo.style.marginLeft = "6px";
+      bo.addEventListener("click", function () {
+        if (!confirm("¿Borrar a " + d.nombre + " de la lista? Si vuelve a entrar aparecerá otra vez como pendiente.")) return;
+        api("dispositivo", { objetivo: d.id, nuevoEstado: "borrado" }).then(function (res) {
+          if (res.ok) sincronizar(); else avisarSiNoPuede(res);
+        });
       });
+      acciones.appendChild(bo);
       fila.appendChild(acciones);
       cajaD.appendChild(fila);
     });
@@ -2046,27 +2308,24 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
 
     var cajaH = el("div", "prod-caja");
     cajaH.appendChild(el("h3", null, "Historial"));
-    cajaH.appendChild(el("p", "intro-note", "Todo lo que se sube, se edita o se borra queda anotado con quién y cuándo."));
+    cajaH.appendChild(el("p", "intro-note", "Qué hizo cada quien, de lo más nuevo a lo más viejo."));
     var lista = el("div");
     cajaH.appendChild(lista);
-    var salir = el("button", "sec", "Salir de producción");
-    salir.type = "button";
-    salir.style.marginTop = "14px";
-    salir.addEventListener("click", function () {
-      codigoProd = "";
-      try { sessionStorage.removeItem("milo-smoke-oak-codigo"); } catch (e) {}
-      dispositivosRemotos = null;
-      pintarProduccion();
-    });
-    cajaH.appendChild(salir);
     prodContent.appendChild(cajaH);
 
     api("historial", {}).then(function (res) {
       if (!res.ok) return;
+      if (!res.lineas.length) lista.appendChild(el("p", "compare-empty", "Todavía no ha pasado nada."));
       res.lineas.forEach(function (h) {
         var fila = el("div", "hist-row");
         fila.appendChild(el("span", "hist-fecha", h.fecha ? new Date(h.fecha).toLocaleString("es-CO", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"));
-        fila.appendChild(el("span", null, (h.autor || "Sin nombre") + " · " + h.accion + (h.detalle ? " · " + h.detalle : "")));
+        // El detalle ya viene escrito como frase ("marcó «Cuerpo entero» en Look 01"), así que
+        // basta ponerle delante quién fue.
+        var quien = el("b", null, h.autor || "Sin nombre");
+        var frase = el("span", null, " " + (h.detalle || h.accion));
+        var txt = el("span");
+        txt.appendChild(quien); txt.appendChild(frase);
+        fila.appendChild(txt);
         lista.appendChild(fila);
       });
     });
@@ -2081,6 +2340,7 @@ window.SO_USER_REFS = {"ecom": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQAB
     pintarBarra();
     return sincronizar();
   }).then(function () {
+    aplicarPermiso();
     avisoPendiente();
     Object.keys(fotosDOM).forEach(function (look) { fotosDOM[look](); });
   });
